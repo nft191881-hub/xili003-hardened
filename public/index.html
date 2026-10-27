@@ -1163,4 +1163,58 @@
                     <small class="user-sub">920 订单</small>
                   </div>
                 </div>
-                <span class
+                <span class="pill-status warn">偏高</span>
+              </div>
+
+              <div class="mini-item">
+                <div class="mini-left">
+                  <div class="coin-sm sol">S</div>
+                  <div>
+                    <div>SOL/USDT</div>
+                    <small class="user-sub">760 订单</small>
+                  </div>
+                </div>
+                <span class="pill-status ok">稳定</span>
+              </div>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+
+    <script>
+      const userName = document.getElementById('userName');
+      userName.textContent = 'NovaX Trader';
+
+      document.querySelectorAll('.tab-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+        });
+      });
+
+      document.querySelector('.deal-btn').addEventListener('click', () => {
+        alert('P2P 撮合已发起，订单正在匹配中');
+      });
+
+      document.querySelector('.send-btn').addEventListener('click', () => {
+        const input = document.querySelector('.chat-entry input');
+        const value = input.value.trim();
+        if (!value) return;
+        const box = document.querySelector('.chat-box');
+        const msg = document.createElement('div');
+        msg.className = 'chat-msg';
+        msg.innerHTML = `
+          <div class="chat-head">
+            <span class="chat-user">You</span>
+            <span class="chat-time">Now</span>
+          </div>
+          <div class="chat-text">${value}</div>
+        `;
+        box.appendChild(msg);
+        input.value = '';
+        box.scrollTop = box.scrollHeight;
+      });
+    </script>
+  </body>
+</html>
