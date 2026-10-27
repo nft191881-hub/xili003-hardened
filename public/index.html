@@ -1,104 +1,170 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>NovaX App</title>
-    <link rel="stylesheet" href="./styles.css" />
-  </head>
-  <body data-page="home">
-    <div class="phone-shell">
-      <div class="status-bar">
-        <span>9:41</span>
-        <div class="signal">
-          <span></span><span></span><span></span><span></span>
-        </div>
-      </div>
-
-      <div class="app-inner">
-        <div class="header-row">
-          <h1>NovaX</h1>
-          <button id="logoutButton" class="icon-btn" type="button">⇠</button>
-        </div>
-
-        <div class="wallet-block">
-          <div class="wallet-top">
-            <span class="wallet-label">总资产</span>
-            <span class="pill" id="homePill">+ 7.82%</span>
-          </div>
-          <div class="wallet-balance" id="homeTotal">$0</div>
-          <div class="wallet-foot">
-            <span class="wallet-sub" id="homeSubLeft">≈ 0 BTC</span>
-            <span class="wallet-sub" id="homeSubRight">USDT 0</span>
-          </div>
-        </div>
-
-        <div class="quick-grid">
-          <div class="quick-card">
-            <div class="quick-icon">↗</div>
-            <div class="quick-text">买入</div>
-          </div>
-          <div class="quick-card">
-            <div class="quick-icon">↘</div>
-            <div class="quick-text">卖出</div>
-          </div>
-          <div class="quick-card">
-            <div class="quick-icon">◎</div>
-            <div class="quick-text">钱包</div>
-          </div>
-        </div>
-
-        <div class="section-head">
-          <h2>交易对</h2>
-          <div class="more">更多</div>
-        </div>
-
-        <div id="marketList" class="coin-list"></div>
-
-        <div class="trade-box">
-          <div class="trade-header">
-            <div class="section-head" style="margin:0; width:100%;">
-              <h2 style="margin:0;">P2P 撮合</h2>
-              <div class="more">实时</div>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Web3 P2P 平台原型</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        body { background-color: #f3f4f6; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        ::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body>
+    <div id="app" class="max-w-md mx-auto bg-gray-50 h-screen flex flex-col relative shadow-xl overflow-hidden">
+        
+        <!-- 顶部导航栏 -->
+        <header class="bg-white px-4 py-3 flex justify-between items-center border-b sticky top-0 z-10">
+            <div class="text-xl font-bold text-blue-600 flex items-center gap-2">
+                <div class="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center text-white text-sm">P</div>
+                P2P.Hub
             </div>
-          </div>
+            <div class="text-sm text-gray-500" v-if="activeTab === 'trade'">礼品卡交易</div>
+            <div class="text-sm text-gray-500" v-if="activeTab === 'chat'">消息</div>
+            <div class="text-sm text-gray-500" v-if="activeTab === 'feed'">动态广场</div>
+            <div class="text-sm text-gray-500" v-if="activeTab === 'wallet'">我的资产</div>
+        </header>
 
-          <div class="trade-type">
-            <button class="type-btn active" type="button">买入</button>
-            <button class="type-btn" type="button">卖出</button>
-          </div>
-
-          <form id="tradeForm">
-            <div class="trade-form" style="margin-top:14px;">
-              <select class="field" id="pairSelect">
-                <option value="BTC/USDT">BTC / USDT</option>
-                <option value="ETH/USDT">ETH / USDT</option>
-                <option value="SOL/USDT">SOL / USDT</option>
-                <option value="USDC/USDT">USDC / USDT</option>
-              </select>
-              <input class="field" id="amountInput" value="2500" />
-              <input class="field" id="priceInput" value="6.98" />
-              <input class="field" id="methodInput" placeholder="支付方式：银行卡" />
+        <!-- 主体内容区 -->
+        <main class="flex-1 overflow-y-auto pb-16 bg-gray-100">
+            
+            <!-- ================= 1. P2P 交易界面 ================= -->
+            <div v-show="activeTab === 'trade'" class="p-3">
+                <div class="bg-white rounded-xl p-3 mb-3 flex justify-between items-center shadow-sm">
+                    <div class="flex gap-2">
+                        <span class="bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-medium">购买</span>
+                        <span class="text-gray-600 px-3 py-1 rounded-full text-sm">出售</span>
+                    </div>
+                    <div class="text-sm font-bold">USD ▼</div>
+                </div>
+                
+                <div class="bg-white rounded-xl p-4 mb-3 shadow-sm" v-for="i in 3" :key="i">
+                    <div class="flex justify-between items-center mb-2">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 bg-orange-100 text-orange-500 rounded-full flex items-center justify-center font-bold">G</div>
+                            <span class="font-bold text-gray-800">giftwang</span>
+                        </div>
+                        <div class="text-xs text-gray-400">👍 43814 | 📄 108078 | 🤝 99%</div>
+                    </div>
+                    <div class="flex justify-between text-sm mb-3">
+                        <span class="text-gray-500">支付 Apple Store 礼品卡</span>
+                        <span class="text-gray-500">收款 (USDT)</span>
+                    </div>
+                    <div class="flex justify-between items-end mb-3">
+                        <div class="text-2xl font-bold">10 <span class="text-sm font-normal">USD</span></div>
+                        <div class="text-2xl font-bold text-blue-600">8.50 <span class="text-sm font-normal text-gray-500">USDT</span></div>
+                    </div>
+                    <div class="bg-gray-50 rounded p-2 flex justify-between items-center text-xs text-gray-500">
+                        <div>限额: 100.00-500.00 USD<br><span class="text-blue-500 border border-blue-500 px-1 rounded mt-1 inline-block">实体卡</span></div>
+                        <button class="bg-blue-500 text-white px-4 py-2 rounded font-medium">交易前需KYC</button>
+                    </div>
+                </div>
             </div>
 
-            <div class="trade-bottom">
-              <div class="trade-total">预计到账</div>
-              <div class="trade-price" id="estimateValue">USDT 2,500</div>
+            <!-- ================= 2. 聊天界面 ================= -->
+            <div v-show="activeTab === 'chat'" class="p-3">
+                <div class="bg-white rounded-xl p-4 mb-2 flex gap-3 items-center shadow-sm">
+                    <div class="w-12 h-12 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-xl">群</div>
+                    <div class="flex-1">
+                        <div class="flex justify-between"><span class="font-bold">USDT 交流大群</span><span class="text-xs text-gray-400">19:20</span></div>
+                        <div class="text-sm text-gray-500 truncate mt-1">张三: 谁出点U，小额收一点</div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl p-4 mb-2 flex gap-3 items-center shadow-sm">
+                    <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xl">李</div>
+                    <div class="flex-1">
+                        <div class="flex justify-between"><span class="font-bold">李四 (交易中)</span><span class="text-xs text-gray-400">18:05</span></div>
+                        <div class="text-sm text-gray-500 truncate mt-1">[订单卡片] 我已付款，请查收放币</div>
+                    </div>
+                </div>
             </div>
 
-            <button type="submit" class="submit-btn">立即撮合</button>
-          </form>
-        </div>
-      </div>
+            <!-- ================= 3. 动态界面 ================= -->
+            <div v-show="activeTab === 'feed'" class="p-3">
+                <div class="bg-white rounded-xl p-3 mb-3 shadow-sm">
+                    <textarea class="w-full bg-gray-50 rounded p-2 text-sm outline-none resize-none" rows="2" placeholder="分享你的心情，或者发布你的交易广告..."></textarea>
+                    <div class="flex justify-end mt-2">
+                        <button class="bg-blue-500 text-white px-4 py-1.5 rounded-full text-sm">发布</button>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl p-4 mb-3 shadow-sm">
+                    <div class="flex items-center gap-2 mb-2">
+                        <div class="w-8 h-8 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center">王</div>
+                        <div>
+                            <div class="font-bold text-sm">王五</div>
+                            <div class="text-xs text-gray-400">10分钟前</div>
+                        </div>
+                    </div>
+                    <p class="text-sm text-gray-800 mb-2">长期高价回收 Apple Store 礼品卡，量大从优，支持担保交易！</p>
+                    <div class="flex gap-4 text-gray-400 text-sm">
+                        <span>👍 12</span>
+                        <span>💬 3</span>
+                    </div>
+                </div>
+            </div>
 
-      <div class="bottom-nav">
-        <a class="nav-item active" href="./index.html"><span class="icon">⌂</span>首页</a>
-        <a class="nav-item" href="./wallet.html"><span class="icon">◎</span>钱包</a>
-        <a class="nav-item" href="./trade.html"><span class="icon">⇄</span>交易</a>
-        <a class="nav-item" href="./chat.html"><span class="icon">☰</span>聊天</a>
-      </div>
+            <!-- ================= 4. 钱包界面 ================= -->
+            <div v-show="activeTab === 'wallet'" class="p-4">
+                <div class="bg-gradient-to-r from-blue-600 to-blue-400 rounded-2xl p-6 text-white shadow-lg mb-6 relative overflow-hidden">
+                    <div class="text-sm opacity-80 mb-1">总资产估值 (USDT)</div>
+                    <div class="text-4xl font-bold mb-4">1,250.00</div>
+                    <div class="flex justify-between items-center text-sm bg-white/20 p-2 rounded-lg">
+                        <span>TRC20 地址</span>
+                        <span class="font-mono">TY8x...3kL9 ⧉</span>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+                    <div class="p-4 border-b flex justify-between items-center">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 bg-green-500 rounded-full text-white flex items-center justify-center">T</div>
+                            <span class="font-bold">USDT (TRC20)</span>
+                        </div>
+                        <span class="font-bold">1,250.00</span>
+                    </div>
+                    <div class="p-4 border-b flex justify-between items-center">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 bg-red-500 rounded-full text-white flex items-center justify-center">T</div>
+                            <span class="font-bold">TRX</span>
+                        </div>
+                        <span class="font-bold">500.00</span>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+        <!-- 底部 Tab 导航 -->
+        <nav class="bg-white border-t absolute bottom-0 w-full flex justify-around py-2 pb-4 z-20">
+            <button @click="activeTab = 'trade'" class="flex flex-col items-center" :class="activeTab === 'trade' ? 'text-blue-600' : 'text-gray-400'">
+                <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <span class="text-[10px]">P2P交易</span>
+            </button>
+            <button @click="activeTab = 'chat'" class="flex flex-col items-center" :class="activeTab === 'chat' ? 'text-blue-600' : 'text-gray-400'">
+                <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+                <span class="text-[10px]">聊天</span>
+            </button>
+            <button @click="activeTab = 'feed'" class="flex flex-col items-center" :class="activeTab === 'feed' ? 'text-blue-600' : 'text-gray-400'">
+                <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path></svg>
+                <span class="text-[10px]">动态</span>
+            </button>
+            <button @click="activeTab = 'wallet'" class="flex flex-col items-center" :class="activeTab === 'wallet' ? 'text-blue-600' : 'text-gray-400'">
+                <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+                <span class="text-[10px]">钱包</span>
+            </button>
+        </nav>
     </div>
 
-    <script src="./app.js"></script>
-  </body>
+    <script>
+        const { createApp } = Vue;
+        createApp({
+            data() {
+                return {
+                    activeTab: 'trade' 
+                }
+            }
+        }).mount('#app');
+    </script>
+</body>
 </html>
