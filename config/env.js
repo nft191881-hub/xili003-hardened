@@ -3,6 +3,7 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 const REQUIRED_ENV = ['DATABASE_URL', 'JWT_SECRET'];
+
 for (const key of REQUIRED_ENV) {
   if (!process.env[key]) {
     console.error(`Missing required environment variable: ${key}`);
