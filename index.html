@@ -3,161 +3,230 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Web3 P2P 平台原型</title>
+    <title>Web3 P2P 平台</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <style>
-        body { background-color: #f3f4f6; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        body { background-color: #000000; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
         ::-webkit-scrollbar { display: none; }
+        /* 隐藏掉一些暗黑模式下的颜色冲突 */
+        .dark-bg { background-color: #0d0d0f; }
+        .card-bg { background-color: #1c1c1e; }
+        .asset-bg { background: linear-gradient(135deg, #2a3a2e 0%, #1a221a 100%); }
     </style>
 </head>
-<body>
-    <div id="app" class="max-w-md mx-auto bg-gray-50 h-screen flex flex-col relative shadow-xl overflow-hidden">
+<body class="text-white">
+    <div id="app" class="max-w-md mx-auto dark-bg h-screen flex flex-col relative shadow-2xl overflow-hidden">
         
-        <!-- 顶部导航栏 -->
-        <header class="bg-white px-4 py-3 flex justify-between items-center border-b sticky top-0 z-10">
-            <div class="text-xl font-bold text-blue-600 flex items-center gap-2">
-                <div class="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center text-white text-sm">P</div>
+        <!-- 顶部状态栏 (仅钱包页显示完整顶部) -->
+        <header v-if="activeTab === 'wallet'" class="px-4 py-3 flex justify-between items-center sticky top-0 z-10 dark-bg">
+            <div class="flex items-center gap-1 text-sm bg-[#1c1c1e] px-3 py-1.5 rounded-full">
+                <span class="text-gray-300">添加钱包</span>
+                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            </div>
+            <div class="flex gap-4 text-gray-300">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm14 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+            </div>
+        </header>
+
+        <header v-else class="bg-[#0d0d0f] px-4 py-3 flex justify-between items-center border-b border-gray-800 sticky top-0 z-10">
+            <div class="text-xl font-bold text-blue-500 flex items-center gap-2">
+                <div class="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm">P</div>
                 P2P.Hub
             </div>
-            <div class="text-sm text-gray-500" v-if="activeTab === 'chat'">消息</div>
-            <div class="text-sm text-gray-500" v-if="activeTab === 'trade'">礼品卡交易</div>
-            <div class="text-sm text-gray-500" v-if="activeTab === 'feed'">动态广场</div>
-            <div class="text-sm text-gray-500" v-if="activeTab === 'wallet'">我的资产</div>
+            <div class="text-sm text-gray-400" v-if="activeTab === 'chat'">消息</div>
+            <div class="text-sm text-gray-400" v-if="activeTab === 'trade'">礼品卡交易</div>
+            <div class="text-sm text-gray-400" v-if="activeTab === 'feed'">动态广场</div>
         </header>
 
         <!-- 主体内容区 -->
-        <main class="flex-1 overflow-y-auto pb-16 bg-gray-100">
+        <main class="flex-1 overflow-y-auto pb-20">
             
             <!-- ================= 1. 聊天界面 ================= -->
             <div v-show="activeTab === 'chat'" class="p-3">
-                <div class="bg-white rounded-xl p-4 mb-2 flex gap-3 items-center shadow-sm">
-                    <div class="w-12 h-12 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-xl">群</div>
+                <div class="card-bg rounded-xl p-4 mb-2 flex gap-3 items-center">
+                    <div class="w-12 h-12 bg-gray-800 text-green-400 rounded-full flex items-center justify-center text-xl">群</div>
                     <div class="flex-1">
-                        <div class="flex justify-between"><span class="font-bold">USDT 交流大群</span><span class="text-xs text-gray-400">19:20</span></div>
-                        <div class="text-sm text-gray-500 truncate mt-1">张三: 谁出点U，小额收一点</div>
+                        <div class="flex justify-between"><span class="font-bold text-gray-200">USDT 交流大群</span><span class="text-xs text-gray-500">19:20</span></div>
+                        <div class="text-sm text-gray-400 truncate mt-1">张三: 谁出点U，小额收一点</div>
                     </div>
                 </div>
-                <div class="bg-white rounded-xl p-4 mb-2 flex gap-3 items-center shadow-sm">
-                    <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xl">李</div>
+                <div class="card-bg rounded-xl p-4 mb-2 flex gap-3 items-center">
+                    <div class="w-12 h-12 bg-gray-800 text-blue-400 rounded-full flex items-center justify-center text-xl">李</div>
                     <div class="flex-1">
-                        <div class="flex justify-between"><span class="font-bold">李四 (交易中)</span><span class="text-xs text-gray-400">18:05</span></div>
-                        <div class="text-sm text-gray-500 truncate mt-1">[订单卡片] 我已付款，请查收放币</div>
+                        <div class="flex justify-between"><span class="font-bold text-gray-200">李四 (交易中)</span><span class="text-xs text-gray-500">18:05</span></div>
+                        <div class="text-sm text-gray-400 truncate mt-1">[订单卡片] 我已付款，请查收放币</div>
                     </div>
                 </div>
             </div>
 
             <!-- ================= 2. P2P 交易界面 ================= -->
             <div v-show="activeTab === 'trade'" class="p-3">
-                <div class="bg-white rounded-xl p-3 mb-3 flex justify-between items-center shadow-sm">
+                <div class="card-bg rounded-xl p-3 mb-3 flex justify-between items-center">
                     <div class="flex gap-2">
-                        <span class="bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-medium">购买</span>
-                        <span class="text-gray-600 px-3 py-1 rounded-full text-sm">出售</span>
+                        <span class="bg-blue-600 text-white px-4 py-1.5 rounded-full text-sm font-medium">购买</span>
+                        <span class="text-gray-400 px-4 py-1.5 rounded-full text-sm">出售</span>
                     </div>
-                    <div class="text-sm font-bold">USD ▼</div>
+                    <div class="text-sm font-bold text-gray-300">USD ▼</div>
                 </div>
                 
-                <div class="bg-white rounded-xl p-4 mb-3 shadow-sm" v-for="i in 3" :key="i">
+                <div class="card-bg rounded-xl p-4 mb-3" v-for="i in 3" :key="i">
                     <div class="flex justify-between items-center mb-2">
                         <div class="flex items-center gap-2">
-                            <div class="w-8 h-8 bg-orange-100 text-orange-500 rounded-full flex items-center justify-center font-bold">G</div>
-                            <span class="font-bold text-gray-800">giftwang</span>
+                            <div class="w-8 h-8 bg-orange-900/50 text-orange-400 rounded-full flex items-center justify-center font-bold">G</div>
+                            <span class="font-bold text-gray-200">giftwang</span>
                         </div>
-                        <div class="text-xs text-gray-400">👍 43814 | 📄 108078 | 🤝 99%</div>
+                        <div class="text-xs text-gray-500">👍 43814 | 📄 108078 | 🤝 99%</div>
                     </div>
                     <div class="flex justify-between text-sm mb-3">
-                        <span class="text-gray-500">支付 Apple Store 礼品卡</span>
-                        <span class="text-gray-500">收款 (USDT)</span>
+                        <span class="text-gray-400">支付 Apple Store 礼品卡</span>
+                        <span class="text-gray-400">收款 (USDT)</span>
                     </div>
                     <div class="flex justify-between items-end mb-3">
-                        <div class="text-2xl font-bold">10 <span class="text-sm font-normal">USD</span></div>
-                        <div class="text-2xl font-bold text-blue-600">8.50 <span class="text-sm font-normal text-gray-500">USDT</span></div>
+                        <div class="text-2xl font-bold text-white">10 <span class="text-sm font-normal text-gray-400">USD</span></div>
+                        <div class="text-2xl font-bold text-blue-500">8.50 <span class="text-sm font-normal text-gray-500">USDT</span></div>
                     </div>
-                    <div class="bg-gray-50 rounded p-2 flex justify-between items-center text-xs text-gray-500">
-                        <div>限额: 100.00-500.00 USD<br><span class="text-blue-500 border border-blue-500 px-1 rounded mt-1 inline-block">实体卡</span></div>
-                        <button class="bg-blue-500 text-white px-4 py-2 rounded font-medium">交易前需KYC</button>
+                    <div class="bg-black/30 rounded p-2 flex justify-between items-center text-xs text-gray-400">
+                        <div>限额: 100.00-500.00 USD<br><span class="text-blue-500 border border-blue-500/50 bg-blue-500/10 px-1 rounded mt-1 inline-block">实体卡</span></div>
+                        <button class="bg-blue-600 text-white px-4 py-2 rounded font-medium shadow-md">交易前需KYC</button>
                     </div>
                 </div>
             </div>
 
             <!-- ================= 3. 动态界面 ================= -->
             <div v-show="activeTab === 'feed'" class="p-3">
-                <div class="bg-white rounded-xl p-3 mb-3 shadow-sm">
-                    <textarea class="w-full bg-gray-50 rounded p-2 text-sm outline-none resize-none" rows="2" placeholder="分享你的心情，或者发布你的交易广告..."></textarea>
+                <div class="card-bg rounded-xl p-3 mb-3">
+                    <textarea class="w-full bg-black/40 text-gray-200 rounded p-2 text-sm outline-none resize-none placeholder-gray-600" rows="2" placeholder="分享你的心情，或者发布你的交易广告..."></textarea>
                     <div class="flex justify-end mt-2">
-                        <button class="bg-blue-500 text-white px-4 py-1.5 rounded-full text-sm">发布</button>
+                        <button class="bg-blue-600 text-white px-4 py-1.5 rounded-full text-sm font-medium">发布</button>
                     </div>
                 </div>
-                <div class="bg-white rounded-xl p-4 mb-3 shadow-sm">
+                <div class="card-bg rounded-xl p-4 mb-3">
                     <div class="flex items-center gap-2 mb-2">
-                        <div class="w-8 h-8 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center">王</div>
+                        <div class="w-8 h-8 bg-purple-900/50 text-purple-400 rounded-full flex items-center justify-center">王</div>
                         <div>
-                            <div class="font-bold text-sm">王五</div>
-                            <div class="text-xs text-gray-400">10分钟前</div>
+                            <div class="font-bold text-sm text-gray-200">王五</div>
+                            <div class="text-xs text-gray-500">10分钟前</div>
                         </div>
                     </div>
-                    <p class="text-sm text-gray-800 mb-2">长期高价回收 Apple Store 礼品卡，量大从优，支持担保交易！</p>
-                    <div class="flex gap-4 text-gray-400 text-sm">
+                    <p class="text-sm text-gray-300 mb-2">长期高价回收 Apple Store 礼品卡，量大从优，支持担保交易！</p>
+                    <div class="flex gap-4 text-gray-500 text-sm">
                         <span>👍 12</span>
                         <span>💬 3</span>
                     </div>
                 </div>
             </div>
 
-            <!-- ================= 4. 钱包界面 ================= -->
-            <div v-show="activeTab === 'wallet'" class="p-4">
-                <div class="bg-gradient-to-r from-blue-600 to-blue-400 rounded-2xl p-6 text-white shadow-lg mb-6 relative overflow-hidden">
-                    <div class="text-sm opacity-80 mb-1">总资产估值 (USDT)</div>
-                    <div class="text-4xl font-bold mb-4">1,250.00</div>
-                    <div class="flex justify-between items-center text-sm bg-white/20 p-2 rounded-lg">
-                        <span>TRC20 地址</span>
-                        <span class="font-mono">TY8x...3kL9 ⧉</span>
-                    </div>
-                </div>
+            <!-- ================= 4. 钱包界面 (深度复刻版) ================= -->
+            <div v-show="activeTab === 'wallet'" class="px-4 pb-6">
                 
-                <div class="bg-white rounded-xl shadow-sm overflow-hidden">
-                    <div class="p-4 border-b flex justify-between items-center">
-                        <div class="flex items-center gap-2">
-                            <div class="w-8 h-8 bg-green-500 rounded-full text-white flex items-center justify-center">T</div>
-                            <span class="font-bold">USDT (TRC20)</span>
+                <!-- 用户信息 -->
+                <div class="flex items-center justify-between mt-2 mb-6">
+                    <div class="flex items-center gap-3">
+                        <div class="w-14 h-14 bg-black border border-gray-700 rounded-2xl flex items-center justify-center overflow-hidden shadow-[0_0_15px_rgba(0,255,0,0.15)] relative">
+                            <!-- 模拟那个发光的猫头 -->
+                            <span class="text-3xl">🐱</span>
                         </div>
-                        <span class="font-bold">1,250.00</span>
-                    </div>
-                    <div class="p-4 border-b flex justify-between items-center">
-                        <div class="flex items-center gap-2">
-                            <div class="w-8 h-8 bg-red-500 rounded-full text-white flex items-center justify-center">T</div>
-                            <span class="font-bold">TRX</span>
+                        <div>
+                            <div class="text-lg font-bold flex items-center gap-1 text-white">NFT1688 <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></div>
+                            <div class="text-xs text-gray-400 mt-0.5">24 关注 &nbsp; 16 粉丝 &nbsp; 0 动态</div>
                         </div>
-                        <span class="font-bold">500.00</span>
                     </div>
                 </div>
+
+                <!-- 资产卡片 -->
+                <div class="asset-bg rounded-2xl p-5 mb-4 border border-gray-800">
+                    <div class="flex items-center gap-2 text-gray-300 text-sm mb-1">
+                        总资产
+                        <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                    </div>
+                    <div class="text-4xl font-bold mb-6 tracking-tight text-white">$ 0.05</div>
+                    
+                    <div class="flex justify-between px-2">
+                        <button class="flex flex-col items-center gap-2">
+                            <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-black shadow-lg">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7l4-4m0 0l4 4m-4-4v18"></path></svg>
+                            </div>
+                            <span class="text-xs text-gray-300">转账</span>
+                        </button>
+                        <button class="flex flex-col items-center gap-2">
+                            <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-black shadow-lg">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 17l-4 4m0 0l-4-4m4 4V3"></path></svg>
+                            </div>
+                            <span class="text-xs text-gray-300">收款</span>
+                        </button>
+                        <button class="flex flex-col items-center gap-2">
+                            <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-black shadow-lg font-bold text-xl">
+                                ₿
+                            </div>
+                            <span class="text-xs text-gray-300">代币</span>
+                        </button>
+                        <button class="flex flex-col items-center gap-2">
+                            <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-black shadow-lg">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                            </div>
+                            <span class="text-xs text-gray-300">历史</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 精选功能 -->
+                <div class="card-bg rounded-2xl p-4 mb-4">
+                    <div class="text-sm font-bold mb-4 text-gray-200">精选功能</div>
+                    <div class="grid grid-cols-4 gap-y-6 text-center">
+                        <div class="flex flex-col items-center gap-1.5"><div class="w-8 h-8 rounded-full border border-green-500 text-green-500 flex items-center justify-center"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg></div><span class="text-[11px] text-gray-400">发现</span></div>
+                        <div class="flex flex-col items-center gap-1.5"><div class="w-8 h-8 rounded-full border border-green-500 text-green-500 flex items-center justify-center"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg></div><span class="text-[11px] text-gray-400">闪兑</span></div>
+                        <div class="flex flex-col items-center gap-1.5"><div class="w-8 h-8 rounded-full border border-green-500 text-green-500 flex items-center justify-center"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg></div><span class="text-[11px] text-gray-400">合约</span></div>
+                        <div class="flex flex-col items-center gap-1.5"><div class="w-8 h-8 rounded-full border border-green-500 text-green-500 flex items-center justify-center"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg></div><span class="text-[11px] text-gray-400">跨链</span></div>
+                        
+                        <div class="flex flex-col items-center gap-1.5"><div class="w-8 h-8 rounded-full border border-green-500 text-green-500 flex items-center justify-center"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"></path></svg></div><span class="text-[11px] text-gray-400">口令红包</span></div>
+                        <div class="flex flex-col items-center gap-1.5"><div class="w-8 h-8 rounded-full border border-green-500 text-green-500 flex items-center justify-center"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg></div><span class="text-[11px] text-gray-400">收藏</span></div>
+                        <div class="flex flex-col items-center gap-1.5"><div class="w-8 h-8 rounded-full border border-green-500 text-green-500 flex items-center justify-center"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm14 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg></div><span class="text-[11px] text-gray-400">闪付</span></div>
+                        <div class="flex flex-col items-center gap-1.5"><div class="w-8 h-8 rounded-full border border-green-500 text-green-500 flex items-center justify-center"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"></path></svg></div><span class="text-[11px] text-gray-400">万能Gas</span></div>
+                    </div>
+                </div>
+
+                <!-- 列表 -->
+                <div class="card-bg rounded-2xl overflow-hidden text-sm">
+                    <div class="flex justify-between items-center p-4 border-b border-gray-800">
+                        <div class="flex items-center gap-3 text-gray-200"><span class="text-lg">💰</span> 奖励中心</div>
+                        <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </div>
+                    <div class="flex justify-between items-center p-4 border-b border-gray-800">
+                        <div class="flex items-center gap-3 text-gray-200"><span class="text-lg">💎</span> 等级能量</div>
+                        <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </div>
+                    <div class="flex justify-between items-center p-4">
+                        <div class="flex items-center gap-3 text-gray-200"><span class="text-lg">📖</span> 新手引导</div>
+                        <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </div>
+                </div>
+
             </div>
 
         </main>
 
-        <!-- 底部 Tab 导航 (顺序已调换) -->
-        <nav class="bg-white border-t absolute bottom-0 w-full flex justify-around py-2 pb-4 z-20">
-            <!-- 1. 聊天 -->
-            <button @click="activeTab = 'chat'" class="flex flex-col items-center" :class="activeTab === 'chat' ? 'text-blue-600' : 'text-gray-400'">
+        <!-- 底部 Tab 导航 (暗黑版) -->
+        <nav class="bg-black border-t border-gray-800 absolute bottom-0 w-full flex justify-around py-3 pb-6 z-20">
+            <button @click="activeTab = 'chat'" class="flex flex-col items-center" :class="activeTab === 'chat' ? 'text-green-500' : 'text-gray-500'">
                 <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
                 <span class="text-[10px]">聊天</span>
             </button>
             
-            <!-- 2. P2P交易 -->
-            <button @click="activeTab = 'trade'" class="flex flex-col items-center" :class="activeTab === 'trade' ? 'text-blue-600' : 'text-gray-400'">
+            <button @click="activeTab = 'trade'" class="flex flex-col items-center" :class="activeTab === 'trade' ? 'text-green-500' : 'text-gray-500'">
                 <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                 <span class="text-[10px]">P2P交易</span>
             </button>
 
-            <!-- 3. 动态 -->
-            <button @click="activeTab = 'feed'" class="flex flex-col items-center" :class="activeTab === 'feed' ? 'text-blue-600' : 'text-gray-400'">
+            <button @click="activeTab = 'feed'" class="flex flex-col items-center" :class="activeTab === 'feed' ? 'text-green-500' : 'text-gray-500'">
                 <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path></svg>
                 <span class="text-[10px]">动态</span>
             </button>
 
-            <!-- 4. 钱包 -->
-            <button @click="activeTab = 'wallet'" class="flex flex-col items-center" :class="activeTab === 'wallet' ? 'text-blue-600' : 'text-gray-400'">
-                <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+            <button @click="activeTab = 'wallet'" class="flex flex-col items-center" :class="activeTab === 'wallet' ? 'text-green-500' : 'text-gray-500'">
+                <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
                 <span class="text-[10px]">钱包</span>
             </button>
         </nav>
@@ -168,7 +237,7 @@
         createApp({
             data() {
                 return {
-                    activeTab: 'chat' // 默认显示聊天页
+                    activeTab: 'wallet' // 既然你想看钱包，这次默认就打开钱包
                 }
             }
         }).mount('#app');
