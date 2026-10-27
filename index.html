@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>Web3 P2P</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.prod.js"></script>
 <style>
 body{background:#000;color:#fff;font-family:-apple-system,sans-serif;-webkit-tap-highlight-color:transparent}
 ::-webkit-scrollbar{display:none}
@@ -18,10 +18,14 @@ body{background:#000;color:#fff;font-family:-apple-system,sans-serif;-webkit-tap
 .pixel-bar{background:repeating-linear-gradient(90deg,transparent,transparent 2px,#C5FF32 2px,#C5FF32 6px);filter:drop-shadow(0 0 6px rgba(197,255,50,.6))}
 .fade-enter-active,.fade-leave-active{transition:opacity .2s}.fade-enter-from,.fade-leave-to{opacity:0}
 .up-enter-active,.up-leave-active{transition:transform .3s}.up-enter-from,.up-leave-to{transform:translateY(100%)}
+.slide-enter-active,.slide-leave-active{transition:transform .3s}.slide-enter-from,.slide-leave-to{transform:translateX(100%)}
+.tgl:checked{right:0;border-color:#E6C875}.tgl:checked+.tgl-lbl{background:#E6C875}.tgl{right:0;z-index:1;border-color:#4a4a4a;transition:.3s}.tgl-lbl{background:#333;transition:.3s}
+[v-cloak] { display: none; }
+svg { max-width: 100%; max-height: 100%; }
 </style>
 </head>
 <body>
-<div id="app" class="max-w-md mx-auto h-screen flex flex-col relative overflow-hidden">
+<div id="app" v-cloak class="max-w-md mx-auto h-screen flex flex-col relative overflow-hidden">
 <header v-if="tab!=='wallet'" class="px-4 py-3 flex justify-between sticky top-0 z-10 bg-black/90">
 <div class="text-lg font-bold">{{tab==='chat'?'微信':(tab==='community'?'社区':'交易')}}</div>
 </header>
@@ -33,13 +37,6 @@ body{background:#000;color:#fff;font-family:-apple-system,sans-serif;-webkit-tap
     <div class="flex-1 min-w-0 border-b border-[#222] pb-3">
       <div class="flex justify-between items-center mb-1"><span class="font-bold text-[15px]">官方交流大群</span><span class="text-xs text-gray-500">刚刚</span></div>
       <div class="text-[13px] text-gray-400 truncate">欢迎来到Web3</div>
-    </div>
-  </div>
-  <div class="card neon-line flex items-center p-3 mb-2 mx-2 rounded-xl">
-    <div class="w-12 h-12 bg-[#1c1c1e] rounded-lg flex items-center justify-center text-xl mr-3">客</div>
-    <div class="flex-1 min-w-0 border-b border-[#222] pb-3">
-      <div class="flex justify-between items-center mb-1"><span class="font-bold text-[15px]">在线客服</span><span class="text-xs text-gray-500">10:00</span></div>
-      <div class="text-[13px] text-gray-400 truncate">您好，请问有什么可以帮您？</div>
     </div>
   </div>
 </div>
@@ -101,6 +98,8 @@ body{background:#000;color:#fff;font-family:-apple-system,sans-serif;-webkit-tap
 <div class="w-6 h-6 bg-green-400 rounded-md text-black flex items-center justify-center text-xs font-bold">X</div>
 <span class="text-lg font-bold text-neon">XILI ▾</span>
 </div>
+<!-- 这里加回设置齿轮 -->
+<svg @click="showSet=true" class="w-6 h-6 text-gray-400 active:rotate-90 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><circle cx="12" cy="12" r="3" stroke-width="2"/></svg>
 </div>
 <div class="mb-8 relative">
 <div class="text-[56px] font-bold leading-none tracking-tight">$0.00</div>
@@ -137,7 +136,40 @@ body{background:#000;color:#fff;font-family:-apple-system,sans-serif;-webkit-tap
 <button @click="tab='wallet'" :class="tab==='wallet'?'text-gold':'text-gray-600'" class="flex flex-col items-center gap-1"><span class="text-xl">👛</span><span class="text-[10px]">钱包</span></button>
 </nav>
 
-<!-- 通用弹窗: 发布动态 -->
+<!-- 设置页面 (全屏滑入) -->
+<transition name="slide">
+<div v-if="showSet" class="absolute inset-0 z-50 bg-black flex flex-col">
+  <header class="px-4 py-3 flex items-center gap-3 bg-black border-b border-gray-800">
+    <button @click="showSet=false" class="text-gray-300 active:opacity-50 flex items-center">＜ 返回</button>
+    <div class="text-lg font-bold flex-1 text-center pr-10">设置</div>
+  </header>
+  <main class="flex-1 overflow-y-auto p-4 space-y-4 pb-20">
+    <div class="card p-2">
+      <div class="flex justify-between p-4 border-b border-[#222]"><div class="font-bold">编辑个人资料</div><div class="text-gray-500">头像/密码 ＞</div></div>
+      <div class="flex justify-between p-4"><div class="font-bold">个人介绍</div><div class="text-gray-500">签名 ＞</div></div>
+    </div>
+    <div class="text-xs text-gray-500 px-2 pt-2">隐私与安全</div>
+    <div class="card p-2">
+      <div class="flex justify-between p-4 border-b border-[#222]"><div>拉黑用户</div><div class="text-gray-500">＞</div></div>
+      <div class="flex justify-between p-4 border-b border-[#222]"><div>谁可以私信我</div><div class="text-gray-500">所有人 ＞</div></div>
+      <div class="flex justify-between p-4 border-b border-[#222]"><div>谁可以邀请我进群</div><div class="text-gray-500">所有人 ＞</div></div>
+      <div class="flex justify-between p-4"><div>公开我的资产</div><label class="relative flex items-center cursor-pointer"><input type="checkbox" class="tgl absolute w-6 h-6 rounded-full bg-white appearance-none cursor-pointer"><span class="tgl-lbl block h-6 rounded-full w-11"></span></label></div>
+    </div>
+    <div class="text-xs text-gray-500 px-2 pt-2">基础设置</div>
+    <div class="card p-2">
+      <div class="flex justify-between p-4 border-b border-[#222]"><div>语言设置</div><div class="text-gray-500">跟随系统 ＞</div></div>
+      <div class="flex justify-between p-4 border-b border-[#222]"><div>主题设置</div><div class="text-gray-500">纯黑 ＞</div></div>
+      <div class="flex justify-between p-4"><div>消息提醒</div><label class="relative flex items-center cursor-pointer"><input type="checkbox" checked class="tgl absolute w-6 h-6 rounded-full bg-white appearance-none cursor-pointer"><span class="tgl-lbl block h-6 rounded-full w-11"></span></label></div>
+    </div>
+    <div class="card p-2">
+      <div class="flex justify-between p-4 border-b border-[#222]"><div>关于我们</div><div class="text-gray-500">＞</div></div>
+      <div class="flex justify-between p-4"><div>检测更新</div><div class="text-gray-500">v1.0.0</div></div>
+    </div>
+  </main>
+</div>
+</transition>
+
+<!-- 发布动态弹窗 -->
 <transition name="fade"><div v-if="showPost" class="absolute inset-0 z-50 bg-black/80 backdrop-blur" @click="showPost=false">
 <transition name="up"><div class="absolute bottom-0 w-full bg-[#121212] rounded-t-2xl p-5" @click.stop>
 <div class="flex justify-between mb-4"><h3 class="font-bold">发布动态</h3><button @click="showPost=false" class="text-gray-500">取消</button></div>
@@ -147,7 +179,7 @@ body{background:#000;color:#fff;font-family:-apple-system,sans-serif;-webkit-tap
 </div></transition>
 </div></transition>
 
-<!-- 通用弹窗: 钱包延伸功能 -->
+<!-- 钱包延伸功能弹窗 -->
 <transition name="fade"><div v-if="actSheet" class="absolute inset-0 z-50 bg-black/80 backdrop-blur" @click="actSheet=null">
 <transition name="up"><div class="absolute bottom-0 w-full bg-[#121212] rounded-t-2xl p-5" @click.stop>
 <div class="flex justify-between mb-4"><h3 class="font-bold">{{actSheet}}功能</h3><button @click="actSheet=null" class="text-gray-500">关闭</button></div>
@@ -159,7 +191,7 @@ body{background:#000;color:#fff;font-family:-apple-system,sans-serif;-webkit-tap
 </div>
 <script>
 const {createApp}=Vue;
-createApp({data:()=>({tab:'wallet',comTab:'动态',tradeType:'buy',showPost:false,actSheet:null})}).mount('#app');
+createApp({data:()=>({tab:'wallet',comTab:'动态',tradeType:'buy',showPost:false,actSheet:null,showSet:false})}).mount('#app');
 </script>
 </body>
 </html>
