@@ -1,7 +1,7 @@
 {
   "name": "xili003-hardened",
   "version": "1.0.0",
-  "description": "Security-hardened replacement for the xili003 application",
+  "description": "Security-hardened replacement for xili003",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
