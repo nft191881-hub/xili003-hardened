@@ -3,24 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>XILI 数字服务站</title>
+    <title>Web3 P2P 交易平台</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <style>
+        /* 提取的高级暗黑质感 */
         body { background-color: #050505; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; color: #fff; }
         ::-webkit-scrollbar { display: none; }
         
-        /* 黑金主题色 */
+        /* 高亮暗金色 */
         .text-gold { color: #E6C875; }
         .bg-gold { background-color: #E6C875; }
-        .border-gold { border-color: rgba(230, 200, 117, 0.3); }
         
-        /* 卡片背景 */
-        .dark-card { background-color: #121212; border: 1px solid #222; }
+        /* 卡片质感：极简暗灰 + 细边框 */
+        .dark-card { background-color: #121212; border: 1px solid #27272a; }
         
-        /* 星空背景点缀 */
+        /* 星空背景 */
         .star-bg {
-            background-image: radial-gradient(1px 1px at 20px 30px, #fff, rgba(0,0,0,0)), radial-gradient(1px 1px at 40px 70px, #fff, rgba(0,0,0,0)), radial-gradient(2px 2px at 90px 40px, rgba(230,200,117,0.5), rgba(0,0,0,0));
+            background-image: radial-gradient(1px 1px at 20px 30px, #fff, rgba(0,0,0,0)), radial-gradient(1px 1px at 40px 70px, #fff, rgba(0,0,0,0)), radial-gradient(2px 2px at 90px 40px, rgba(230,200,117,0.3), rgba(0,0,0,0));
             background-repeat: repeat;
             background-size: 200px 200px;
         }
@@ -34,34 +34,121 @@
 <body>
     <div id="app" class="max-w-md mx-auto h-screen flex flex-col relative overflow-hidden bg-black star-bg">
         
-        <!-- 顶部状态栏 -->
-        <header class="px-4 py-3 flex justify-between items-center sticky top-0 z-10 bg-black/80 backdrop-blur">
-            <div class="text-lg font-bold text-white flex items-center gap-2">
-                XILI 平台
+        <!-- 顶部栏 -->
+        <header class="px-4 py-3 flex justify-between items-center sticky top-0 z-10 bg-black/80 backdrop-blur border-b border-gray-800/50">
+            <div class="text-lg font-bold text-white tracking-wide">
+                P2P 交易平台
             </div>
-            <div class="text-sm text-gray-400" v-if="activeTab === 'wallet'">个人中心</div>
-            <div class="text-sm text-gray-400" v-if="activeTab === 'chat'">消息</div>
-            <div class="text-sm text-gray-400" v-if="activeTab === 'trade'">商城首页</div>
-            <div class="text-sm text-gray-400" v-if="activeTab === 'feed'">动态广场</div>
+            <div class="text-sm text-gray-400" v-if="activeTab === 'wallet'">我的资产</div>
+            <div class="text-sm text-gray-400" v-if="activeTab === 'chat'">消息中心</div>
+            <div class="text-sm text-gray-400" v-if="activeTab === 'trade'">交易大厅</div>
+            <div class="text-sm text-gray-400" v-if="activeTab === 'feed'">社区动态</div>
         </header>
 
         <!-- 主体内容区 -->
         <main class="flex-1 overflow-y-auto pb-20 relative z-10">
             
-            <!-- ================= 1. 钱包/个人中心 ================= -->
+            <!-- ================= 1. 交易大厅 (P2P) ================= -->
+            <div v-show="activeTab === 'trade'" class="p-4">
+                
+                <!-- 交易区 Banner -->
+                <div class="bg-gradient-to-br from-[#1a1811] to-[#0a0a0a] border border-[#2a261b] rounded-2xl p-5 mb-5 relative overflow-hidden">
+                    <div class="text-lg font-bold text-gold mb-1">USDT / 法币交易</div>
+                    <div class="text-xs text-gray-400 mb-4">安全 · 快捷 · 零手续费 · TRC20</div>
+                    <div class="flex gap-3">
+                        <button class="flex-1 bg-gold text-black font-bold py-2 rounded-xl text-sm active:scale-95 transition">我要买</button>
+                        <button class="flex-1 bg-[#222] text-white border border-gray-700 font-bold py-2 rounded-xl text-sm active:scale-95 transition">我要卖</button>
+                    </div>
+                </div>
+
+                <!-- 挂单列表 -->
+                <div class="flex items-center gap-2 mb-3">
+                    <div class="w-1 h-4 bg-gold rounded-full"></div>
+                    <div class="text-base font-bold text-white">推荐商家</div>
+                </div>
+
+                <div class="dark-card rounded-2xl p-4 mb-3" v-for="i in 2" :key="i">
+                    <div class="flex justify-between items-center mb-3">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 bg-orange-900/50 text-orange-400 rounded-full flex items-center justify-center font-bold">商</div>
+                            <span class="font-bold text-gray-200">认证商家_{{i}}</span>
+                        </div>
+                        <div class="text-xs text-gray-500">成交 43814 | 好评 99%</div>
+                    </div>
+                    
+                    <div class="flex justify-between items-end mb-3">
+                        <div>
+                            <div class="text-xs text-gray-500 mb-1">单价 (CNY)</div>
+                            <div class="text-xl font-bold text-white">7.25</div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-xs text-gray-500 mb-1">限额 (CNY)</div>
+                            <div class="text-sm font-bold text-gray-300">100 - 50,000</div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex gap-2 mb-3">
+                        <span class="text-[10px] text-blue-400 border border-blue-500/30 bg-blue-500/10 px-1.5 py-0.5 rounded">银行卡</span>
+                        <span class="text-[10px] text-blue-400 border border-blue-500/30 bg-blue-500/10 px-1.5 py-0.5 rounded">支付宝</span>
+                        <span class="text-[10px] text-blue-400 border border-blue-500/30 bg-blue-500/10 px-1.5 py-0.5 rounded">微信</span>
+                    </div>
+
+                    <button class="w-full bg-[#222] text-gold border border-gold/30 py-2.5 rounded-xl font-bold text-sm active:bg-[#333] transition">
+                        购买 USDT
+                    </button>
+                </div>
+            </div>
+
+            <!-- ================= 2. 消息/聊天 ================= -->
+            <div v-show="activeTab === 'chat'" class="p-4">
+                <div class="dark-card rounded-2xl p-4 mb-3 flex gap-3 items-center">
+                    <div class="w-12 h-12 bg-gray-800 text-gold rounded-full flex items-center justify-center text-xl">群</div>
+                    <div class="flex-1">
+                        <div class="flex justify-between"><span class="font-bold text-gray-200">官方交流大群</span><span class="text-xs text-gray-500">刚刚</span></div>
+                        <div class="text-sm text-gray-400 truncate mt-1">欢迎来到 Web3 交流群</div>
+                    </div>
+                </div>
+                <div class="dark-card rounded-2xl p-4 mb-3 flex gap-3 items-center">
+                    <div class="w-12 h-12 bg-gray-800 text-blue-400 rounded-full flex items-center justify-center text-xl">客</div>
+                    <div class="flex-1">
+                        <div class="flex justify-between"><span class="font-bold text-gray-200">在线客服</span><span class="text-xs text-gray-500">10:00</span></div>
+                        <div class="text-sm text-gray-400 truncate mt-1">您好，请问有什么可以帮您？</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= 3. 动态广场 ================= -->
+            <div v-show="activeTab === 'feed'" class="p-4">
+                <div class="dark-card rounded-2xl p-3 mb-4">
+                    <textarea class="w-full bg-[#1a1a1a] text-gray-200 rounded-xl p-3 text-sm outline-none resize-none placeholder-gray-600" rows="2" placeholder="发布求购、广告或心情..."></textarea>
+                    <div class="flex justify-end mt-2">
+                        <button class="bg-gold text-black px-5 py-1.5 rounded-full text-sm font-bold">发布</button>
+                    </div>
+                </div>
+                <div class="dark-card rounded-2xl p-4">
+                    <div class="flex items-center gap-2 mb-2">
+                        <div class="w-8 h-8 bg-gray-800 text-gold rounded-full flex items-center justify-center">广</div>
+                        <div>
+                            <div class="font-bold text-sm text-gray-200">广告位招租</div>
+                            <div class="text-xs text-gray-500">10分钟前</div>
+                        </div>
+                    </div>
+                    <p class="text-sm text-gray-300 mb-2">长期高价回收 Apple Store 礼品卡，支持担保交易，秒打款。</p>
+                </div>
+            </div>
+
+            <!-- ================= 4. 钱包/个人中心 ================= -->
             <div v-show="activeTab === 'wallet'" class="px-4 pb-6">
                 
                 <!-- 用户信息 -->
                 <div class="flex items-center justify-between mt-2 mb-6">
                     <div class="flex items-center gap-3">
                         <div class="w-14 h-14 bg-gradient-to-tr from-[#2a261b] to-[#1a1811] border border-[#E6C875]/30 rounded-2xl flex items-center justify-center text-3xl shadow-[0_0_15px_rgba(230,200,117,0.15)]">
-                            🐱
+                            👤
                         </div>
                         <div>
-                            <div class="text-lg font-bold text-white flex items-center gap-1">NFT1688 <span class="text-[10px] bg-gray-800 text-gray-400 px-1.5 py-0.5 rounded border border-gray-700">UID: 881003</span></div>
-                            <div class="text-xs text-gray-400 mt-1 flex gap-2">
-                                <span class="text-gold">已实名 (KYC)</span> | <span>安全等级: 高</span>
-                            </div>
+                            <div class="text-lg font-bold text-white flex items-center gap-1">我的账号 <span class="text-[10px] bg-gray-800 text-gray-400 px-1.5 py-0.5 rounded border border-gray-700">UID: 10001</span></div>
+                            <div class="text-xs text-gold mt-1">已实名认证</div>
                         </div>
                     </div>
                     <svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path></svg>
@@ -69,14 +156,12 @@
 
                 <!-- 资产卡片 -->
                 <div class="bg-gradient-to-br from-[#1a1811] to-[#0a0a0a] border border-[#2a261b] rounded-2xl p-5 mb-6 relative overflow-hidden">
-                    <div class="absolute -right-10 -top-10 w-32 h-32 bg-gold/5 rounded-full blur-2xl"></div>
-                    
                     <div class="text-sm text-gray-400 mb-1">总资产估值 (USDT)</div>
-                    <div class="text-4xl font-bold text-white mb-6">$ 1,250.05</div>
+                    <div class="text-4xl font-bold text-white mb-6">$ 0.00</div>
                     
                     <div class="flex justify-between px-2">
                         <button @click="openModal('deposit')" class="flex flex-col items-center gap-2">
-                            <div class="w-12 h-12 bg-gold text-black rounded-full flex items-center justify-center font-bold text-xl shadow-[0_0_15px_rgba(230,200,117,0.4)] active:scale-95 transition">
+                            <div class="w-12 h-12 bg-gold text-black rounded-full flex items-center justify-center font-bold text-xl active:scale-95 transition">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
                             </div>
                             <span class="text-xs text-gold font-bold">充值</span>
@@ -87,11 +172,11 @@
                             </div>
                             <span class="text-xs text-gray-300">提现</span>
                         </button>
-                        <button @click="openModal('history')" class="flex flex-col items-center gap-2">
+                        <button class="flex flex-col items-center gap-2">
                             <div class="w-12 h-12 bg-[#222] border border-gray-700 text-white rounded-full flex items-center justify-center font-bold text-xl active:scale-95 transition">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
                             </div>
-                            <span class="text-xs text-gray-300">账单</span>
+                            <span class="text-xs text-gray-300">划转</span>
                         </button>
                     </div>
                 </div>
@@ -101,7 +186,7 @@
                     <div class="text-base font-bold text-white">我的资产</div>
                 </div>
                 <div class="dark-card rounded-2xl overflow-hidden mb-6">
-                    <div class="p-4 border-b border-gray-800 flex justify-between items-center">
+                    <div class="p-4 flex justify-between items-center">
                         <div class="flex items-center gap-3">
                             <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center font-bold text-white shadow-lg">₮</div>
                             <div>
@@ -110,21 +195,8 @@
                             </div>
                         </div>
                         <div class="text-right">
-                            <div class="font-bold text-white">1,250.05</div>
-                            <div class="text-[10px] text-gray-500">≈ $1,250.05</div>
-                        </div>
-                    </div>
-                    <div class="p-4 flex justify-between items-center">
-                        <div class="flex items-center gap-3">
-                            <div class="w-8 h-8 bg-gold rounded-full flex items-center justify-center font-bold text-black shadow-lg">L</div>
-                            <div>
-                                <div class="font-bold text-white">LUDD</div>
-                                <div class="text-[10px] text-gray-500">平台代币</div>
-                            </div>
-                        </div>
-                        <div class="text-right">
-                            <div class="font-bold text-white">5,000.00</div>
-                            <div class="text-[10px] text-gray-500">≈ 支付用</div>
+                            <div class="font-bold text-white">0.00</div>
+                            <div class="text-[10px] text-gray-500">≈ $0.00</div>
                         </div>
                     </div>
                 </div>
@@ -132,53 +204,15 @@
                 <!-- 功能列表 -->
                 <div class="dark-card rounded-2xl overflow-hidden text-sm">
                     <div class="flex justify-between items-center p-4 border-b border-gray-800">
-                        <div class="flex items-center gap-3 text-gray-200"><span class="text-lg">🧾</span> 我的订单</div>
+                        <div class="flex items-center gap-3 text-gray-200"><span class="text-lg">🧾</span> 我的订单 (P2P/礼品卡)</div>
                         <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                     </div>
                     <div class="flex justify-between items-center p-4 border-b border-gray-800">
                         <div class="flex items-center gap-3 text-gray-200"><span class="text-lg">💳</span> 收付款设置</div>
                         <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                     </div>
-                    <div class="flex justify-between items-center p-4 border-b border-gray-800">
-                        <div class="flex items-center gap-3 text-gray-200"><span class="text-lg">🛡️</span> 安全中心</div>
-                        <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                    </div>
-                    <div class="flex justify-between items-center p-4">
-                        <div class="flex items-center gap-3 text-gray-200"><span class="text-lg">🎧</span> 联系客服</div>
-                        <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                    </div>
                 </div>
 
-            </div>
-
-            <!-- ================= 2. 商城主页 (简版) ================= -->
-            <div v-show="activeTab === 'trade'" class="p-4">
-                <h2 class="text-2xl font-bold mb-4 text-white">XILI 数字服务站</h2>
-                <div class="bg-gradient-to-br from-[#1a1811] to-[#0a0a0a] border border-[#2a261b] rounded-2xl p-5 mb-4">
-                    <div class="text-xl font-bold text-gold mb-2">数字商品 一站直达</div>
-                    <div class="text-xs text-gray-400 mb-4">方便 · 快捷 · 安全 · 多元化</div>
-                </div>
-            </div>
-
-            <!-- ================= 3. 聊天 (简版) ================= -->
-            <div v-show="activeTab === 'chat'" class="p-4">
-                <div class="dark-card rounded-2xl p-4 mb-3 flex gap-3 items-center">
-                    <div class="w-12 h-12 bg-gray-800 text-gold rounded-full flex items-center justify-center text-xl">群</div>
-                    <div class="flex-1">
-                        <div class="flex justify-between"><span class="font-bold text-gray-200">XILI 交流大群</span><span class="text-xs text-gray-500">12:00</span></div>
-                        <div class="text-sm text-gray-400 truncate mt-1">官方客服: 欢迎来到数字服务站</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ================= 4. 动态 (简版) ================= -->
-            <div v-show="activeTab === 'feed'" class="p-4">
-                <div class="dark-card rounded-2xl p-3 mb-3">
-                    <textarea class="w-full bg-[#1a1a1a] text-gray-200 rounded p-2 text-sm outline-none resize-none placeholder-gray-600" rows="2" placeholder="发布求购信息或动态..."></textarea>
-                    <div class="flex justify-end mt-2">
-                        <button class="bg-gold text-black px-4 py-1.5 rounded-full text-sm font-bold">发布</button>
-                    </div>
-                </div>
             </div>
 
         </main>
@@ -190,8 +224,8 @@
                 <span class="text-[10px]">聊天</span>
             </button>
             <button @click="activeTab = 'trade'" class="flex flex-col items-center gap-1" :class="activeTab === 'trade' ? 'text-gold' : 'text-gray-500'">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                <span class="text-[10px]">商城首页</span>
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <span class="text-[10px]">交易</span>
             </button>
             <button @click="activeTab = 'feed'" class="flex flex-col items-center gap-1" :class="activeTab === 'feed' ? 'text-gold' : 'text-gray-500'">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path></svg>
@@ -215,7 +249,7 @@
                 </div>
                 
                 <div class="flex flex-col items-center">
-                    <div class="text-sm text-gold bg-gold/10 px-4 py-1.5 rounded-full mb-4 border border-gold/20 font-bold">TRC20 网络</div>
+                    <div class="text-sm text-gold bg-gold/10 px-4 py-1.5 rounded-full mb-4 border border-gold/20 font-bold">仅支持 TRC20 网络</div>
                     
                     <!-- 模拟二维码 -->
                     <div class="w-44 h-44 bg-white rounded-xl mb-4 p-2 flex items-center justify-center">
@@ -225,7 +259,7 @@
                     </div>
                     
                     <div class="w-full bg-black p-3 rounded-xl flex justify-between items-center mb-4 border border-gray-800">
-                        <span class="text-sm font-mono text-gray-300 truncate w-4/5">TY8x...3kL9FakeAddress</span>
+                        <span class="text-sm font-mono text-gray-300 truncate w-4/5">TXXXXXXXXXXXXXXXXXXXXX</span>
                         <span @click="copyAddress" class="text-gold text-sm font-bold cursor-pointer">{{ copyText }}</span>
                     </div>
                     
@@ -257,44 +291,13 @@
                 </div>
                 
                 <div class="flex justify-between text-xs text-gray-500 mb-6 px-2 font-medium">
-                    <span>可用: 1,250.05 USDT</span>
+                    <span>可用: 0.00 USDT</span>
                     <span>手续费: 1 USDT</span>
                 </div>
                 
-                <button class="w-full bg-gold text-black font-bold py-4 rounded-xl active:scale-95 transition text-lg shadow-[0_0_15px_rgba(230,200,117,0.3)]">确认提现</button>
+                <button class="w-full bg-gold text-black font-bold py-4 rounded-xl active:scale-95 transition text-lg">确认提现</button>
             </div>
 
-            <!-- 账单记录弹窗 -->
-            <div v-if="modal.type === 'history'" class="modal-content bg-[#121212] w-full rounded-t-3xl p-6 relative z-10 border-t border-gray-800">
-                <div class="flex justify-between items-center mb-6">
-                    <h3 class="text-xl font-bold text-white">资金账单</h3>
-                    <button @click="closeModal" class="w-8 h-8 bg-[#222] rounded-full text-gray-400 flex items-center justify-center">✕</button>
-                </div>
-                
-                <div class="space-y-4 mb-4">
-                    <div class="flex justify-between items-center border-b border-gray-800 pb-3">
-                        <div>
-                            <div class="text-sm text-white font-bold">购买商品 - 飞机</div>
-                            <div class="text-xs text-gray-500 mt-1">2023-10-27 14:30</div>
-                        </div>
-                        <div class="text-red-500 font-bold">-5.00</div>
-                    </div>
-                    <div class="flex justify-between items-center border-b border-gray-800 pb-3">
-                        <div>
-                            <div class="text-sm text-white font-bold">充值 USDT</div>
-                            <div class="text-xs text-gray-500 mt-1">2023-10-26 09:15</div>
-                        </div>
-                        <div class="text-green-500 font-bold">+1000.00</div>
-                    </div>
-                    <div class="flex justify-between items-center pb-3">
-                        <div>
-                            <div class="text-sm text-white font-bold">出售商品 - 卡券</div>
-                            <div class="text-xs text-gray-500 mt-1">2023-10-25 18:20</div>
-                        </div>
-                        <div class="text-green-500 font-bold">+50.00</div>
-                    </div>
-                </div>
-            </div>
         </div>
 
     </div>
@@ -304,7 +307,7 @@
         createApp({
             data() {
                 return {
-                    activeTab: 'wallet', // 默认展示钱包页
+                    activeTab: 'trade', // 默认打开交易大厅
                     modal: { show: false, type: '' },
                     copyText: '复制'
                 }
@@ -313,14 +316,13 @@
                 openModal(type) {
                     this.modal.type = type;
                     this.modal.show = true;
-                    this.copyText = '复制'; // 每次打开重置复制状态
+                    this.copyText = '复制';
                 },
                 closeModal() {
                     this.modal.show = false;
                 },
                 copyAddress() {
                     this.copyText = '已复制';
-                    // 这里可以加上真实的剪贴板API调用
                 }
             }
         }).mount('#app');
