@@ -3,10 +3,7 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 10000;
 
-// 告诉服务器，直接展示根目录下的 index.html
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
-});
+app.use(express.static(__dirname));
 
 app.listen(PORT, () => {
   console.log('Server is running on port ' + PORT);
