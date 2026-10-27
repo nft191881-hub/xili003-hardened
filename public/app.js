@@ -1,302 +1,419 @@
-const state = {
-  token: localStorage.getItem('token') || '',
-  user: JSON.parse(localStorage.getItem('user') || 'null'),
-  categories: [],
-  products: [],
-  orders: [],
-  messages: [],
-};
+const TOKEN_KEY = 'novax_token';
 
-const els = {
-  loginForm: document.getElementById('loginForm'),
-  registerForm: document.getElementById('registerForm'),
-  loginUsername: document.getElementById('loginUsername'),
-  loginPassword: document.getElementById('loginPassword'),
-  registerUsername: document.getElementById('registerUsername'),
-  registerPassword: document.getElementById('registerPassword'),
-  logoutBtn: document.getElementById('logoutBtn'),
-  userInfo: document.getElementById('userInfo'),
-  productCategory: document.getElementById('productCategory'),
-  productForm: document.getElementById('productForm'),
-  productTitle: document.getElementById('productTitle'),
-  productDescription: document.getElementById('productDescription'),
-  productPrice: document.getElementById('productPrice'),
-  productStock: document.getElementById('productStock'),
-  productImages: document.getElementById('productImages'),
-  categoryFilter: document.getElementById('categoryFilter'),
-  productList: document.getElementById('productList'),
-  orderList: document.getElementById('orderList'),
-  searchInput: document.getElementById('searchInput'),
-  chatForm: document.getElementById('chatForm'),
-  chatInput: document.getElementById('chatInput'),
-  chatList: document.getElementById('chatList'),
-};
+function getToken() {
+  return localStorage.getItem(TOKEN_KEY) || '';
+}
 
-document.querySelectorAll('.tab').forEach((button) => {
-  button.addEventListener('click', () => {
-    document.querySelectorAll('.tab').forEach((b) => b.classList.toggle('active', b === button));
-    const isLogin = button.dataset.tab === 'login';
-    els.loginForm.classList.toggle('active', isLogin);
-    els.registerForm.classList.toggle('active', !isLogin);
-  });
-});
+function setToken(token) {
+  localStorage.setItem(TOKEN_KEY, token);
+}
+
+function clearToken() {
+  localStorage.removeItem(TOKEN_KEY);
+}
 
 async function api(path, options = {}) {
+  const headers = {
+    'Content-Type': 'application/json',
+    ...(options.headers || {})
+  };
+
+  const token = getToken();
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+
   const response = await fetch(path, {
-    headers: {
-      'Content-Type': 'application/json',
-      ...(state.token ? { Authorization: `Bearer ${state.token}` } : {}),
-      ...(options.headers || {}),
-    },
     ...options,
+    headers
   });
 
   const contentType = response.headers.get('content-type') || '';
   const payload = contentType.includes('application/json') ? await response.json() : await response.text();
 
   if (!response.ok) {
-    throw new Error(typeof payload === 'string' ? payload : payload.error || '请求失败');
+    throw new Error(typeof payload === 'string' ? payload : payload.error || 'Request failed');
   }
 
   return payload;
 }
 
-function saveSession(token, user) {
-  state.token = token;
-  state.user = user;
-  localStorage.setItem('token', token);
-  localStorage.setItem('user', JSON.stringify(user));
-  renderUserState();
+function money(value) {
+  return `$${Number(value).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
 
-function clearSession() {
-  state.token = '';
-  state.user = null;
-  localStorage.removeItem('token');
-  localStorage.removeItem('user');
-  renderUserState();
+function renderMarkets(markets) {
+  const list = document.getElementById('marketList');
+  if (!list) return;
+
+  list.innerHTML = markets.map(m => `
+    <div class="coin-card">
+      <div class="coin-info">
+        <div class="coin-badge ${m.id === 'btc' ? 'btc' : m.id === 'eth' ? 'eth' : m.id === 'sol' ? 'sol' : 'usdc'}">
+          ${m.symbol[0]}
+        </div>
+        <div>
+          <div class="coin-name">${m.symbol} / USDT</div>
+          <div class="coin-meta">${m.name}</div>
+        </div>
+      </div>
+      <div class="coin-price">
+        <div class="p ${m.change >= 0 ? 'up' : 'down'}">${money(m.price)}</div>
+        <div class="u ${m.change >= 0 ? 'up' : 'down'}">${m.change >= 0 ? '+' : ''}${m.change.toFixed(2)}%</div>
+      </div>
+    </div>
+  `).join('');
 }
 
-function renderUserState() {
-  if (state.user) {
-    els.userInfo.textContent = `${state.user.username} (${state.user.role})`;
-    els.logoutBtn.classList.remove('hidden');
-  } else {
-    els.userInfo.textContent = '未登录';
-    els.logoutBtn.classList.add('hidden');
+function renderWallet(wallet) {
+  const total = document.getElementById('walletTotal');
+  if (total) total.textContent = money(wallet.totalUsd || 0);
+
+  const info = document.getElementById('walletInfo');
+  if (info) info.textContent = `本月收益 $${((wallet.totalUsd || 0) * 0.042).toFixed(2)}`;
+
+  const available = document.getElementById('walletAvailable');
+  if (available) available.textContent = `可用 ${(wallet.usdc || 0).toLocaleString()}`;
+
+  const assets = document.getElementById('walletAssets');
+  if (!assets) return;
+
+  const items = [
+    { name: 'BTC', value: wallet.btc || 0, color: 'btc', amount: (wallet.btc || 0) * 68421 },
+    { name: 'ETH', value: wallet.eth || 0, color: 'eth', amount: (wallet.eth || 0) * 3842 },
+    { name: 'SOL', value: wallet.sol || 0, color: 'sol', amount: (wallet.sol || 0) * 148.24 },
+    { name: 'USDC', value: wallet.usdc || 0, color: 'usdc', amount: wallet.usdc || 0 }
+  ];
+
+  assets.innerHTML = items.map(item => `
+    <div class="asset-item">
+      <div class="asset-head">
+        <div class="coin-info">
+          <div class="coin-badge ${item.color}">${item.name[0]}</div>
+          <div>
+            <div class="coin-name">${item.name}</div>
+            <div class="asset-meta">${item.value}</div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="asset-amount">${money(item.amount)}</div>
+        <div class="asset-meta ${item.amount > 0 ? 'up' : 'down'}">${item.amount > 0 ? '+1.1%' : '-0.9%'}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderOrders(orders) {
+  const walletOrders = document.getElementById('walletOrders');
+  if (!walletOrders) return;
+
+  if (!orders || !orders.length) {
+    walletOrders.innerHTML = '<div class=\"order-item\"><div class=\"order-head\"><strong>暂无订单</strong></div></div>';
+    return;
+  }
+
+  walletOrders.innerHTML = orders.map(order => `
+    <div class="order-item">
+      <div class="order-head">
+        <strong>${order.pair}</strong>
+        <span class="state-pill ${order.status === 'open' ? 'warn' : 'ok'}">${order.status === 'open' ? '待确认' : '已完成'}</span>
+      </div>
+      <div class="order-meta">${new Date(order.createdAt).toLocaleString()}</div>
+      <div class="order-total">${order.side === 'buy' ? '+' : '-'} ${money(order.amount * order.price)}</div>
+    </div>
+  `).join('');
+}
+
+function renderTradeDepth(markets) {
+  const tradeDepth = document.getElementById('tradeDepth');
+  if (!tradeDepth) return;
+
+  const depth = [
+    { label: '卖单', value: '7.06 / 12.8k', color: 'down', badge: 'btc' },
+    { label: '买单', value: '6.98 / 18.4k', color: 'up', badge: 'eth' },
+    { label: '卖单', value: '148.2 / 8.4k', color: 'down', badge: 'sol' }
+  ];
+
+  tradeDepth.innerHTML = depth.map(item => `
+    <div class="coin-card">
+      <div class="coin-info">
+        <div class="coin-badge ${item.badge}">${item.badge.toUpperCase()[0]}</div>
+        <div>
+          <div class="coin-name">${item.label}</div>
+          <div class="coin-meta">${item.value}</div>
+        </div>
+      </div>
+      <div class="coin-price">
+        <div class="p ${item.color}">${item.color === 'up' ? '+0.21%' : '-0.12%'}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderChat(messages) {
+  const chatList = document.getElementById('chatList');
+  if (!chatList) return;
+
+  if (!messages || !messages.length) {
+    chatList.innerHTML = '<div class=\"chat-msg\"><div class=\"chat-text\">暂无消息</div></div>';
+    return;
+  }
+
+  chatList.innerHTML = messages.map(msg => `
+    <div class="chat-msg">
+      <div class="chat-head">
+        <span class="chat-user">${msg.username}</span>
+        <span class="chat-time">${new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+      </div>
+      <div class="chat-text">${msg.body}</div>
+    </div>
+  `).join('');
+}
+
+function setupTypeButtons() {
+  document.querySelectorAll('.type-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+}
+
+function bindEstimate() {
+  const amountInput = document.getElementById('amountInput');
+  const priceInput = document.getElementById('priceInput');
+  const estimate = document.getElementById('estimateValue');
+
+  if (amountInput && priceInput && estimate) {
+    const update = () => {
+      const amount = Number(amountInput.value || 0);
+      const price = Number(priceInput.value || 0);
+      estimate.textContent = `USDT ${Number(amount * price).toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
+    };
+
+    amountInput.addEventListener('input', update);
+    priceInput.addEventListener('input', update);
+  }
+
+  const amountInput2 = document.getElementById('amountInputTrade');
+  const priceInput2 = document.getElementById('priceInputTrade');
+  const estimate2 = document.getElementById('estimateValueTrade');
+
+  if (amountInput2 && priceInput2 && estimate2) {
+    const update2 = () => {
+      const amount = Number(amountInput2.value || 0);
+      const price = Number(priceInput2.value || 0);
+      estimate2.textContent = `USDT ${Number(amount * price).toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
+    };
+
+    amountInput2.addEventListener('input', update2);
+    priceInput2.addEventListener('input', update2);
   }
 }
 
-async function loadCategories() {
-  const categories = await api('/api/categories');
-  state.categories = categories;
+async function loadHomeData() {
+  try {
+    const markets = await api('/api/markets');
+    renderMarkets(markets);
 
-  const options = categories.map((c) => `<option value="${c.id}">${c.name}</option>`).join('');
-  els.productCategory.innerHTML = `<option value="">请选择分类</option>${options}`;
-  els.categoryFilter.innerHTML = `<option value="">全部分类</option>${options}`;
+    const wallet = await api('/api/wallet');
+    const total = wallet.totalUsd || 42680;
+    document.getElementById('homeTotal').textContent = money(total);
+    document.getElementById('homeSubLeft').textContent = `≈ ${(wallet.btc || 0).toFixed(4)} BTC`;
+    document.getElementById('homeSubRight').textContent = `USDT ${(wallet.usdc || 0).toLocaleString()}`;
+  } catch (err) {
+    console.error(err);
+  }
 }
 
-function renderProducts() {
-  const keyword = document.getElementById('searchInput').value.trim().toLowerCase();
-  const categoryId = document.getElementById('categoryFilter').value;
+async function loadWalletData() {
+  try {
+    const wallet = await api('/api/wallet');
+    renderWallet(wallet);
 
-  const filtered = state.products.filter((p) => {
-    const matchKeyword = !keyword || (p.title || '').toLowerCase().includes(keyword) || (p.description || '').toLowerCase().includes(keyword);
-    const matchCategory = !categoryId || String(p.category_id || p.categoryId) === String(categoryId);
-    return matchKeyword && matchCategory;
-  });
+    const orders = await api('/api/orders');
+    renderOrders(orders);
+  } catch (err) {
+    console.error(err);
+  }
+}
 
-  els.productList.innerHTML = filtered.map((product) => `
-    <div class="product-card">
-      <h4>${product.title}</h4>
-      <div class="product-meta">
-        <span>卖家：${product.seller_name || '未知'}</span>
-        <span>库存：${product.stock}</span>
-      </div>
-      <div class="product-price">￥${Number(product.price).toFixed(2)}</div>
-      <p>${product.description || '暂无描述'}</p>
-      <div class="product-actions">
-        <span>${product.sold || 0} 已售</span>
-        <button class="buy-btn" data-id="${product.id}">购买</button>
-      </div>
-    </div>
-  `).join('') || '<div class="product-card">暂无商品</div>';
+async function loadTradeData() {
+  try {
+    const markets = await api('/api/markets');
+    renderTradeDepth(markets);
+  } catch (err) {
+    console.error(err);
+  }
+}
 
-  document.querySelectorAll('.buy-btn').forEach((btn) => {
-    btn.addEventListener('click', async () => {
-      if (!state.token) {
-        alert('请先登录');
+async function loadChatData() {
+  try {
+    const messages = await api('/api/chat');
+    renderChat(messages);
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+async function handleLoginSignup(type) {
+  const username = document.getElementById(type === 'register' ? 'registerUsername' : 'loginUsername')?.value;
+  const password = document.getElementById(type === 'register' ? 'registerPassword' : 'loginPassword')?.value;
+
+  if (!username || !password) return;
+
+  try {
+    const result = await api(`/api/${type === 'register' ? 'register' : 'login'}`, {
+      method: 'POST',
+      body: JSON.stringify({ username, password })
+    });
+
+    setToken(result.token);
+    window.location.href = '/';
+  } catch (err) {
+    alert(err.message);
+  }
+}
+
+function setupAuth() {
+  const loginForm = document.getElementById('loginForm');
+  if (loginForm) {
+    loginForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      handleLoginSignup('login');
+    });
+  }
+
+  const registerForm = document.getElementById('registerForm');
+  if (registerForm) {
+    registerForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      handleLoginSignup('register');
+    });
+  }
+
+  const logoutButton = document.getElementById('logoutButton');
+  if (logoutButton) {
+    logoutButton.addEventListener('click', () => {
+      clearToken();
+      window.location.href = '/';
+    });
+  }
+}
+
+function setupTradeSubmission() {
+  const tradeForm = document.getElementById('tradeForm');
+  if (tradeForm) {
+    tradeForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const token = getToken();
+      if (!token) {
+        alert('Please login first');
         return;
       }
-      const id = Number(btn.dataset.id);
+
+      const payload = {
+        pair: document.getElementById('pairSelect').value,
+        side: document.querySelector('.type-btn.active').textContent.trim().toLowerCase(),
+        amount: Number(document.getElementById('amountInput').value),
+        price: Number(document.getElementById('priceInput').value)
+      };
+
       try {
-        const result = await api('/api/orders', {
+        await api('/api/orders', {
           method: 'POST',
-          body: JSON.stringify({ product_id: id, qty: 1 }),
+          body: JSON.stringify(payload)
         });
-        alert(`购买成功，订单号：${result.id}`);
-        await loadOrders();
-      } catch (error) {
-        alert(error.message);
+        alert('Order placed successfully');
+        window.location.href = './wallet.html';
+      } catch (err) {
+        alert(err.message);
       }
     });
+  }
+
+  const tradeFormPage = document.getElementById('tradeFormPage');
+  if (tradeFormPage) {
+    tradeFormPage.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const token = getToken();
+      if (!token) {
+        alert('Please login first');
+        return;
+      }
+
+      const payload = {
+        pair: document.getElementById('pairSelectTrade').value,
+        side: document.querySelector('.type-btn.active').textContent.trim().toLowerCase(),
+        amount: Number(document.getElementById('amountInputTrade').value),
+        price: Number(document.getElementById('priceInputTrade').value)
+      };
+
+      try {
+        await api('/api/orders', {
+          method: 'POST',
+          body: JSON.stringify(payload)
+        });
+        alert('Order placed successfully');
+        window.location.href = './wallet.html';
+      } catch (err) {
+        alert(err.message);
+      }
+    });
+  }
+}
+
+function setupChatSending() {
+  const sendBtn = document.getElementById('sendChatButton');
+  if (!sendBtn) return;
+
+  sendBtn.addEventListener('click', async () => {
+    const token = getToken();
+    if (!token) {
+      alert('Please login first');
+      return;
+    }
+
+    const input = document.getElementById('chatInput');
+    const text = input.value.trim();
+
+    if (!text) return;
+
+    try {
+      await api('/api/chat', {
+        method: 'POST',
+        body: JSON.stringify({ message: text })
+      });
+
+      input.value = '';
+      await loadChatData();
+    } catch (err) {
+      alert(err.message);
+    }
   });
 }
 
-async function loadProducts() {
-  const products = await api('/api/products');
-  state.products = products;
-  renderProducts();
-}
-
-async function loadOrders() {
-  if (!state.token) {
-    els.orderList.innerHTML = '<div class=\"order-card\">请先登录查看订单</div>';
-    return;
-  }
-
-  const orders = await api('/api/orders');
-  state.orders = orders;
-  els.orderList.innerHTML = orders.map((order) => `
-    <div class=\"order-card\">
-      <h4>${order.product_title || '商品订单'}</h4>
-      <div class=\"order-meta\">
-        <span>金额：￥${Number(order.amount).toFixed(2)}</span>
-        <span>状态：${order.status}</span>
-      </div>
-      <div class=\"order-meta\">
-        <span>数量：${order.qty}</span>
-        <span>${new Date(order.created_at).toLocaleString()}</span>
-      </div>
-    </div>
-  `).join('') || '<div class=\"order-card\">暂无订单</div>';
-}
-
-async function loadMessages() {
-  const messages = await api('/api/chat');
-  state.messages = messages;
-  els.chatList.innerHTML = messages.map((msg) => `
-    <div class=\"chat-item\">
-      <strong>${msg.username}</strong>
-      <span>${msg.body}</span>
-      <small>${new Date(msg.created_at).toLocaleString()}</small>
-    </div>
-  `).join('') || '<div class=\"chat-item\">暂无留言</div>';
-}
-
-async function loadProfile() {
-  if (!state.token) return;
-  try {
-    const user = await api('/api/me');
-    state.user = user;
-    localStorage.setItem('user', JSON.stringify(user));
-    renderUserState();
-  } catch (_error) {
-    clearSession();
-  }
-}
-
-els.loginForm.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const username = els.loginUsername.value.trim();
-  const password = els.loginPassword.value;
-
-  try {
-    const result = await api('/api/login', {
-      method: 'POST',
-      body: JSON.stringify({ username, password }),
-    });
-    saveSession(result.token, result.user);
-    els.loginForm.reset();
-    await Promise.all([loadOrders(), loadMessages()]);
-  } catch (error) {
-    alert(error.message);
-  }
-});
-
-els.registerForm.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const username = els.registerUsername.value.trim();
-  const password = els.registerPassword.value;
-
-  try {
-    const result = await api('/api/register', {
-      method: 'POST',
-      body: JSON.stringify({ username, password }),
-    });
-    saveSession(result.token, result.user);
-    els.registerForm.reset();
-    await Promise.all([loadOrders(), loadMessages()]);
-  } catch (error) {
-    alert(error.message);
-  }
-});
-
-els.logoutBtn.addEventListener('click', () => {
-  clearSession();
-  loadOrders();
-});
-
-els.productForm.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  if (!state.token) {
-    alert('请先登录后再发布商品');
-    return;
-  }
-
-  try {
-    await api('/api/products', {
-      method: 'POST',
-      body: JSON.stringify({
-        title: els.productTitle.value.trim(),
-        description: els.productDescription.value.trim(),
-        price: Number(els.productPrice.value),
-        stock: Number(els.productStock.value),
-        category_id: Number(els.productCategory.value),
-        images: (els.productImages.value || '').split(',').map((v) => v.trim()).filter(Boolean),
-      }),
-    });
-
-    els.productForm.reset();
-    await loadProducts();
-    alert('商品发布成功');
-  } catch (error) {
-    alert(error.message);
-  }
-});
-
-els.searchInput.addEventListener('input', renderProducts);
-els.categoryFilter.addEventListener('change', renderProducts);
-
-els.chatForm.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  if (!state.token) {
-    alert('请先登录');
-    return;
-  }
-
-  const message = els.chatInput.value.trim();
-  if (!message) return;
-
-  try {
-    await api('/api/chat', {
-      method: 'POST',
-      body: JSON.stringify({ message }),
-    });
-    els.chatInput.value = '';
-    await loadMessages();
-  } catch (error) {
-    alert(error.message);
-  }
-});
-
 async function init() {
-  renderUserState();
-  await loadCategories();
-  await loadProducts();
-  await loadMessages();
-  await loadProfile();
-  await loadOrders();
+  setupAuth();
+  setupTypeButtons();
+  bindEstimate();
+  setupTradeSubmission();
+  setupChatSending();
+
+  const page = document.body.dataset.page;
+
+  if (page === 'home') {
+    await loadHomeData();
+  } else if (page === 'wallet') {
+    await loadWalletData();
+  } else if (page === 'trade') {
+    await loadTradeData();
+  } else if (page === 'chat') {
+    await loadChatData();
+  }
 }
 
 init();
