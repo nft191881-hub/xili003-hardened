@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>XILI 商城</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="brand">XILI 商城</div>
+        <nav class="nav">
+          <a href="#products">商品</a>
+          <a href="#orders">订单</a>
+          <a href="#chat">消息</a>
+        </nav>
+        <div id="userInfo" class="user-box">未登录</div>
+      </header>
+
+      <main class="main-layout">
+        <aside class="panel auth-panel">
+          <h3>账户</h3>
+          <div class="tab-switch">
+            <button class="tab active" data-tab="login">登录</button>
+            <button class="tab" data-tab="register">注册</button>
+          </div>
+
+          <form id="loginForm" class="auth-form active">
+            <input id="loginUsername" type="text" placeholder="用户名" required />
+            <input id="loginPassword" type="password" placeholder="密码" required />
+            <button type="submit">登录</button>
+          </form>
+
+          <form id="registerForm" class="auth-form">
+            <input id="registerUsername" type="text" placeholder="用户名" required />
+            <input id="registerPassword" type="password" placeholder="密码" required />
+            <button type="submit">注册</button>
+          </form>
+
+          <button id="logoutBtn" class="danger hidden">退出登录</button>
+        </aside>
+
+        <section class="content">
+          <div class="panel" id="products">
+            <div class="section-head">
+              <h3>商品列表</h3>
+              <div class="filters">
+                <input id="searchInput" type="text" placeholder="搜索商品" />
+                <select id="categoryFilter">
+                  <option value="">全部分类</option>
+                </select>
+              </div>
+            </div>
+            <div id="productList" class="product-list"></div>
+          </div>
+
+          <div class="panel" id="orders">
+            <h3>我的订单</h3>
+            <div id="orderList" class="order-list"></div>
+          </div>
+
+          <div class="panel" id="chat">
+            <h3>消息留言</h3>
+            <div id="chatList" class="chat-list"></div>
+            <form id="chatForm" class="chat-form">
+              <input id="chatInput" type="text" placeholder="输入留言内容" required />
+              <button type="submit">发送</button>
+            </form>
+          </div>
+        </section>
+
+        <aside class="panel publish-panel">
+          <h3>发布商品</h3>
+          <form id="productForm">
+            <select id="productCategory" required></select>
+            <input id="productTitle" type="text" placeholder="商品标题" required />
+            <textarea id="productDescription" rows="4" placeholder="商品描述"></textarea>
+            <input id="productPrice" type="number" step="0.01" min="0.01" placeholder="价格" required />
+            <input id="productStock" type="number" min="0" placeholder="库存" required />
+            <input id="productImages" type="text" placeholder="图片 URL（可选，逗号分隔）" />
+            <button type="submit">发布商品</button>
+          </form>
+        </aside>
+      </main>
+    </div>
+
+    <script src="/app.js"></script>
+  </body>
+</html>
