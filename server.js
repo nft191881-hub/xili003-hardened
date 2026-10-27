@@ -1,6 +1,7 @@
 const express = require('express');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
+const path = require('path');
 const { initDatabase } = require('./config/db');
 const authRoutes = require('./routes/auth');
 const productRoutes = require('./routes/products');
@@ -40,6 +41,11 @@ const apiLimiter = rateLimit({
 });
 
 app.use('/api/', apiLimiter);
+
+app.use(express.static(path.join(__dirname, 'public')));
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 
 app.get('/health', async (req, res) => {
   try {
