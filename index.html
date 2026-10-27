@@ -12,8 +12,21 @@ body{background:#000;color:#fff;font-family:-apple-system,sans-serif;-webkit-tap
 .text-gold{color:#E6C875}.bg-gold{background:#E6C875}
 .text-neon{color:#C5FF32}.bg-neon{background:#C5FF32}
 .card{background:#121212;border-radius:20px;overflow:hidden}
-.circle{background:#1c1c1e;border-radius:50%;display:flex;align-items:center;justify-content:center}
-.circle:active{transform:scale(.95);background:#2c2c2e}
+/* 新增：水泡透明质感（毛玻璃 + 极细白边 + 高光阴影） */
+.glass-bubble {
+    background: rgba(30, 30, 30, 0.4);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: inset 0 1px 1px rgba(255,255,255,0.05), 0 4px 15px rgba(0,0,0,0.5);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+}
+.glass-bubble:active {
+    transform: scale(0.92);
+    background: rgba(50, 50, 50, 0.5);
+}
 .neon-line{border:.5px solid rgba(197,255,50,.3);box-shadow:0 0 10px rgba(197,255,50,.05)}
 .pixel-bar{background:repeating-linear-gradient(90deg,transparent,transparent 2px,#C5FF32 2px,#C5FF32 6px);filter:drop-shadow(0 0 6px rgba(197,255,50,.6))}
 .slide-enter-active,.slide-leave-active{transition:transform .3s}
@@ -57,12 +70,11 @@ body{background:#000;color:#fff;font-family:-apple-system,sans-serif;-webkit-tap
 <div v-show="tab==='feed'" class="p-4">
 <div class="card p-3"><textarea class="w-full bg-[#1c1c1e] rounded-xl p-3 text-sm outline-none" rows="2" placeholder="发布动态..."></textarea><div class="flex justify-end mt-2"><button class="bg-gold text-black px-5 py-1.5 rounded-full text-sm font-bold">发布</button></div></div>
 </div>
-<!-- 钱包 (微调版) -->
+<!-- 钱包 -->
 <div v-show="tab==='wallet'" class="px-5 pt-8 pb-6">
 <div class="flex justify-between items-start mb-6">
 <div class="flex items-center gap-2">
 <div class="w-6 h-6 bg-green-400 rounded-md text-black flex items-center justify-center text-xs font-bold">X</div>
-<!-- 修改为用户名 XILI -->
 <span class="text-lg font-bold text-neon">XILI ▾</span>
 <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
 </div>
@@ -73,13 +85,27 @@ body{background:#000;color:#fff;font-family:-apple-system,sans-serif;-webkit-tap
 <div class="text-sm text-gray-500 mt-2">$0.00 (0.00%) &nbsp; 1 日</div>
 <div class="absolute right-0 top-4 w-24 h-2 pixel-bar opacity-80"></div>
 </div>
+
+<!-- 替换为水泡透明样式的四大金刚 -->
 <div class="flex justify-between px-2 mb-10">
-<div class="flex flex-col items-center gap-2"><div class="w-16 h-16 circle"><svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M8 7l4-4m0 0l4 4m-4-4v18"/></svg></div><span class="text-xs text-gray-300">发送</span></div>
-<div class="flex flex-col items-center gap-2"><div class="w-16 h-16 circle"><svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M16 17l-4 4m0 0l-4-4m4 4V3"/></svg></div><span class="text-xs text-gray-300">接收</span></div>
-<!-- 修改为明细 -->
-<div class="flex flex-col items-center gap-2"><div class="w-16 h-16 circle"><svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg></div><span class="text-xs text-gray-300">明细</span></div>
-<div @click="showMore=true" class="flex flex-col items-center gap-2"><div class="w-16 h-16 circle"><svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg></div><span class="text-xs text-gray-300">更多</span></div>
+<div class="flex flex-col items-center gap-2">
+<div class="w-16 h-16 glass-bubble"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2.5" d="M8 7l4-4m0 0l4 4m-4-4v18"/></svg></div>
+<span class="text-xs text-gray-300">发送</span>
 </div>
+<div class="flex flex-col items-center gap-2">
+<div class="w-16 h-16 glass-bubble"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2.5" d="M16 17l-4 4m0 0l-4-4m4 4V3"/></svg></div>
+<span class="text-xs text-gray-300">接收</span>
+</div>
+<div class="flex flex-col items-center gap-2">
+<div class="w-16 h-16 glass-bubble"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg></div>
+<span class="text-xs text-gray-300">明细</span>
+</div>
+<div @click="showMore=true" class="flex flex-col items-center gap-2">
+<div class="w-16 h-16 glass-bubble"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2.5" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg></div>
+<span class="text-xs text-gray-300">更多</span>
+</div>
+</div>
+
 <div class="bg-[#1c1c1e] rounded-[24px] p-6 relative overflow-hidden mb-6">
 <div class="relative z-10">
 <div class="text-sm font-bold text-neon mb-1">开始使用</div>
@@ -90,7 +116,6 @@ body{background:#000;color:#fff;font-family:-apple-system,sans-serif;-webkit-tap
 <div class="absolute -right-4 -bottom-4 w-32 h-32 opacity-20 pointer-events-none"><div class="absolute top-4 right-8 w-16 h-16 bg-white rounded-full mix-blend-screen blur-sm"></div><div class="absolute bottom-4 right-4 w-24 h-16 bg-gradient-to-t from-gray-600 to-gray-800 rounded-t-lg border-t border-gray-500"></div></div>
 </div>
 
-<!-- 新增：交易记录空状态 -->
 <div class="mt-8">
     <div class="text-sm font-bold text-gray-400 mb-4 px-1">交易记录</div>
     <div class="flex flex-col items-center justify-center py-10 opacity-60">
