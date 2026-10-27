@@ -13,7 +13,7 @@ function authRequired(req, res, next) {
 
     const decoded = jwt.verify(token, JWT_SECRET);
 
-    query('SELECT id, username, role FROM users WHERE id = $1', [decoded.id])
+    query('SELECT id, username, role, balance, merchant, deposit, contact FROM users WHERE id = $1', [decoded.id])
       .then((result) => {
         if (!result.rows[0]) {
           return res.status(401).json({ error: '用户不存在或已被删除' });

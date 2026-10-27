@@ -18,4 +18,9 @@ router.get('/api/admin/stats', authRequired, requireRole('admin', 'owner'), asyn
   });
 });
 
+router.get('/api/admin/users', authRequired, requireRole('admin', 'owner'), async (req, res) => {
+  const result = await query('SELECT id, username, role, balance, merchant, deposit, created_at FROM users ORDER BY id DESC LIMIT 100');
+  return res.json(result.rows);
+});
+
 module.exports = router;

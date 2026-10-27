@@ -13,7 +13,6 @@ const app = express();
 const port = Number(PORT || 3000);
 
 app.disable('x-powered-by');
-
 app.use(helmet({
   contentSecurityPolicy: false,
   crossOriginEmbedderPolicy: false,
@@ -46,9 +45,9 @@ app.get('/health', async (req, res) => {
   try {
     const { query } = require('./config/db');
     await query('SELECT 1');
-    res.json({ ok: true, status: 'healthy' });
+    return res.json({ ok: true, status: 'healthy' });
   } catch (error) {
-    res.status(500).json({ ok: false, error: 'database unavailable' });
+    return res.status(500).json({ ok: false, error: 'database unavailable' });
   }
 });
 
@@ -60,7 +59,7 @@ app.use(adminRoutes);
 
 app.use((error, req, res, next) => {
   console.error('Unhandled error:', error);
-  res.status(500).json({ error: '服务器内部错误' });
+  return res.status(500).json({ error: '服务器内部错误' });
 });
 
 async function start() {

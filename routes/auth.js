@@ -32,7 +32,7 @@ router.post('/api/register', async (req, res) => {
   }
 
   try {
-    const exists = await query('SELECT 1 FROM users WHERE lower(username) = lower($1)', [username]);
+    const exists = await query('SELECT 1 FROM users WHERE lower(username)=lower($1)', [username]);
     if (exists.rows[0]) {
       return res.status(409).json({ error: '用户名已被使用' });
     }
@@ -70,7 +70,7 @@ router.post('/api/login', async (req, res) => {
 
     return res.json({
       token: signUser(user),
-      user: { id: user.id, username: user.username, role: user.role }
+      user: { id: user.id, username: user.username, role: user.role, balance: user.balance }
     });
   } catch (error) {
     console.error('login error:', error);
@@ -83,6 +83,10 @@ router.get('/api/me', authRequired, async (req, res) => {
     id: req.user.id,
     username: req.user.username,
     role: req.user.role,
+    balance: req.user.balance,
+    merchant: req.user.merchant,
+    deposit: req.user.deposit,
+    contact: req.user.contact,
   });
 });
 

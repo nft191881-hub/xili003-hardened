@@ -17,7 +17,12 @@ router.get('/api/products', async (req, res) => {
   const categoryId = Number(req.query.category_id || 0);
   const keyword = sanitizeText(req.query.q || '', 40);
 
-  let sql = 'SELECT p.id, p.title, p.description, p.price, p.stock, p.created_at, u.username AS seller_name FROM products p JOIN users u ON u.id = p.seller_id WHERE p.active = true';
+  let sql = `
+    SELECT p.id, p.title, p.description, p.price, p.stock, p.sold, p.images, u.username AS seller_name
+    FROM products p
+    JOIN users u ON u.id = p.seller_id
+    WHERE p.active = true AND p.blocked = false
+  `;
   const params = [];
 
   if (categoryId > 0) {
@@ -38,16 +43,15 @@ router.get('/api/products', async (req, res) => {
 
 router.get('/api/products/:id', async (req, res) => {
   const id = Number(req.params.id || 0);
+  const result = await query(`
+    SELECT p.*, u.username AS seller_name, u.role AS seller_role, c.name AS category_name
+    FROM products p
+    JOIN users u ON u.id = p.seller_id
+    LEFT JOIN categories c ON c.id = p.category_id
+    WHERE p.id = $1
+  `, [id]);
 
-  const result = await query(
-    'SELECT p.*, u.username AS seller_name FROM products p JOIN users u ON u.id = p.seller_id WHERE p.id = $1',
-    [id]
-  );
-
-  if (!result.rows[0]) {
-    return res.status(404).json({ error: '商品不存在' });
-  }
-
+  if (!result.rows[0]) return res.status(404).json({ error: '商品不存在' });
   return res.json(result.rows[0]);
 });
 
@@ -57,6 +61,7 @@ router.post('/api/products', authRequired, async (req, res) => {
   const price = Number(req.body.price || 0);
   const stock = Number(req.body.stock || 0);
   const categoryId = Number(req.body.category_id || 0);
+  const images = Array.isArray(req.body.images) ? req.body.images.slice(0, 5) : [];
 
   if (!title) return res.status(400).json({ error: '请填写商品标题' });
   if (!Number.isFinite(price) || price <= 0 || price > 1_000_000) return res.status(400).json({ error: '价格不合法' });
@@ -65,10 +70,11 @@ router.post('/api/products', authRequired, async (req, res) => {
   const category = await query('SELECT 1 FROM categories WHERE id = $1 AND enabled = true', [categoryId]);
   if (!categoryId || !category.rows[0]) return res.status(400).json({ error: '请选择有效分类' });
 
-  const result = await query(
-    'INSERT INTO products(seller_id, category_id, title, description, price, stock) VALUES($1, $2, $3, $4, $5, $6) RETURNING id',
-    [req.user.id, categoryId, title, description, price, stock]
-  );
+  const result = await query(`
+    INSERT INTO products(seller_id, category_id, title, description, price, stock, images)
+    VALUES($1, $2, $3, $4, $5, $6, $7)
+    RETURNING id
+  `, [req.user.id, categoryId, title, description, price, stock, images]);
 
   return res.status(201).json({ id: result.rows[0].id });
 });

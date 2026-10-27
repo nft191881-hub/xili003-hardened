@@ -15,7 +15,7 @@ router.post('/api/chat', authRequired, async (req, res) => {
     return res.status(400).json({ error: '消息不能为空' });
   }
 
-  await query('INSERT INTO messages(sender_id, body) VALUES($1, $2)', [req.user.id, body]);
+  await query('INSERT INTO messages(user_id, kind, body) VALUES($1, $2, $3)', [req.user.id, 'text', body]);
   return res.status(201).json({ ok: true });
 });
 
@@ -23,7 +23,8 @@ router.get('/api/chat', async (req, res) => {
   const result = await query(`
     SELECT m.id, m.body, m.created_at, u.username
     FROM messages m
-    JOIN users u ON u.id = m.sender_id
+    JOIN users u ON u.id = m.user_id
+    WHERE m.deleted = false
     ORDER BY m.created_at DESC
     LIMIT 50
   `);

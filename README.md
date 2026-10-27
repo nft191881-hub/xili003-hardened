@@ -1,35 +1,48 @@
 # Hardened xili003
 
-This project is a security-focused replacement for the original xili003 application.
+This project is a security-focused replacement for the original xili003 application, built for a clean Render deployment setup.
 
-## What was fixed
-- enforced environment variable validation
-- removed insecure TLS certificate bypass
-- added Helmet security headers
-- added request rate limiting
-- normalized user input handling
-- separated auth, product, order, chat, and admin routes
-- set a safer database bootstrap strategy
+## Features
+- user registration and login
+- JWT auth
+- category listing and product catalog
+- product publishing
+- order creation and confirmation
+- chat messaging
+- admin stats and user listing
+- hardened startup checks and rate limiting
 
 ## Setup
-1. npm install
-2. cp .env.example .env
-3. fill in DATABASE_URL and JWT_SECRET
-4. npm start
 
-## Basic endpoints
-- GET /health
-- POST /api/register
-- POST /api/login
-- GET /api/me
-- GET /api/categories
-- GET /api/products
-- POST /api/products
-- POST /api/orders
-- GET /api/orders
-- POST /api/chat
-- GET /api/chat
-- GET /api/admin/stats
+1. Install dependencies
+   npm install
+
+2. Create environment file
+   cp .env.example .env
+
+3. Fill in your environment values
+   - DATABASE_URL
+   - JWT_SECRET
+   - PORT
+
+4. Start the app
+   npm start
+
+5. Health check
+   curl http://localhost:3000/health
+
+## Render deployment
+
+Set these environment variables in Render:
+- DATABASE_URL
+- JWT_SECRET
+- PORT=3000
+
+Build command:
+- npm install
+
+Start command:
+- npm start
 
 ## Notes
-This is a hardened minimal replacement, not a direct clone of the original system. It is intentionally smaller and safer for production deployment and future module-based expansion.
+This is a hardened, modular replacement intended to be cleaner and safer than the original monolithic server.
