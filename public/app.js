@@ -151,27 +151,152 @@ async function loadProducts() {
 
 async function loadOrders() {
   if (!state.token) {
-    els.orderList.innerHTML = '<div class="order-card">请先登录查看订单</div>';
+    els.orderList.innerHTML = '<div class=\"order-card\">请先登录查看订单</div>';
     return;
   }
 
   const orders = await api('/api/orders');
   state.orders = orders;
   els.orderList.innerHTML = orders.map((order) => `
-    <div class="order-card">
+    <div class=\"order-card\">
       <h4>${order.product_title || '商品订单'}</h4>
-      <div class="order-meta">
+      <div class=\"order-meta\">
         <span>金额：￥${Number(order.amount).toFixed(2)}</span>
         <span>状态：${order.status}</span>
       </div>
-      <div class="order-meta">
+      <div class=\"order-meta\">
         <span>数量：${order.qty}</span>
         <span>${new Date(order.created_at).toLocaleString()}</span>
       </div>
     </div>
-  `).join('') || '<div class="order-card">暂无订单</div>';
+  `).join('') || '<div class=\"order-card\">暂无订单</div>';
 }
 
 async function loadMessages() {
   const messages = await api('/api/chat');
   state.messages = messages;
+  els.chatList.innerHTML = messages.map((msg) => `
+    <div class=\"chat-item\">
+      <strong>${msg.username}</strong>
+      <span>${msg.body}</span>
+      <small>${new Date(msg.created_at).toLocaleString()}</small>
+    </div>
+  `).join('') || '<div class=\"chat-item\">暂无留言</div>';
+}
+
+async function loadProfile() {
+  if (!state.token) return;
+  try {
+    const user = await api('/api/me');
+    state.user = user;
+    localStorage.setItem('user', JSON.stringify(user));
+    renderUserState();
+  } catch (_error) {
+    clearSession();
+  }
+}
+
+els.loginForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const username = els.loginUsername.value.trim();
+  const password = els.loginPassword.value;
+
+  try {
+    const result = await api('/api/login', {
+      method: 'POST',
+      body: JSON.stringify({ username, password }),
+    });
+    saveSession(result.token, result.user);
+    els.loginForm.reset();
+    await Promise.all([loadOrders(), loadMessages()]);
+  } catch (error) {
+    alert(error.message);
+  }
+});
+
+els.registerForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const username = els.registerUsername.value.trim();
+  const password = els.registerPassword.value;
+
+  try {
+    const result = await api('/api/register', {
+      method: 'POST',
+      body: JSON.stringify({ username, password }),
+    });
+    saveSession(result.token, result.user);
+    els.registerForm.reset();
+    await Promise.all([loadOrders(), loadMessages()]);
+  } catch (error) {
+    alert(error.message);
+  }
+});
+
+els.logoutBtn.addEventListener('click', () => {
+  clearSession();
+  loadOrders();
+});
+
+els.productForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  if (!state.token) {
+    alert('请先登录后再发布商品');
+    return;
+  }
+
+  try {
+    await api('/api/products', {
+      method: 'POST',
+      body: JSON.stringify({
+        title: els.productTitle.value.trim(),
+        description: els.productDescription.value.trim(),
+        price: Number(els.productPrice.value),
+        stock: Number(els.productStock.value),
+        category_id: Number(els.productCategory.value),
+        images: (els.productImages.value || '').split(',').map((v) => v.trim()).filter(Boolean),
+      }),
+    });
+
+    els.productForm.reset();
+    await loadProducts();
+    alert('商品发布成功');
+  } catch (error) {
+    alert(error.message);
+  }
+});
+
+els.searchInput.addEventListener('input', renderProducts);
+els.categoryFilter.addEventListener('change', renderProducts);
+
+els.chatForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  if (!state.token) {
+    alert('请先登录');
+    return;
+  }
+
+  const message = els.chatInput.value.trim();
+  if (!message) return;
+
+  try {
+    await api('/api/chat', {
+      method: 'POST',
+      body: JSON.stringify({ message }),
+    });
+    els.chatInput.value = '';
+    await loadMessages();
+  } catch (error) {
+    alert(error.message);
+  }
+});
+
+async function init() {
+  renderUserState();
+  await loadCategories();
+  await loadProducts();
+  await loadMessages();
+  await loadProfile();
+  await loadOrders();
+}
+
+init();
