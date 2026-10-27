@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NovaX Trade</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body data-page="trade">
+    <div class="phone-shell">
+      <div class="status-bar">
+        <span>9:41</span>
+        <div class="signal">
+          <span></span><span></span><span></span><span></span>
+        </div>
+      </div>
+
+      <div class="app-inner">
+        <div class="header-row">
+          <h1>交易</h1>
+          <div class="icon-btn">◔</div>
+        </div>
+
+        <div class="trade-box">
+          <div class="trade-header">
+            <div class="section-head" style="margin:0; width:100%;">
+              <h2 style="margin:0;">P2P 撮合</h2>
+              <div class="more">实时</div>
+            </div>
+          </div>
+
+          <div class="trade-type">
+            <button class="type-btn active" type="button">买入</button>
+            <button class="type-btn" type="button">卖出</button>
+          </div>
+
+          <form id="tradeFormPage">
+            <div class="trade-form" style="margin-top:14px;">
+              <select class="field" id="pairSelectTrade">
+                <option value="BTC/USDT">BTC / USDT</option>
+                <option value="ETH/USDT">ETH / USDT</option>
+                <option value="SOL/USDT">SOL / USDT</option>
+                <option value="USDC/USDT">USDC / USDT</option>
+              </select>
+              <input class="field" id="amountInputTrade" value="2500" />
+              <input class="field" id="priceInputTrade" value="6.98" />
+              <input class="field" id="methodInputTrade" placeholder="支付方式：银行卡" />
+            </div>
+
+            <div class="trade-bottom">
+              <div class="trade-total">预计到账</div>
+              <div class="trade-price" id="estimateValueTrade">USDT 2,500</div>
+            </div>
+
+            <button type="submit" class="submit-btn">立即撮合</button>
+          </form>
+        </div>
+
+        <div class="card-box">
+          <div class="section-head">
+            <h2>买卖盘</h2>
+            <div class="more">深度</div>
+          </div>
+
+          <div id="tradeDepth" class="coin-list"></div>
+        </div>
+      </div>
+
+      <div class="bottom-nav">
+        <a class="nav-item" href="./index.html"><span class="icon">⌂</span>首页</a>
+        <a class="nav-item" href="./wallet.html"><span class="icon">◎</span>钱包</a>
+        <a class="nav-item active" href="./trade.html"><span class="icon">⇄</span>交易</a>
+        <a class="nav-item" href="./chat.html"><span class="icon">☰</span>聊天</a>
+      </div>
+    </div>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
