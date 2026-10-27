@@ -11,11 +11,14 @@
         body { background-color: #000000; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; color: #fff; }
         ::-webkit-scrollbar { display: none; }
         
-        /* 荧光绿与黑金色 */
+        /* 黑金主题色 (用于聊天、交易、动态、设置) */
+        .text-gold { color: #E6C875; }
+        .bg-gold { background-color: #E6C875; }
+        
+        /* 钱包专属荧光绿 */
         .text-neon { color: #C5FF32; }
         .bg-neon { background-color: #C5FF32; }
-        .text-gold { color: #E6C875; }
-        
+
         /* 无边框深灰卡片 */
         .ui-card { background-color: #121212; border-radius: 1.25rem; overflow: hidden; }
         .btn-circle { background-color: #1c1c1e; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.1s; }
@@ -27,7 +30,7 @@
             box-shadow: 0 0 10px rgba(197, 255, 50, 0.05);
         }
 
-        /* 像素绿条 */
+        /* 钱包页的像素绿条 */
         .pixel-bar {
             background-image: repeating-linear-gradient(to right, transparent, transparent 2px, #C5FF32 2px, #C5FF32 6px);
             filter: drop-shadow(0 0 6px rgba(197,255,50,0.6));
@@ -39,7 +42,7 @@
         .toggle-checkbox { right: 0; z-index: 1; border-color: #4a4a4a; transition: all 0.3s; }
         .toggle-label { background-color: #333; transition: all 0.3s; }
 
-        /* 动画 */
+        /* 页面动画 */
         .slide-enter-active, .slide-leave-active { transition: transform 0.3s ease; }
         .slide-enter-from, .slide-leave-to { transform: translateX(100%); }
         .fade-enter-active, .fade-leave-active { transition: opacity 0.2s; }
@@ -65,10 +68,10 @@
             <!-- 内容区 -->
             <main class="flex-1 overflow-y-auto pb-20">
                 
-                <!-- 1. 聊天 (极细荧光绿边框) -->
+                <!-- 1. 聊天 (带极细荧光绿边框，保持原样) -->
                 <div v-show="activeTab === 'chat'" class="p-4 space-y-3 mt-4">
                     <div class="ui-card neon-border p-4 flex gap-3 items-center">
-                        <div class="w-12 h-12 bg-[#1c1c1e] text-neon rounded-full flex items-center justify-center text-xl">群</div>
+                        <div class="w-12 h-12 bg-[#1c1c1e] text-green-400 rounded-full flex items-center justify-center text-xl">群</div>
                         <div class="flex-1">
                             <div class="flex justify-between"><span class="font-bold text-gray-100">官方交流大群</span><span class="text-xs text-gray-500">刚刚</span></div>
                             <div class="text-sm text-gray-400 truncate mt-1">欢迎来到 Web3 交流群</div>
@@ -83,27 +86,27 @@
                     </div>
                 </div>
 
-                <!-- 2. 交易 -->
+                <!-- 2. 交易 (保持黑金原样) -->
                 <div v-show="activeTab === 'trade'" class="p-4">
-                    <div class="bg-[#121212] rounded-2xl p-5 mb-5">
-                        <div class="text-lg font-bold text-neon mb-1">USDT / 法币交易</div>
+                    <div class="bg-gradient-to-br from-[#1a1811] to-[#0a0a0a] rounded-2xl p-5 mb-5">
+                        <div class="text-lg font-bold text-gold mb-1">USDT / 法币交易</div>
                         <div class="text-xs text-gray-400 mb-4">安全 · 快捷 · 零手续费 · TRC20</div>
                         <div class="flex gap-3">
-                            <button class="flex-1 bg-neon text-black font-bold py-2 rounded-xl text-sm">我要买</button>
+                            <button class="flex-1 bg-gold text-black font-bold py-2 rounded-xl text-sm">我要买</button>
                             <button class="flex-1 bg-[#222] text-white font-bold py-2 rounded-xl text-sm">我要卖</button>
                         </div>
                     </div>
                 </div>
 
-                <!-- 3. 动态 -->
+                <!-- 3. 动态 (保持黑金原样) -->
                 <div v-show="activeTab === 'feed'" class="p-4">
                     <div class="ui-card p-3 mb-4">
                         <textarea class="w-full bg-[#1c1c1e] text-gray-200 rounded-xl p-3 text-sm outline-none resize-none placeholder-gray-600" rows="2" placeholder="发布动态..."></textarea>
-                        <div class="flex justify-end mt-2"><button class="bg-neon text-black px-5 py-1.5 rounded-full text-sm font-bold">发布</button></div>
+                        <div class="flex justify-end mt-2"><button class="bg-gold text-black px-5 py-1.5 rounded-full text-sm font-bold">发布</button></div>
                     </div>
                 </div>
 
-                <!-- ================= 4. 钱包 (重构版) ================= -->
+                <!-- ================= 4. 钱包 (独立重构，严格对标参考图) ================= -->
                 <div v-show="activeTab === 'wallet'" class="px-5 pt-8 pb-6">
                     
                     <!-- 顶部账户信息 -->
@@ -117,12 +120,12 @@
                             <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                             <svg class="w-5 h-5 text-gray-400 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
                         </div>
-                        <!-- 右侧齿轮 -->
+                        <!-- 右侧齿轮设置 -->
                         <svg @click="showSettings = true" class="w-6 h-6 text-gray-400 cursor-pointer active:rotate-90 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                     </div>
 
                     <!-- 金额直接显示 -->
-                    <div class="mb-8 relative">
+                    <div class="mb-10 relative">
                         <div class="text-[56px] font-bold text-white leading-none tracking-tight">$0.00</div>
                         <div class="text-sm text-gray-500 mt-2 font-mono">$0.00 (0.00%) &nbsp; 1 日</div>
                         <!-- 像素绿点缀条 -->
@@ -182,28 +185,28 @@
                 </div>
             </main>
 
-            <!-- 底部导航 -->
+            <!-- 底部导航 (保持黑金高亮，其他页面不受污染) -->
             <nav class="absolute bottom-0 w-full bg-black flex justify-around py-3 pb-6 z-20">
-                <button @click="activeTab = 'chat'" class="flex flex-col items-center gap-1" :class="activeTab === 'chat' ? 'text-neon' : 'text-gray-600'">
+                <button @click="activeTab = 'chat'" class="flex flex-col items-center gap-1" :class="activeTab === 'chat' ? 'text-gold' : 'text-gray-600'">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
                     <span class="text-[10px]">聊天</span>
                 </button>
-                <button @click="activeTab = 'trade'" class="flex flex-col items-center gap-1" :class="activeTab === 'trade' ? 'text-neon' : 'text-gray-600'">
+                <button @click="activeTab = 'trade'" class="flex flex-col items-center gap-1" :class="activeTab === 'trade' ? 'text-gold' : 'text-gray-600'">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                     <span class="text-[10px]">交易</span>
                 </button>
-                <button @click="activeTab = 'feed'" class="flex flex-col items-center gap-1" :class="activeTab === 'feed' ? 'text-neon' : 'text-gray-600'">
+                <button @click="activeTab = 'feed'" class="flex flex-col items-center gap-1" :class="activeTab === 'feed' ? 'text-gold' : 'text-gray-600'">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path></svg>
                     <span class="text-[10px]">动态</span>
                 </button>
-                <button @click="activeTab = 'wallet'" class="flex flex-col items-center gap-1" :class="activeTab === 'wallet' ? 'text-neon' : 'text-gray-600'">
+                <button @click="activeTab = 'wallet'" class="flex flex-col items-center gap-1" :class="activeTab === 'wallet' ? 'text-gold' : 'text-gray-600'">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
                     <span class="text-[10px]">钱包</span>
                 </button>
             </nav>
         </div>
 
-        <!-- ================= 更多弹窗 (邀请计划/数字U卡) ================= -->
+        <!-- ================= 更多弹窗 (专属钱包页) ================= -->
         <transition name="fade">
             <div v-if="showMoreModal" class="absolute inset-0 z-40 bg-black/60 backdrop-blur-sm" @click="showMoreModal = false">
                 <transition name="slide-up">
@@ -237,7 +240,7 @@
             </div>
         </transition>
 
-        <!-- ================= 设置页面 ================= -->
+        <!-- ================= 设置页面 (保持原样) ================= -->
         <transition name="slide">
             <div v-if="showSettings" class="absolute inset-0 z-50 bg-black flex flex-col">
                 <header class="px-4 py-3 flex items-center gap-3 sticky top-0 z-10 bg-black">
@@ -373,9 +376,9 @@
         createApp({
             data() {
                 return {
-                    activeTab: 'wallet', // 这次直接默认打开钱包，方便你看效果
-                    showSettings: false, // 设置页
-                    showMoreModal: false // 更多弹窗
+                    activeTab: 'chat', // 默认打开聊天，其他页面完全独立
+                    showSettings: false, 
+                    showMoreModal: false 
                 }
             }
         }).mount('#app');
