@@ -13,8 +13,8 @@ body{background:#000;color:#fff;font-family:-apple-system,sans-serif;-webkit-tap
 .text-neon{color:#C5FF32}.bg-neon{background:#C5FF32}
 .card{background:#121212;border-radius:16px;overflow:hidden}
 .glass-bubble{background:rgba(30,30,30,.4);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.12);box-shadow:inset 0 1px 1px rgba(255,255,255,.05),0 4px 15px rgba(0,0,0,.5);border-radius:50%;display:flex;align-items:center;justify-content:center;transition:.2s}
-.glass-bubble:active{transform:scale(.92);background:rgba(50,19750,50,,.5)}
-.neon255-line{border:.,5px solid rgba(197,255,50,.503);box-shadow:,.0 0 8px rgba(05)}
+.glass-bubble:active{transform:scale(.92);background:rgba(50,50,50,.5)}
+.neon-line{border:.5px solid rgba(197,255,50,.3);box-shadow:0 0 8px rgba(197,255,50,.05)}
 .pixel-bar{background:repeating-linear-gradient(90deg,transparent,transparent 2px,#C5FF32 2px,#C5FF32 6px);filter:drop-shadow(0 0 6px rgba(197,255,50,.6))}
 .fade-enter-active,.fade-leave-active{transition:opacity .2s}.fade-enter-from,.fade-leave-to{opacity:0}
 .up-enter-active,.up-leave-active{transition:transform .3s}.up-enter-from,.up-leave-to{transform:translateY(100%)}
@@ -27,9 +27,6 @@ svg { max-width: 100%; max-height: 100%; }
 .list-item:last-child { border-bottom: none; }
 .pay-tag { background: #1c1c1e; border: 1px solid transparent; padding: 6px 14px; border-radius: 8px; font-size: 13px; color: #aaa; transition: all 0.2s; }
 .pay-tag.active { border-color: #C5FF32; color: #C5FF32; background: rgba(197,255,50,0.1); }
-/* 图二风格的胶囊卡片：深灰底、大圆角、大留白 */
-.menu-card { background: #121212; border-radius: 20px; padding: 18px 20px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; transition: all 0.2s; }
-.menu-card:active { background: #1c1c1e; transform: scale(0.98); }
 .context-menu { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(30, 30, 30, 0.95); backdrop-filter: blur(20px); border-radius: 14px; width: 220px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.1); z-index: 100; }
 .context-item { display: flex; align-items: center; gap: 12px; padding: 14px 16px; font-size: 15px; color: #eee; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; transition: background 0.1s; }
 .context-item:active { background: rgba(255,255,255,0.1); }
@@ -165,48 +162,50 @@ svg { max-width: 100%; max-height: 100%; }
   </div>
 </div>
 
-<!-- ================= 4. 钱包 (内容全部恢复，只套用胶囊卡片风格) ================= -->
+<!-- ================= 4. 钱包 (彻底去除了打X的菜单) ================= -->
 <div v-show="tab==='wallet'" class="px-5 pt-8 pb-6">
-<!-- 个人中心头部 -->
 <div class="flex justify-between items-start mb-6">
   <div class="flex items-center gap-2"><div class="w-6 h-6 bg-green-400 rounded-md text-black flex items-center justify-center text-xs font-bold">X</div><span class="text-lg font-bold text-neon">XILI ▾</span></div>
   <svg @click="showSet=true" class="w-6 h-6 text-gray-400 cursor-pointer" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><circle cx="12" cy="12" r="3" stroke-width="2"/></svg>
 </div>
-<!-- 资产 -->
 <div class="mb-8 relative"><div class="text-[56px] font-bold leading-none tracking-tight">$0.00</div><div class="text-sm text-gray-400 mt-2">成交 1,024 笔 &nbsp; | &nbsp; 成交率 99.8%</div><div class="absolute right-0 top-4 w-24 h-2 pixel-bar opacity-80"></div></div>
-<!-- 四大金刚 -->
 <div class="flex justify-between px-2 mb-8">
 <div @click="actSheet='发送'" class="flex flex-col items-center gap-2"><div class="w-16 h-16 glass-bubble"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2.5" d="M8 7l4-4m0 0l4 4m-4-4v18"/></svg></div><span class="text-xs text-gray-300">发送</span></div>
 <div @click="actSheet='接收'" class="flex flex-col items-center gap-2"><div class="w-16 h-16 glass-bubble"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2.5" d="M16 17l-4 4m0 0l-4-4m4 4V3"/></svg></div><span class="text-xs text-gray-300">接收</span></div>
 <div @click="actSheet='明细'" class="flex flex-col items-center gap-2"><div class="w-16 h-16 glass-bubble"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg></div><span class="text-xs text-gray-300">明细</span></div>
 <div @click="actSheet='更多'" class="flex flex-col items-center gap-2"><div class="w-16 h-16 glass-bubble"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2.5" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg></div><span class="text-xs text-gray-300">更多</span></div>
 </div>
-<!-- 开始 P2P 交易卡片 (原样恢复) -->
+
 <div class="bg-[#1c1c1e] rounded-[24px] p-6 relative overflow-hidden mb-6"><div class="relative z-10"><div class="text-sm font-bold text-neon mb-1">开始使用</div><div class="text-2xl font-bold mb-2">开始 P2P 交易</div><div class="text-sm text-gray-400 mb-6">买卖 USDT，安全快捷。</div><div class="flex gap-3"><button class="flex-1 bg-neon text-black font-bold py-3.5 rounded-full">买入</button><button class="flex-1 bg-[#2c2c2e] font-bold py-3.5 rounded-full">卖出</button></div></div></div>
-<!-- 交易记录空状态 (原样恢复) -->
-<div class="mt-4 mb-6"><div class="text-sm font-bold text-gray-400 mb-4 px-1">交易记录</div><div class="flex flex-col items-center justify-center py-8 opacity-60"><div class="text-4xl mb-3">📭</div><div class="text-sm text-gray-500">还没有记录，开始交易吧</div></div></div>
 
-<!-- 底部菜单列表 (只套用图二的大圆角胶囊卡片风格，内容是我们自己的) -->
-<div class="mt-2">
-  <div class="menu-card" @click="actSheet='我的订单'"><div class="text-[15px] text-gray-200">我的订单</div><div class="text-gray-600 text-lg">›</div></div>
-  <div class="menu-card" @click="actSheet='收付款设置'"><div class="text-[15px] text-gray-200">收付款设置</div><div class="text-gray-600 text-lg">›</div></div>
-  <div class="menu-card" @click="actSheet='安全中心'"><div class="text-[15px] text-gray-200">安全中心</div><div class="text-gray-600 text-lg">›</div></div>
-  <div class="menu-card" @click="actSheet='联系客服'"><div class="text-[15px] text-gray-200">联系客服</div><div class="text-gray-600 text-lg">›</div></div>
-</div>
+<div class="mt-4"><div class="text-sm font-bold text-gray-400 mb-4 px-1">交易记录</div><div class="flex flex-col items-center justify-center py-8 opacity-60"><div class="text-4xl mb-3">📭</div><div class="text-sm text-gray-500">还没有记录，开始交易吧</div></div></div>
 
+<!-- 这里已经彻底干净，没有任何多余菜单 -->
 </div>
 </main>
 
-<!-- ================= 底部导航 ================= -->
-<nav class="absolute bottom-0 w-full bg-black flex justify-around py-3 pb-6 z-20">
-<button @click="tab='chat'" :class="tab==='chat'?'text-gold':'text-gray-600'" class="flex flex-col items-center gap-1"><span class="text-xl">💬</span><span class="text-[10px]">聊天</span></button>
-<button @click="tab='community'" :class="tab==='community'?'text-gold':'text-gray-600'" class="flex flex-col items-center gap-1"><span class="text-xl">🌍</span><span class="text-[10px]">社区</span></button>
-<button @click="tab='trade'" :class="tab==='trade'?'text-gold':'text-gray-600'" class="flex flex-col items-center gap-1"><span class="text-xl">💱</span><span class="text-[10px]">交易</span></button>
-<button @click="tab='wallet'" :class="tab==='wallet'?'text-gold':'text-gray-600'" class="flex flex-col items-center gap-1"><span class="text-xl">👛</span><span class="text-[10px]">钱包</span></button>
+<!-- ================= 底部导航 (极致极简纯黑版) ================= -->
+<nav class="absolute bottom-0 w-full bg-black flex justify-around py-4 pb-6 z-20">
+<button @click="tab='chat'" :class="tab==='chat'?'text-white':'text-gray-600'" class="flex flex-col items-center gap-1 transition-colors">
+  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+  <span class="text-[10px]">聊天</span>
+</button>
+<button @click="tab='community'" :class="tab==='community'?'text-white':'text-gray-600'" class="flex flex-col items-center gap-1 transition-colors">
+  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path></svg>
+  <span class="text-[10px]">社区</span>
+</button>
+<button @click="tab='trade'" :class="tab==='trade'?'text-white':'text-gray-600'" class="flex flex-col items-center gap-1 transition-colors">
+  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+  <span class="text-[10px]">交易</span>
+</button>
+<button @click="tab='wallet'" :class="tab==='wallet'?'text-white':'text-gray-600'" class="flex flex-col items-center gap-1 transition-colors">
+  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+  <span class="text-[10px]">钱包</span>
+</button>
 </nav>
 
 <!-- ================= 弹窗区 ================= -->
-<!-- 1. 分组管理 -->
+<!-- 分组管理 -->
 <transition name="fade"><div v-if="showGroupManage" class="absolute inset-0 z-50 bg-black/80 backdrop-blur" @click="showGroupManage=false">
   <transition name="up"><div class="absolute bottom-0 w-full bg-[#121212] rounded-t-3xl p-6" @click.stop>
     <div class="flex justify-between items-center mb-6"><h3 class="text-lg font-bold">分组管理</h3><button @click="showGroupManage=false" class="text-gray-500">关闭</button></div>
@@ -215,7 +214,7 @@ svg { max-width: 100%; max-height: 100%; }
   </div></transition>
 </div></transition>
 
-<!-- 2. 聊天长按上下文菜单 -->
+<!-- 聊天菜单 -->
 <transition name="fade"><div v-if="showContextMenu" class="absolute inset-0 z-50 bg-black/50 backdrop-blur-sm" @click="showContextMenu=false" @contextmenu.prevent>
   <div class="context-menu" @click.stop>
     <div class="context-item" @click="handleMenu('消息免打扰')"><span class="text-lg">🔕</span> 消息免打扰</div>
@@ -227,7 +226,7 @@ svg { max-width: 100%; max-height: 100%; }
   </div>
 </div></transition>
 
-<!-- 3. 添加到分组 -->
+<!-- 添加到分组 -->
 <transition name="fade"><div v-if="showAddToGroup" class="absolute inset-0 z-50 bg-black/60 backdrop-blur" @click="showAddToGroup=false">
   <transition name="up"><div class="absolute bottom-0 w-full bg-[#1c1c1e] rounded-t-3xl p-6" @click.stop>
     <div class="flex justify-between items-center mb-4"><h3 class="text-lg font-bold">添加到分组</h3><button @click="showAddToGroup=false" class="text-gray-500">取消</button></div>
@@ -238,7 +237,7 @@ svg { max-width: 100%; max-height: 100%; }
   </div></transition>
 </div></transition>
 
-<!-- 设置与交易弹窗 -->
+<!-- 设置/交易弹窗 -->
 <transition name="slide"><div v-if="showSet" class="absolute inset-0 z-40 bg-black flex flex-col"><header class="px-4 py-3 flex items-center gap-3 bg-black border-b border-gray-800"><button @click="showSet=false" class="text-gray-300 flex items-center">＜ 返回</button><div class="text-lg font-bold flex-1 text-center pr-10">设置</div></header><main class="flex-1 overflow-y-auto p-4 space-y-4 pb-20"><div class="card p-2"><div @click="setAction='profile'" class="flex justify-between p-4 border-b border-[#222]"><div class="font-bold">编辑个人资料</div><div class="text-gray-500">＞</div></div></div></main></div></transition>
 <transition name="fade"><div v-if="setAction" class="absolute inset-0 z-50 bg-black/80 backdrop-blur" @click="setAction=null"><transition name="up"><div class="absolute bottom-0 w-full bg-[#121212] rounded-t-3xl p-6" @click.stop><div class="flex justify-between items-center mb-6"><h3 class="text-lg font-bold">编辑资料</h3><button @click="setAction=null" class="text-gray-500">关闭</button></div><button @click="setAction=null" class="w-full bg-gold text-black font-bold py-3.5 rounded-xl">保存</button></div></transition></div></transition>
 <transition name="fade"><div v-if="showOrderModal" class="absolute inset-0 z-50 bg-black/80 backdrop-blur" @click="showOrderModal=false"><transition name="up"><div class="absolute bottom-0 w-full bg-[#121212] rounded-t-3xl p-6" @click.stop><div class="flex justify-between items-center mb-6"><h3 class="text-lg font-bold">{{tradeType==='buy'?'购买':'出售'}} USDT</h3><button @click="showOrderModal=false" class="text-gray-500">关闭</button></div><div class="bg-[#1c1c1e] p-4 rounded-xl mb-4"><div class="text-xs text-gray-500 mb-1">交易金额 (CNY)</div><div class="flex items-center border-b border-gray-700 pb-2"><input v-model="orderCNY" type="number" class="bg-transparent text-2xl outline-none flex-1 text-white font-bold placeholder-gray-600" placeholder="0.00"><span class="text-gray-400 font-bold">CNY</span></div></div><div class="bg-[#1c1c1e] p-4 rounded-xl mb-4"><div class="text-xs text-gray-500 mb-1">预计获得 (USDT)</div><div class="flex items-center pb-2"><input :value="orderUSDT" readonly class="bg-transparent text-2xl outline-none flex-1 text-neon font-bold"><span class="text-neon font-bold">USDT</span></div></div><button @click="submitOrder" class="w-full bg-neon text-black font-bold py-3.5 rounded-xl">确认下单</button></div></transition></div></transition>
@@ -254,7 +253,7 @@ svg { max-width: 100%; max-height: 100%; }
 const {createApp}=Vue;
 createApp({
   data:()=>({
-    tab:'wallet', // 默认打开钱包让你检查
+    tab:'wallet', 
     comTab:'动态',
     showSet:false,
     setAction:null,
