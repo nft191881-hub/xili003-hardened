@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>Web3 P2P</title>
-<!-- 换回最稳定的国际官方源 -->
+<!-- 换了国内极度稳定的镜像源，保证秒开 -->
 <script src="https://cdn.tailwindcss.com"></script>
-<script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+<script src="https://cdn.staticfile.net/vue/3.3.4/vue.global.prod.js"></script>
 <style>
 body{background:#000;color:#fff;font-family:-apple-system,sans-serif;-webkit-tap-highlight-color:transparent; user-select: none; margin:0;}
 ::-webkit-scrollbar{display:none}
@@ -29,13 +29,11 @@ svg { max-width: 100%; max-height: 100%; }
 .menu-item:last-child { border-bottom: none; }
 .menu-icon { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; margin-right: 12px; }
 
-/* 聊天气泡 */
 .chat-bubble-left { background: #2c2c2e; color: #fff; border-radius: 8px; border-top-left-radius: 0; position: relative; }
 .chat-bubble-left::before { content: ''; position: absolute; top: 0; left: -6px; border-top: 0px solid transparent; border-right: 6px solid #2c2c2e; border-bottom: 6px solid transparent; }
 .chat-bubble-right { background: #2b8c57; color: #fff; border-radius: 8px; border-top-right-radius: 0; position: relative; }
 .chat-bubble-right::before { content: ''; position: absolute; top: 0; right: -6px; border-top: 0px solid transparent; border-left: 6px solid #2b8c57; border-bottom: 6px solid transparent; }
 
-/* 动画 */
 .fade-enter-active,.fade-leave-active{transition:opacity .2s}.fade-enter-from,.fade-leave-to{opacity:0}
 .up-enter-active,.up-leave-active{transition:transform .3s}.up-enter-from,.up-leave-to{transform:translateY(100%)}
 .slide-enter-active,.slide-leave-active{transition:transform .3s}.slide-enter-from,.slide-leave-to{transform:translateX(100%)}
@@ -48,37 +46,41 @@ svg { max-width: 100%; max-height: 100%; }
 <!-- 1. 聊天列表 -->
 <div v-show="tab==='chat'">
   <div class="flex justify-between items-center px-4 pt-4 pb-2 text-gray-300">
-    <button @click="showGroupManage=true" class="cursor-pointer active:text-white p-2 -m-2">
-      <svg class="w-6 h-6 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
-    </button>
+    <button class="p-2 -m-2"><svg class="w-6 h-6 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg></button>
     <div class="flex gap-2">
-      <button class="p-2 -m-1"><svg class="w-6 h-6 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg></button>
-      <button class="p-2 -m-1"><svg class="w-6 h-6 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg></button>
+      <button class="p-2 -m-2"><svg class="w-6 h-6 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg></button>
+      <button class="p-2 -m-2"><svg class="w-6 h-6 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg></button>
     </div>
   </div>
   
   <div class="flex gap-2 px-4 pb-2 overflow-x-auto">
-    <div v-for="g in chatGroups" :key="g" @click="chatTab=g" 
-         :class="chatTab===g ? 'bg-[#2a3a2e] text-neon border border-neon/20' : 'bg-[#121212] text-gray-400'" 
-         class="px-4 py-1.5 rounded-full text-sm font-bold whitespace-nowrap transition-colors cursor-pointer">{{g}}</div>
+    <div v-for="g in ['全部','未读','群组']" :key="g" class="px-4 py-1.5 rounded-full text-sm font-bold bg-[#121212] text-gray-400">{{g}}</div>
   </div>
 
   <div class="px-2">
-    <div v-for="(chat, index) in chats" :key="index" 
-         class="flex items-center px-3 py-1.5 active:bg-[#121212] transition-colors cursor-pointer"
-         @click="openChatDetail(chat)">
-      
+    <div class="flex items-center px-3 py-1.5 active:bg-[#121212] transition-colors cursor-pointer" @click="activeChat = {name: '官方 P2P 交流大群', avatarText: '群'}">
       <div class="w-[52px] h-[52px] bg-gradient-to-tr from-gray-700 to-gray-600 rounded-[14px] flex items-center justify-center text-xl mr-3 flex-shrink-0 shadow-sm relative">
-        <span>{{ chat.avatarText }}</span>
-        <div v-if="chat.unread" class="absolute -top-1 -right-1 w-3.5 h-3.5 bg-neon rounded-full border-2 border-black"></div>
+        <span>群</span>
+        <div class="absolute -top-1 -right-1 w-3.5 h-3.5 bg-neon rounded-full border-2 border-black"></div>
       </div>
-      
       <div class="flex-1 min-w-0 h-[52px] flex flex-col justify-center border-b border-[#1a1a1a]">
         <div class="flex justify-between items-center mb-1">
-          <span class="font-bold text-[15px] text-gray-100 truncate pr-2">{{ chat.name }}</span>
-          <span class="text-[11px] text-gray-500 flex-shrink-0">{{ chat.time }}</span>
+          <span class="font-bold text-[15px] text-gray-100 truncate pr-2">官方 P2P 交流大群</span>
+          <span class="text-[11px] text-gray-500 flex-shrink-0">08:55</span>
         </div>
-        <div class="text-[13px] text-gray-400 truncate">{{ chat.lastMsg }}</div>
+        <div class="text-[13px] text-gray-400 truncate">张三: 收一点USDT</div>
+      </div>
+    </div>
+    <div class="flex items-center px-3 py-1.5 active:bg-[#121212] transition-colors cursor-pointer" @click="activeChat = {name: '在线客服', avatarText: '客'}">
+      <div class="w-[52px] h-[52px] bg-gradient-to-tr from-gray-700 to-gray-600 rounded-[14px] flex items-center justify-center text-xl mr-3 flex-shrink-0 shadow-sm relative">
+        <span>客</span>
+      </div>
+      <div class="flex-1 min-w-0 h-[52px] flex flex-col justify-center border-b border-[#1a1a1a]">
+        <div class="flex justify-between items-center mb-1">
+          <span class="font-bold text-[15px] text-gray-100 truncate pr-2">在线客服</span>
+          <span class="text-[11px] text-gray-500 flex-shrink-0">昨天</span>
+        </div>
+        <div class="text-[13px] text-gray-400 truncate">您好，请问有什么可以帮您？</div>
       </div>
     </div>
   </div>
@@ -87,18 +89,19 @@ svg { max-width: 100%; max-height: 100%; }
 <!-- 2. 社区 -->
 <div v-show="tab==='community'" class="relative h-full">
   <div class="flex justify-around items-center px-4 py-2 border-b border-[#1a1a1a] sticky top-0 bg-black z-10">
-    <div v-for="t in ['动态','行情','机会']" :key="t" @click="comTab=t" class="pb-2 text-sm font-bold transition-colors cursor-pointer" :class="comTab===t?'text-gold border-b-2 border-gold':'text-gray-500'">{{t}}</div>
+    <div class="pb-2 text-sm font-bold text-gold border-b-2 border-gold">动态</div>
+    <div class="pb-2 text-sm font-bold text-gray-500">行情</div>
+    <div class="pb-2 text-sm font-bold text-gray-500">机会</div>
   </div>
-  <div v-show="comTab==='动态'" class="p-4 space-y-4">
-    <div class="card p-4" v-for="i in 3" :key="i">
+  <div class="p-4 space-y-4">
+    <div class="card p-4">
       <div class="flex items-center gap-2 mb-3">
         <div class="w-8 h-8 bg-[#333] rounded-full flex items-center justify-center text-xs">U</div>
-        <div><div class="text-sm font-bold">用户_{{i}} <span v-if="i===1" class="text-[10px] bg-gold text-black px-1 rounded">置顶</span></div><div class="text-[10px] text-gray-500">2小时前</div></div>
+        <div><div class="text-sm font-bold">用户_1</div><div class="text-[10px] text-gray-500">2小时前</div></div>
       </div>
-      <p class="text-sm text-gray-200 mb-3">今天收了一点USDT，有需要的老板联系我。支持担保交易！</p>
+      <p class="text-sm text-gray-200">今天收了一点USDT，有需要的老板联系我。支持担保交易！</p>
     </div>
   </div>
-  <button @click="showPost=true" class="fixed bottom-24 right-4 w-14 h-14 bg-neon text-black rounded-full shadow-[0_0_15px_rgba(197,255,50,0.4)] flex items-center justify-center z-20 active:scale-95 transition cursor-pointer"><svg class="w-8 h-8 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg></button>
 </div>
 
 <!-- 3. 交易 -->
@@ -106,18 +109,17 @@ svg { max-width: 100%; max-height: 100%; }
   <div class="px-4 py-4 flex justify-between items-center bg-black/90 sticky top-0 z-50">
     <div class="flex items-center gap-2"><div class="w-1.5 h-5 bg-neon rounded-full"></div><span class="text-xl font-extrabold text-white tracking-wide">P2P交易</span></div>
     
-    <!-- 加大点击区域，图标设置为穿透，绝对能点到 -->
     <div class="flex items-center gap-4 text-gray-300 relative z-50">
-      <button type="button" @click.stop="showHistory=true" class="w-10 h-10 bg-[#1c1c1e] rounded-full flex items-center justify-center active:scale-90 transition cursor-pointer">
+      <button type="button" @click="showHistory = true" class="w-10 h-10 bg-[#1c1c1e] rounded-full flex items-center justify-center active:scale-90 transition cursor-pointer">
         <svg class="w-5 h-5 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
       </button>
-      <button type="button" @click.stop="showMoreMenu=true" class="w-10 h-10 bg-[#1c1c1e] rounded-full flex items-center justify-between-center active:scale-90 transition cursor-pointer">
-        <svg class="w- items5 h-5 pointer-events-end-none" fill="none" stroke="currentColor" viewBox mb="0 0 24 24"><path stroke-linecap="round-" stroke-linejoin="round" stroke-width="2" d3="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z"></path></svg>
+      <button type="button" @click="showMoreMenu = true" class="w-10 h-10 bg-[#1c1c1e] rounded-full flex items-center justify-center active:scale-90 transition cursor-pointer">
+        <svg class="w-5 h-5 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z"></path></svg>
       </button>
     </div>
   </div>
 
-  <div class="px-4 py-2 flex justify">
+  <div class="px-4 py-2 flex justify-between items-end mb-3">
     <div class="flex items-baseline gap-4">
       <span @click="tradeType='buy'" :class="tradeType==='buy'?'text-3xl font-bold text-white':'text-2xl font-medium text-gray-600'" class="cursor-pointer">购买</span>
       <span @click="tradeType='sell'" :class="tradeType==='sell'?'text-3xl font-bold text-white':'text-2xl font-medium text-gray-600'" class="cursor-pointer">出售</span>
@@ -127,14 +129,13 @@ svg { max-width: 100%; max-height: 100%; }
   <div class="px-4 mb-4"><span class="text-xs text-blue-400 bg-blue-900/20 px-3 py-1.5 rounded-full border border-blue-900/30">{{tradeType==='buy'?'购买':'出售'}} USDT 零手续费</span></div>
 
   <div class="bg-[#121212] mx-4 rounded-2xl overflow-hidden">
-    <!-- 真实数据渲染 -->
     <div class="list-item" v-for="item in listings" :key="item.id">
       <div class="flex justify-between items-center mb-2">
         <div class="flex items-center gap-2">
-          <div :class="item.verified ? 'bg-gradient-to-tr from-green-900 to-black border-green-500/50' : 'bg-gray-800 text-gray-400'" class="w-7 h-7 rounded-full flex items-center justify-center text-[10px] text-white border">{{item.verified?'认':'未'}}</div>
+          <div class="w-7 h-7 rounded-full flex items-center justify-center text-[10px] text-white border bg-gradient-to-tr from-green-900 to-black border-green-500/50">认</div>
           <span class="font-bold text-[15px] text-gray-100">{{item.name}}</span>
         </div>
-        <div class="text-xs text-gray-500 flex items-center gap-1"><span class="text-gray-400">📄</span> {{item.trades}} &nbsp;|&nbsp; <span class="text-gray-400">🤝</span> {{item.rate}}%</div>
+        <div class="text-xs text-gray-500 flex items-center gap-1">📄 {{item.trades}} | 🤝 {{item.rate}}%</div>
       </div>
       <div class="flex justify-between items-end mt-3">
         <div>
@@ -142,9 +143,6 @@ svg { max-width: 100%; max-height: 100%; }
           <div class="text-[13px] text-gray-500">限额: {{item.min}} - {{item.max}} CNY</div>
         </div>
         <button @click.stop="openOrder(item)" class="bg-neon text-black px-6 py-2 rounded-lg text-[14px] font-bold active:scale-95 transition cursor-pointer">{{tradeType==='buy'?'购买':'出售'}}</button>
-      </div>
-      <div class="mt-4 flex items-center gap-3 text-[12px] text-gray-400">
-        <div v-for="pay in (item.pays || [])" :key="pay" class="flex items-center gap-1"><div class="w-0.5 h-3 bg-gold"></div> {{pay}}</div>
       </div>
     </div>
     
@@ -155,27 +153,18 @@ svg { max-width: 100%; max-height: 100%; }
 <!-- 4. 我的 -->
 <div v-show="tab==='wallet'" class="pb-6 bg-[#050505]">
   <div class="bg-[#121212] p-6 pt-10 rounded-b-3xl mb-4">
-    <div class="flex justify-between items-start mb-6">
-      <div class="flex items-center gap-4">
-        <div class="relative">
-          <div class="w-16 h-16 bg-gradient-to-tr from-green-700 to-green-500 rounded-xl flex items-center justify-center text-2xl shadow-lg">X</div>
-          <div class="absolute -bottom-1 -right-1 bg-[#121212] px-1 rounded-full">
-            <div class="w-3.5 h-3.5 bg-neon rounded-full border-2 border-[#121212]"></div>
-          </div>
-        </div>
-        <div>
-          <div class="text-xl font-bold text-white flex items-center gap-2">XILI<span class="text-[10px] bg-neon/20 text-neon px-1.5 py-0.5 rounded border border-neon/30">已认证</span></div>
-          <div class="text-xs text-gray-400 mt-1 flex items-center gap-1"><div class="w-1.5 h-1.5 bg-neon rounded-full"></div> 在线</div>
-        </div>
+    <div class="flex items-center gap-4">
+      <div class="relative">
+        <div class="w-16 h-16 bg-gradient-to-tr from-green-700 to-green-500 rounded-xl flex items-center justify-center text-2xl shadow-lg">X</div>
+        <div class="absolute -bottom-1 -right-1 bg-[#121212] px-1 rounded-full"><div class="w-3.5 h-3.5 bg-neon rounded-full border-2 border-[#121212]"></div></div>
+      </div>
+      <div>
+        <div class="text-xl font-bold text-white flex items-center gap-2">XILI<span class="text-[10px] bg-neon/20 text-neon px-1.5 py-0.5 rounded border border-neon/30">已认证</span></div>
+        <div class="text-xs text-gray-400 mt-1 flex items-center gap-1"><div class="w-1.5 h-1.5 bg-neon rounded-full"></div> 在线</div>
       </div>
     </div>
-
-    <div class="flex justify-between items-center mb-2 cursor-pointer">
-      <div>
-        <div class="text-xs text-gray-400 mb-1">总资产估值 (USDT)</div>
-        <div class="text-[32px] font-bold">$ 0.00</div>
-      </div>
-      <div class="text-gray-500 text-sm">查看钱包 ›</div>
+    <div class="mt-4 pt-4 border-t border-[#1c1c1e] flex justify-between items-center">
+      <div><div class="text-xs text-gray-400 mb-1">总资产估值 (USDT)</div><div class="text-2xl font-bold">$ 0.00</div></div>
     </div>
   </div>
 
@@ -184,22 +173,20 @@ svg { max-width: 100%; max-height: 100%; }
       <div class="menu-item cursor-pointer"><div class="flex items-center"><span class="menu-icon text-green-500">💳</span>钱包</div><div class="text-gray-500">›</div></div>
       <div class="menu-item cursor-pointer"><div class="flex items-center"><span class="menu-icon text-blue-500">⭐</span>收藏</div><div class="text-gray-500">›</div></div>
       <div class="menu-item cursor-pointer" @click="tab='community'"><div class="flex items-center"><span class="menu-icon text-orange-500">🖼️</span>动态</div><div class="text-gray-500">›</div></div>
-      <div class="menu-item cursor-pointer"><div class="flex items-center"><span class="menu-icon text-gray-400">⚙️</span>设置</div><div class="text-gray-500">›</div></div>
     </div>
   </div>
 </div>
 </main>
 
 <!-- 底部导航 -->
-<nav class="absolute bottom-0 w-full bg-black flex justify-around py-2 pb-6 z-40 shadow-[0_-1px_0_rgba(255,255,255,0.05)]">
+<nav class="absolute bottom-0 w-full bg-black flex justify-around py-2 pb-6 z-40 border-t border-[#1a1a1a]">
 <button @click="tab='chat'" :class="tab==='chat'?'text-white':'text-gray-600'" class="flex flex-col items-center gap-1 p-2 transition-colors cursor-pointer"><svg class="w-7 h-7 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg><span class="text-[10px]">聊天</span></button>
 <button @click="tab='community'" :class="tab==='community'?'text-white':'text-gray-600'" class="flex flex-col items-center gap-1 p-2 transition-colors cursor-pointer"><svg class="w-7 h-7 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path></svg><span class="text-[10px]">社区</span></button>
-<button @click="tab='trade'" :class="tab==='trade'?'text-white':'text-gray-600'" class="flex flex-col items-center gap-1 p-2 transition-colors cursor-pointer"><svg class="w-7 h-7 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1">v8m我的0 0v1m</0-1c-1.11 span0-2.08></-.402-2.599-1M21 12abutton9 9 0 11-18 0 9 9 0 0118 0z"></path></svg><span class="text-[10px]">交易</span></button>
-<button @click="tab='wallet'" :class="tab==='wallet'?'text-white':'text-gray-600'" class="flex flex-col items-center gap-1 p-2 transition-colors cursor-pointer"><svg class="w-7 h-7 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg><span class="text-[10px]>
+<button @click="tab='trade'" :class="tab==='trade'?'text-white':'text-gray-600'" class="flex flex-col items-center gap-1 p-2 transition-colors cursor-pointer"><svg class="w-7 h-7 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg><span class="text-[10px]">交易</span></button>
+<button @click="tab='wallet'" :class="tab==='wallet'?'text-white':'text-gray-600'" class="flex flex-col items-center gap-1 p-2 transition-colors cursor-pointer"><svg class="w-7 h-7 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg><span class="text-[10px]">我的</span></button>
 </nav>
 
 <!-- ================= 弹窗区 ================= -->
-<!-- 历史订单 -->
 <transition name="fade"><div v-if="showHistory" class="fixed inset-0 z-[9999] bg-black/80 flex items-end" @click.self="showHistory=false">
   <transition name="up"><div class="w-full bg-[#121212] rounded-t-3xl p-6 h-[70vh] flex flex-col">
     <div class="flex justify-between items-center mb-4"><h3 class="text-lg font-bold">历史订单</h3><button @click="showHistory=false" class="text-gray-500 p-2 cursor-pointer">关闭</button></div>
@@ -207,7 +194,6 @@ svg { max-width: 100%; max-height: 100%; }
   </div></transition>
 </div></transition>
 
-<!-- 更多操作 -->
 <transition name="fade"><div v-if="showMoreMenu" class="fixed inset-0 z-[9999] bg-black/80 flex items-end" @click.self="showMoreMenu=false">
   <transition name="up"><div class="w-full bg-[#121212] rounded-t-3xl p-6">
     <div class="flex justify-between items-center mb-4"><h3 class="text-lg font-bold">更多操作</h3><button @click="showMoreMenu=false" class="text-gray-500 p-2 cursor-pointer">关闭</button></div>
@@ -218,7 +204,6 @@ svg { max-width: 100%; max-height: 100%; }
   </div></transition>
 </div></transition>
 
-<!-- 发布广告 -->
 <transition name="fade"><div v-if="showPostAd" class="fixed inset-0 z-[9999] bg-black/80 flex items-end" @click.self="showPostAd=false">
   <transition name="up"><div class="w-full bg-[#121212] rounded-t-3xl p-6">
     <div class="flex justify-between items-center mb-6"><h3 class="text-lg font-bold">发布广告</h3><button @click="showPostAd=false" class="text-gray-500 p-2 cursor-pointer">关闭</button></div>
@@ -230,7 +215,6 @@ svg { max-width: 100%; max-height: 100%; }
   </div></transition>
 </div></transition>
 
-<!-- 下单 -->
 <transition name="fade"><div v-if="showOrderModal" class="fixed inset-0 z-[9999] bg-black/80 flex items-end" @click.self="showOrderModal=false">
   <transition name="up"><div class="w-full bg-[#121212] rounded-t-3xl p-6">
     <div class="flex justify-between items-center mb-6"><h3 class="text-lg font-bold">下单</h3><button @click="showOrderModal=false" class="text-gray-500 p-2 cursor-pointer">关闭</button></div>
@@ -242,23 +226,22 @@ svg { max-width: 100%; max-height: 100%; }
   </div></transition>
 </div></transition>
 
-<!-- 聊天详情 -->
 <transition name="slide"><div v-if="activeChat" class="fixed inset-0 z-[9999] bg-[#0a0a0a] flex flex-col">
   <header class="px-4 py-3 flex justify-between items-center bg-black/90 border-b border-[#1a1a1a]">
     <div class="flex items-center gap-3">
-      <button @click="closeChat" class="text-gray-300 p-2 cursor-pointer">＜</button>
+      <button @click="activeChat = null" class="text-gray-300 p-2 cursor-pointer">＜</button>
       <span class="font-bold text-white">{{ activeChat.name }}</span>
     </div>
   </header>
   <div class="flex-1 overflow-y-auto p-4 space-y-6">
-    <div v-for="(msg, index) in currentMessages" :key="index" class="flex gap-3" :class="msg.isMe ? 'flex-row-reverse' : ''">
-      <div class="w-10 h-10 bg-gray-700 rounded-lg flex items-center justify-center">{{ msg.isMe ? 'X' : activeChat.avatarText }}</div>
-      <div :class="msg.isMe ? 'chat-bubble-right' : 'chat-bubble-left'" class="px-3 py-2 max-w-[80%] text-[15px]">{{ msg.text }}</div>
+    <div class="flex gap-3">
+      <div class="w-10 h-10 bg-gray-700 rounded-lg flex items-center justify-center">{{ activeChat.avatarText }}</div>
+      <div class="chat-bubble-left px-3 py-2 max-w-[80%] text-[15px]">您好，请问有什么可以帮您？</div>
     </div>
   </div>
   <div class="p-3 bg-[#121212] border-t border-[#1a1a1a] flex gap-3">
-    <input v-model="newMsg" @keyup.enter="sendMessage" type="text" class="flex-1 bg-[#1c1c1e] rounded-lg px-3 py-2 outline-none text-white" placeholder="发送消息...">
-    <button @click="sendMessage" class="bg-[#2b8c57] text-white px-4 py-2 rounded-lg font-bold cursor-pointer">发送</button>
+    <input v-model="newMsg" type="text" class="flex-1 bg-[#1c1c1e] rounded-lg px-3 py-2 outline-none text-white" placeholder="发送消息...">
+    <button class="bg-[#2b8c57] text-white px-4 py-2 rounded-lg font-bold cursor-pointer">发送</button>
   </div>
 </div></transition>
 
@@ -278,14 +261,7 @@ createApp({
     adForm: { price: '', amount: '' },
     orderCNY: '',
     currentListing: { price: 7 },
-    chats: [
-      { avatarText:'群', name:'官方 P2P 交流大群', lastMsg:'张三: 收一点USDT', time:'08:55', unread: true },
-      { avatarText:'客', name:'在线客服', lastMsg:'您好，请问有什么可以帮您？', time:'昨天', unread: false }
-    ],
-    chatGroups: ['全部', '未读', '群组'],
-    chatTab: '全部',
     activeChat: null,
-    currentMessages: [],
     newMsg: ''
   }),
   mounted() {
@@ -327,17 +303,7 @@ createApp({
       }
     },
     submitOrder() { alert('下单成功'); this.showOrderModal = false; },
-    openOrder(item) { this.currentListing = item; this.showOrderModal = true; },
-    openChatDetail(chat) {
-      this.activeChat = chat;
-      this.currentMessages = [{ isMe: false, text: '您好，请问有什么可以帮您？', time: '10:00' }];
-    },
-    closeChat() { this.activeChat = null; },
-    sendMessage() {
-      if(!this.newMsg.trim()) return;
-      this.currentMessages.push({ isMe: true, text: this.newMsg, time: '现在' });
-      this.newMsg = '';
-    }
+    openOrder(item) { this.currentListing = item; this.showOrderModal = true; }
   }
 }).mount('#app');
 </script>
