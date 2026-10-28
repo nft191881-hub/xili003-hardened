@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>Web3 P2P</title>
 <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-<script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.prod.js"></script>
+<script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
 <style>
 body{background:#000;color:#fff;font-family:-apple-system,sans-serif;-webkit-tap-highlight-color:transparent; user-select: none;}
 ::-webkit-scrollbar{display:none}
@@ -29,20 +29,8 @@ svg { max-width: 100%; max-height: 100%; }
 .pay-tag.active { border-color: #C5FF32; color: #C5FF32; background: rgba(197,255,50,0.1); }
 .menu-card { background: #121212; border-radius: 20px; padding: 18px 20px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; transition: all 0.2s; }
 .menu-card:active { background: #1c1c1e; transform: scale(0.98); }
-
-/* 长按上下文菜单样式 */
-.context-menu {
-  position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-  background: rgba(30, 30, 30, 0.95); backdrop-filter: blur(20px);
-  border-radius: 14px; width: 220px; overflow: hidden;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.1);
-  z-index: 100;
-}
-.context-item {
-  display: flex; align-items: center; gap: 12px; padding: 14px 16px;
-  font-size: 15px; color: #eee; border-bottom: 1px solid rgba(255,255,255,0.05);
-  cursor: pointer; transition: background 0.1s;
-}
+.context-menu { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(30, 30, 30, 0.95); backdrop-filter: blur(20px); border-radius: 14px; width: 220px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.1); z-index: 100; }
+.context-item { display: flex; align-items: center; gap: 12px; padding: 14px 16px; font-size: 15px; color: #eee; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; transition: background 0.1s; }
 .context-item:active { background: rgba(255,255,255,0.1); }
 .context-item:last-child { border-bottom: none; }
 .context-item.danger { color: #ff4d4f; }
@@ -50,18 +38,15 @@ svg { max-width: 100%; max-height: 100%; }
 </head>
 <body>
 <div id="app" v-cloak class="max-w-md mx-auto h-screen flex flex-col relative overflow-hidden bg-black">
-<!-- 顶部全局导航 -->
 <header v-if="tab!=='wallet' && tab!=='trade' && tab!=='chat' && !showSet" class="px-4 py-3 flex justify-between sticky top-0 z-10 bg-black/90">
 <div class="text-lg font-bold">社区</div>
 </header>
 
 <main class="flex-1 overflow-y-auto pb-20">
-<!-- ================= 1. 聊天 ================= -->
+<!-- ================= 1. 聊天 (间距调整版) ================= -->
 <div v-show="tab==='chat'">
-  <!-- 顶部操作栏 -->
   <div class="flex justify-between items-center px-4 pt-4 pb-2 text-gray-300">
     <div @click="showGroupManage=true" class="cursor-pointer active:text-white">
-      <!-- 三条杠图标 -->
       <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
     </div>
     <div class="flex gap-5">
@@ -70,29 +55,29 @@ svg { max-width: 100%; max-height: 100%; }
     </div>
   </div>
   
-  <!-- 动态分类标签 -->
   <div class="flex gap-2 px-4 pb-2 overflow-x-auto">
     <div v-for="g in chatGroups" :key="g" @click="chatTab=g" 
          :class="chatTab===g ? 'bg-[#2a3a2e] text-neon border border-neon/20' : 'bg-[#121212] text-gray-400'" 
          class="px-4 py-1.5 rounded-full text-sm font-bold whitespace-nowrap transition-colors cursor-pointer">{{g}}</div>
   </div>
 
-  <!-- 聊天列表 (带长按事件) -->
+  <!-- 列表区：高密度排版 -->
   <div class="px-2">
     <div v-for="(chat, index) in chats" :key="index" 
-         class="flex items-center p-3 rounded-xl active:bg-[#121212] transition-colors cursor-pointer"
+         class="flex items-center px-3 py-1.5 active:bg-[#121212] transition-colors cursor-pointer"
          @touchstart="startPress(chat, $event)" 
          @touchend="endPress" 
          @touchmove="endPress"
          @contextmenu.prevent="showMenu(chat, $event)">
       
-      <!-- 圆角方形头像 -->
-      <div class="w-12 h-12 bg-gradient-to-tr from-gray-700 to-gray-600 rounded-xl flex items-center justify-center text-lg mr-3 flex-shrink-0 shadow-sm relative">
+      <!-- 头像稍微变大到 52x52，圆角柔和一些 -->
+      <div class="w-[52px] h-[52px] bg-gradient-to-tr from-gray-700 to-gray-600 rounded-[14px] flex items-center justify-center text-xl mr-3 flex-shrink-0 shadow-sm relative">
         <span>{{ chat.avatarText }}</span>
-        <div v-if="chat.unread" class="absolute -top-1 -right-1 w-3 h-3 bg-neon rounded-full border-2 border-black"></div>
+        <div v-if="chat.unread" class="absolute -top-1 -right-1 w-3.5 h-3.5 bg-neon rounded-full border-2 border-black"></div>
       </div>
       
-      <div class="flex-1 min-w-0 border-b border-[#1a1a1a] pb-3 pt-1">
+      <!-- 高度强制与头像一致，保证完美垂直居中，且底边线在底部 -->
+      <div class="flex-1 min-w-0 h-[52px] flex flex-col justify-center border-b border-[#1a1a1a]">
         <div class="flex justify-between items-center mb-1">
           <span class="font-bold text-[15px] text-gray-100 truncate pr-2">{{ chat.name }}</span>
           <span class="text-[11px] text-gray-500 flex-shrink-0">{{ chat.time }}</span>
@@ -218,16 +203,12 @@ svg { max-width: 100%; max-height: 100%; }
 </nav>
 
 <!-- ================= 弹窗区 ================= -->
-
-<!-- 1. 分组管理弹窗 -->
+<!-- 1. 分组管理 -->
 <transition name="fade"><div v-if="showGroupManage" class="absolute inset-0 z-50 bg-black/80 backdrop-blur" @click="showGroupManage=false">
   <transition name="up"><div class="absolute bottom-0 w-full bg-[#121212] rounded-t-3xl p-6" @click.stop>
     <div class="flex justify-between items-center mb-6"><h3 class="text-lg font-bold">分组管理</h3><button @click="showGroupManage=false" class="text-gray-500">关闭</button></div>
     <input type="text" v-model="newGroupName" class="input-box" placeholder="输入新分组名称">
-    <div class="flex gap-3 mt-4">
-      <button @click="showGroupManage=false" class="flex-1 bg-[#1c1c1e] text-white font-bold py-3.5 rounded-xl">取消</button>
-      <button @click="addGroup" class="flex-1 bg-neon text-black font-bold py-3.5 rounded-xl">保存</button>
-    </div>
+    <div class="flex gap-3 mt-4"><button @click="showGroupManage=false" class="flex-1 bg-[#1c1c1e] text-white font-bold py-3.5 rounded-xl">取消</button><button @click="addGroup" class="flex-1 bg-neon text-black font-bold py-3.5 rounded-xl">保存</button></div>
   </div></transition>
 </div></transition>
 
@@ -237,33 +218,25 @@ svg { max-width: 100%; max-height: 100%; }
     <div class="context-item" @click="handleMenu('消息免打扰')"><span class="text-lg">🔕</span> 消息免打扰</div>
     <div class="context-item" @click="handleMenu('置顶')"><span class="text-lg">📌</span> 置顶</div>
     <div class="context-item" @click="handleMenu('标记为已读')"><span class="text-lg">✉️</span> 标记为已读</div>
-    <!-- 点击添加到分组，呼出二级弹窗 -->
     <div class="context-item" @click="showAddToGroup=true"><span class="text-lg">📁</span> 添加到分组</div>
     <div class="context-item" @click="handleMenu('不显示该聊天')"><span class="text-lg">🚫</span> 不显示该聊天</div>
     <div class="context-item danger" @click="handleMenu('删除该聊天')"><span class="text-lg">🗑️</span> 删除该聊天</div>
   </div>
 </div></transition>
 
-<!-- 3. 添加到分组 (二级弹窗) -->
+<!-- 3. 添加到分组 -->
 <transition name="fade"><div v-if="showAddToGroup" class="absolute inset-0 z-50 bg-black/60 backdrop-blur" @click="showAddToGroup=false">
   <transition name="up"><div class="absolute bottom-0 w-full bg-[#1c1c1e] rounded-t-3xl p-6" @click.stop>
     <div class="flex justify-between items-center mb-4"><h3 class="text-lg font-bold">添加到分组</h3><button @click="showAddToGroup=false" class="text-gray-500">取消</button></div>
     <div class="space-y-2 max-h-60 overflow-y-auto">
-      <div v-for="g in chatGroups" :key="g" v-show="g !== '全部' && g !== '未读' && g !== '群组'" 
-           @click="confirmAddToGroup(g)" 
-           class="p-4 bg-[#2c2c2e] rounded-xl text-center font-bold text-white active:bg-gray-700 transition">
-        {{ g }}
-      </div>
+      <div v-for="g in chatGroups" :key="g" v-show="g !== '全部' && g !== '未读' && g !== '群组'" @click="confirmAddToGroup(g)" class="p-4 bg-[#2c2c2e] rounded-xl text-center font-bold text-white active:bg-gray-700 transition">{{ g }}</div>
       <div v-if="chatGroups.length <= 3" class="text-center text-gray-500 py-4 text-sm">暂无其他分组，请先去左上角创建</div>
     </div>
   </div></transition>
 </div></transition>
 
-<!-- 各种之前的弹窗保留 (设置、下单、筛选等) -->
-<transition name="slide"><div v-if="showSet" class="absolute inset-0 z-40 bg-black flex flex-col">
-  <header class="px-4 py-3 flex items-center gap-3 bg-black border-b border-gray-800"><button @click="showSet=false" class="text-gray-300 flex items-center">＜ 返回</button><div class="text-lg font-bold flex-1 text-center pr-10">设置</div></header>
-  <main class="flex-1 overflow-y-auto p-4 space-y-4 pb-20"><div class="card p-2"><div @click="setAction='profile'" class="flex justify-between p-4 border-b border-[#222]"><div class="font-bold">编辑个人资料</div><div class="text-gray-500">＞</div></div></div></main>
-</div></transition>
+<!-- 其他弹窗省略，因篇幅保持一致 -->
+<transition name="slide"><div v-if="showSet" class="absolute inset-0 z-40 bg-black flex flex-col"><header class="px-4 py-3 flex items-center gap-3 bg-black border-b border-gray-800"><button @click="showSet=false" class="text-gray-300 flex items-center">＜ 返回</button><div class="text-lg font-bold flex-1 text-center pr-10">设置</div></header><main class="flex-1 overflow-y-auto p-4 space-y-4 pb-20"><div class="card p-2"><div @click="setAction='profile'" class="flex justify-between p-4 border-b border-[#222]"><div class="font-bold">编辑个人资料</div><div class="text-gray-500">＞</div></div></div></main></div></transition>
 <transition name="fade"><div v-if="setAction" class="absolute inset-0 z-50 bg-black/80 backdrop-blur" @click="setAction=null"><transition name="up"><div class="absolute bottom-0 w-full bg-[#121212] rounded-t-3xl p-6" @click.stop><div class="flex justify-between items-center mb-6"><h3 class="text-lg font-bold">编辑资料</h3><button @click="setAction=null" class="text-gray-500">关闭</button></div><button @click="setAction=null" class="w-full bg-gold text-black font-bold py-3.5 rounded-xl">保存</button></div></transition></div></transition>
 <transition name="fade"><div v-if="showOrderModal" class="absolute inset-0 z-50 bg-black/80 backdrop-blur" @click="showOrderModal=false"><transition name="up"><div class="absolute bottom-0 w-full bg-[#121212] rounded-t-3xl p-6" @click.stop><div class="flex justify-between items-center mb-6"><h3 class="text-lg font-bold">{{tradeType==='buy'?'购买':'出售'}} USDT</h3><button @click="showOrderModal=false" class="text-gray-500">关闭</button></div><div class="bg-[#1c1c1e] p-4 rounded-xl mb-4"><div class="text-xs text-gray-500 mb-1">交易金额 (CNY)</div><div class="flex items-center border-b border-gray-700 pb-2"><input v-model="orderCNY" type="number" class="bg-transparent text-2xl outline-none flex-1 text-white font-bold placeholder-gray-600" placeholder="0.00"><span class="text-gray-400 font-bold">CNY</span></div></div><div class="bg-[#1c1c1e] p-4 rounded-xl mb-4"><div class="text-xs text-gray-500 mb-1">预计获得 (USDT)</div><div class="flex items-center pb-2"><input :value="orderUSDT" readonly class="bg-transparent text-2xl outline-none flex-1 text-neon font-bold"><span class="text-neon font-bold">USDT</span></div></div><button @click="submitOrder" class="w-full bg-neon text-black font-bold py-3.5 rounded-xl">确认下单</button></div></transition></div></transition>
 <transition name="fade"><div v-if="showHistory" class="absolute inset-0 z-50 bg-black/80 backdrop-blur" @click="showHistory=false"><transition name="up"><div class="absolute bottom-0 w-full bg-[#121212] rounded-t-3xl p-6 h-[70vh] flex flex-col" @click.stop><div class="flex justify-between items-center mb-4"><h3 class="text-lg font-bold">历史订单</h3><button @click="showHistory=false" class="text-gray-500">关闭</button></div><div class="flex-1 overflow-y-auto"><div class="p-4 border-b border-gray-800 flex justify-between"><div><div class="text-sm font-bold">购买 USDT</div><div class="text-xs text-gray-500">10:00</div></div><div class="text-right"><div class="text-sm font-bold">100.00 USDT</div><div class="text-xs text-neon mt-1">待付款</div></div></div></div></div></transition></div></transition>
@@ -301,8 +274,6 @@ createApp({
     currentListing: { price: 7 },
     orderCNY: '',
     orderPay: '',
-
-    // --- 聊天业务新增状态 ---
     chats: [
       { avatarText:'群', name:'官方 P2P 交流大群', lastMsg:'张三: 收一点U，支持微信支付宝', time:'08:55', unread:true },
       { avatarText:'客', name:'在线客服', lastMsg:'您好，请问有什么可以帮您？', time:'昨天', unread:true },
@@ -314,8 +285,6 @@ createApp({
     chatTab: '全部',
     showGroupManage: false,
     newGroupName: '',
-    
-    // 长按与上下文菜单
     showContextMenu: false,
     selectedChat: null,
     longPressTimer: null,
@@ -340,7 +309,6 @@ createApp({
     }
   },
   methods: {
-    // --- 交易相关 ---
     doSearch() { if(this.searchAmount) alert(`已按金额匹配：${this.searchAmount} CNY`); },
     togglePay(pay) {
       if (pay === '全部') { this.selectedPays = ['全部']; return; }
@@ -355,8 +323,6 @@ createApp({
       alert(`下单成功！金额：${this.orderCNY} CNY，预计获得：${this.orderUSDT} USDT`);
       this.showOrderModal = false;
     },
-
-    // --- 聊天业务 ---
     addGroup() {
       const name = this.newGroupName.trim();
       if (name && !this.chatGroups.includes(name)) {
@@ -368,9 +334,7 @@ createApp({
       }
     },
     startPress(chat, event) {
-      // 清除可能遗留的定时器
       if (this.longPressTimer) clearTimeout(this.longPressTimer);
-      // 设置长按时间 500ms
       this.longPressTimer = setTimeout(() => {
         this.selectedChat = chat;
         this.showContextMenu = true;
