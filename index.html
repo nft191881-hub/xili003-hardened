@@ -47,13 +47,6 @@ svg { max-width: 100%; max-height: 100%; }
       <div class="text-[13px] text-gray-400 truncate">欢迎来到Web3</div>
     </div>
   </div>
-  <div class="card neon-line flex items-center p-3 mb-2 mx-2 rounded-xl">
-    <div class="w-12 h-12 bg-[#1c1c1e] rounded-lg flex items-center justify-center text-xl mr-3">客</div>
-    <div class="flex-1 min-w-0 border-b border-[#222] pb-3">
-      <div class="flex justify-between items-center mb-1"><span class="font-bold text-[15px]">在线客服</span><span class="text-xs text-gray-500">10:00</span></div>
-      <div class="text-[13px] text-gray-400 truncate">您好，请问有什么可以帮您？</div>
-    </div>
-  </div>
 </div>
 
 <!-- ================= 2. 社区 ================= -->
@@ -68,8 +61,6 @@ svg { max-width: 100%; max-height: 100%; }
         <div><div class="text-sm font-bold">用户_{{i}} <span v-if="i===1" class="text-[10px] bg-gold text-black px-1 rounded">置顶</span></div><div class="text-[10px] text-gray-500">2小时前</div></div>
       </div>
       <p class="text-sm text-gray-200 mb-3">今天收了一点USDT，有需要的老板联系我。支持担保交易！</p>
-      <div class="w-full h-32 bg-[#1a1a1a] rounded-lg flex items-center justify-center text-gray-600 mb-3">图片/视频占位</div>
-      <div class="flex gap-4 text-gray-500 text-xs"><span>👍 12</span><span>💬 3</span><span>🔗 分享</span></div>
     </div>
   </div>
   <div v-show="comTab==='行情'" class="p-4"><div class="card p-4 text-center text-gray-500 text-sm">行情模块开发中...</div></div>
@@ -110,7 +101,8 @@ svg { max-width: 100%; max-height: 100%; }
     </div>
   </div>
 
-  <div v-if="selectedPays.length > 0" class="px-4 mb-2 flex gap-2 overflow-x-auto pb-1">
+  <!-- 筛选结果提示 (如果选了"全部"就不显示了，保持界面干净) -->
+  <div v-if="selectedPays.length > 0 && !selectedPays.includes('全部')" class="px-4 mb-2 flex gap-2 overflow-x-auto pb-1">
     <span v-for="p in selectedPays" :key="p" class="text-[10px] bg-neon/20 text-neon px-2 py-0.5 rounded">{{p}}</span>
   </div>
 
@@ -296,6 +288,7 @@ svg { max-width: 100%; max-height: 100%; }
   </div></transition>
 </div></transition>
 
+<!-- 支付筛选弹窗 -->
 <transition name="fade"><div v-if="showFilter" class="absolute inset-0 z-50 bg-black/80 backdrop-blur" @click="showFilter=false">
   <transition name="up"><div class="absolute bottom-0 w-full bg-[#121212] rounded-t-3xl p-6" @click.stop>
     <div class="flex justify-between items-center mb-6"><h3 class="text-lg font-bold">选择支付方式</h3><button @click="showFilter=false" class="text-gray-500">关闭</button></div>
@@ -307,7 +300,7 @@ svg { max-width: 100%; max-height: 100%; }
 </div></transition>
 
 <!-- 社区/钱包 通用弹窗 -->
-<transition name="fade"><div v-if="showPost" class="absolute inset-0 z-50 bg-black/80 backdrop-blur" @click="showPost=false"><transition name="up"><div class="absolute bottom-0 w-full bg-[#121212] rounded-t-2xl p-5" @click.stop><div class="flex justify-between mb-4"><h3 class="font-bold">发布动态</h3><button @click="showPost=false" class="text-gray-500">取消</button></div><textarea class="w-full bg-[#1c1c1e] rounded-xl p-3 text-sm outline-none" rows="4" placeholder="分享你的交易心得..."></textarea><button class="w-full mt-6 bg-gold text-black font-bold py-3 rounded-full">立即发布</button></div></transition></div></transition>
+<transition name="fade"><div v-if="showPost" class="absolute inset-0 z-50 bg-black/80 backdrop-blur" @click="showPost=false"><transition name="up"><div class="absolute bottom-0 w-full bg-[#121212] rounded-t-2xl p-5" @click.stop><div class="flex justify-between mb-4"><h3 class="font-bold">发布动态</h3><button @click="showPost=false" class="text-gray-500">取消</button></div><textarea class="方式w-full最 bg-[#1c1前面c1e] rounded-xl p-3 text-sm outline-none" rows="4" placeholder="分享你的交易心得..."></textarea><button class="w-full mt-6 bg-gold text-black font-bold py-3 rounded-full">立即发布</button></div></transition></div></transition>
 <transition name="fade"><div v-if="actSheet" class="absolute inset-0 z-50 bg-black/80 backdrop-blur" @click="actSheet=null"><transition name="up"><div class="absolute bottom-0 w-full bg-[#121212] rounded-t-2xl p-5" @click.stop><div class="flex justify-between mb-4"><h3 class="font-bold">{{actSheet}}</h3><button @click="actSheet=null" class="text-gray-500">关闭</button></div><div class="text-sm text-gray-400 py-10 text-center">这里是【{{actSheet}}】的功能界面。</div><button @click="actSheet=null" class="w-full bg-neon text-black font-bold py-3 rounded-full">我知道了</button></div></transition></div></transition>
 
 </div>
@@ -328,8 +321,10 @@ createApp({
     // --- 交易模块专属状态 ---
     tradeType:'buy',
     searchAmount:'',
-    payMethods:['微信', '支付宝', '银行卡', '信用卡', '礼品卡'],
-    selectedPays:[],
+    // 在支付加上“全部”
+    payMethods:['全部', '微信', '支付宝', '银行卡', '信用卡', '礼品卡'],
+    // 默认选中“全部”
+    selectedPays:['全部'],
     showOrderModal:false,
     showHistory:false,
     showMoreMenu:false,
@@ -351,7 +346,8 @@ createApp({
   }),
   computed: {
     filteredListings() {
-      if (this.selectedPays.length === 0) return this.listings;
+      // 如果选中了“全部”，或者没有选择任何项，则返回所有商家
+      if (this.selectedPays.includes('全部') || this.selectedPays.length === 0) return this.listings;
       return this.listings.filter(item => item.pays.some(p => this.selectedPays.includes(p)));
     },
     orderUSDT() {
@@ -359,14 +355,40 @@ createApp({
       return (this.orderCNY / this.currentListing.price).toFixed(2);
     }
   },
+  watch: {
+    // 监听 tab 的切换。只要从别的页面切换到 trade 页面，就把筛选重置为 ['全部']
+    tab(newVal, oldVal) {
+      if (newVal === 'trade' && oldVal !== 'trade') {
+        this.selectedPays = ['全部'];
+        this.searchAmount = ''; // 顺手把搜索框也清空，保持干净
+      }
+    }
+  },
   methods: {
     doSearch() {
       if(this.searchAmount) alert(`已按金额匹配：${this.searchAmount} CNY`);
     },
     togglePay(pay) {
+      if (pay === '全部') {
+        this.selectedPays = ['全部'];
+        return;
+      }
+
       const index = this.selectedPays.indexOf(pay);
-      if (index > -1) this.selectedPays.splice(index, 1);
-      else this.selectedPays.push(pay);
+      if (index > -1) {
+        this.selectedPays.splice(index, 1);
+      } else {
+        // 如果之前选的是全部，现在点具体的了，要把“全部”去掉
+        if (this.selectedPays.includes('全部')) {
+          this.selectedPays = [];
+        }
+        this.selectedPays.push(pay);
+      }
+
+      // 如果把具体的全删了，自动变成“全部”
+      if (this.selectedPays.length === 0) {
+        this.selectedPays = ['全部'];
+      }
     },
     openOrder(item) {
       this.currentListing = item;
