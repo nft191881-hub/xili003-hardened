@@ -48,20 +48,20 @@ svg { max-width: 100%; max-height: 100%; }
 </head>
 <body>
 <div id="app" v-cloak class="max-w-md mx-auto h-[100dvh] flex flex-col relative overflow-hidden bg-black">
-<header v-if="tab!=='wallet' && tab!=='trade' && tab!=='chat' && !showSet && !showPost" class="px-4 py-3 flex justify-between sticky top-0 z-10 bg-black/90">
+<header v-if="tab!=='wallet' && tab!=='trade' && tab!=='chat' && !showSet && !showPost" class="px-4 py-3 flex justify-between sticky top-0 z-40 bg-black/90">
 <div class="text-lg font-bold">社区</div>
 </header>
 
-<main class="flex-1 overflow-y-auto pb-20 relative">
+<main class="flex-1 overflow-y-auto pb-20 relative z-10">
 <!-- 1. 聊天列表 -->
 <div v-show="tab==='chat'">
   <div class="flex justify-between items-center px-4 pt-4 pb-2 text-gray-300">
-    <div @click="showGroupManage=true" class="cursor-pointer active:text-white">
+    <button @click="showGroupManage=true" class="cursor-pointer active:text-white p-1 -m-1">
       <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
-    </div>
-    <div class="flex gap-5">
-      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+    </button>
+    <div class="flex gap-4">
+      <button class="p-1 -m-1"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg></button>
+      <button class="p-1 -m-1"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg></button>
     </div>
   </div>
   
@@ -112,13 +112,18 @@ svg { max-width: 100%; max-height: 100%; }
   <button @click="showPost=true" class="fixed bottom-24 right-4 w-14 h-14 bg-neon text-black rounded-full shadow-[0_0_15px_rgba(197,255,50,0.4)] flex items-center justify-center z-20 active:scale-95 transition"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg></button>
 </div>
 
-<!-- 3. 交易 -->
+<!-- 3. 交易 (已修复右上角按钮点击) -->
 <div v-show="tab==='trade'" class="pb-4">
-  <div class="px-4 py-4 flex justify-between items-center bg-black/90 sticky top-0 z-10">
+  <div class="px-4 py-4 flex justify-between items-center bg-black/90 sticky top-0 z-30">
     <div class="flex items-center gap-2"><div class="w-1.5 h-5 bg-neon rounded-full"></div><span class="text-xl font-extrabold text-white tracking-wide">P2P交易</span></div>
-    <div class="flex items-center gap-5 text-gray-300">
-      <svg @click="showHistory=true" class="w-6 h-6 active:text-neon cursor-pointer" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-      <svg @click="showMoreMenu=true" class="w-6 h-6 active:text-neon cursor-pointer" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z"></path></svg>
+    <div class="flex items-center gap-2 text-gray-300">
+      <!-- 改为 button 标签，并加大热区 -->
+      <button @click.stop="showHistory=true" class="p-2 -m-2 active:text-neon active:scale-90 transition">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+      </button>
+      <button @click.stop="showMoreMenu=true" class="p-2 -m-2 active:text-neon active:scale-90 transition">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z"></path></svg>
+      </button>
     </div>
   </div>
 
@@ -137,12 +142,12 @@ svg { max-width: 100%; max-height: 100%; }
         <span class="text-sm font-bold text-white">USDT</span>
       </div>
       <input v-model="searchAmount" type="number" placeholder="输入金额" class="bg-transparent ml-2 flex-1 outline-none text-sm text-white placeholder-gray-500 w-full">
-      <svg @click="doSearch" class="w-5 h-5 text-gray-400 active:text-neon mr-1 cursor-pointer" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+      <button @click.stop="doSearch" class="p-1 -m-1"><svg class="w-5 h-5 text-gray-400 active:text-neon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg></button>
     </div>
-    <div @click="showFilter=true" class="flex flex-col items-center justify-center text-gray-300 cursor-pointer active:text-neon">
+    <button @click.stop="showFilter=true" class="flex flex-col items-center justify-center text-gray-300 active:text-neon p-1 -m-1">
       <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
       <span class="text-[10px]">筛选</span>
-    </div>
+    </button>
   </div>
 
   <div class="px-4 mb-4"><span class="text-xs text-blue-400 bg-blue-900/20 px-3 py-1.5 rounded-full border border-blue-900/30">{{tradeType==='buy'?'购买':'出售'}} USDT 零手续费</span></div>
@@ -162,8 +167,8 @@ svg { max-width: 100%; max-height: 100%; }
           <div class="text-xl font-bold text-gray-200 mb-1">{{item.price}} <span class="text-xs font-normal text-gray-500">CNY</span></div>
           <div class="text-[13px] text-gray-500">限额: {{item.min}} - {{item.max}} CNY</div>
         </div>
-        <button v-if="item.verified" @click="openOrder(item)" class="bg-neon text-black px-6 py-2 rounded-lg text-[14px] font-bold active:scale-95 transition">{{tradeType==='buy'?'购买':'出售'}}</button>
-        <button v-else @click="showKyc=true" class="bg-[#1c1c1e] text-gray-400 border border-gray-700 px-5 py-2 rounded-lg text-[13px] font-bold">交易前需 KYC</button>
+        <button v-if="item.verified" @click.stop="openOrder(item)" class="bg-neon text-black px-6 py-2 rounded-lg text-[14px] font-bold active:scale-95 transition">{{tradeType==='buy'?'购买':'出售'}}</button>
+        <button v-else @click.stop="showKyc=true" class="bg-[#1c1c1e] text-gray-400 border border-gray-700 px-5 py-2 rounded-lg text-[13px] font-bold">交易前需 KYC</button>
       </div>
       <div class="mt-4 flex items-center gap-3 text-[12px] text-gray-400">
         <div v-for="pay in item.pays" :key="pay" class="flex items-center gap-1"><div class="w-0.5 h-3 bg-gold"></div> {{pay}}</div>
@@ -172,10 +177,9 @@ svg { max-width: 100%; max-height: 100%; }
   </div>
 </div>
 
-<!-- ================= 4. 我的 (微信风格) ================= -->
+<!-- ================= 4. 我的 ================= -->
 <div v-show="tab==='wallet'" class="pb-6 bg-[#050505]">
   
-  <!-- 头部信息 -->
   <div class="bg-[#121212] p-6 pt-10 rounded-b-3xl mb-4">
     <div class="flex justify-between items-start mb-6">
       <div class="flex items-center gap-4">
@@ -195,11 +199,11 @@ svg { max-width: 100%; max-height: 100%; }
           </div>
         </div>
       </div>
-      <!-- 二维码 -->
-      <svg @click="alert('打开个人二维码')" class="w-6 h-6 text-gray-400 cursor-pointer" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm14 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
+      <button @click.stop="alert('打开个人二维码')" class="p-1 -m-1 text-gray-400 cursor-pointer active:scale-90 transition">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm14 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
+      </button>
     </div>
 
-    <!-- 内嵌资产卡片 (轻量展示，实际点击进入详情) -->
     <div class="flex justify-between items-center mb-2 cursor-pointer" @click="showSubWallet = true">
       <div>
         <div class="text-xs text-gray-400 mb-1">总资产估值 (USDT)</div>
@@ -210,7 +214,6 @@ svg { max-width: 100%; max-height: 100%; }
   </div>
 
   <div class="px-4">
-    <!-- 菜单组1 -->
     <div class="menu-group">
       <div @click="showSubWallet = true" class="menu-item">
         <div class="flex items-center"><span class="menu-icon text-green-500">💳</span>钱包</div>
@@ -230,7 +233,6 @@ svg { max-width: 100%; max-height: 100%; }
       </div>
     </div>
 
-    <!-- 菜单组2 -->
     <div class="menu-group mt-4">
       <div @click="alert('已生成分享链接')" class="menu-item">
         <div class="flex items-center"><span class="menu-icon text-green-400">🔗</span>分享给好友</div>
@@ -286,171 +288,78 @@ svg { max-width: 100%; max-height: 100%; }
   </div>
 </transition>
 
-<!-- ================= 聊天界面 ================= -->
+<!-- ================= 弹窗区 ================= -->
+<transition name="fade"><div v-if="showHistory" class="absolute inset-0 z-[100] bg-black/80 backdrop-blur" @click.self="showHistory=false"><transition name="up"><div class="absolute bottom-0 w-full bg-[#121212] rounded-t-3xl p-6 h-[70vh] flex flex-col" @click.stop><div class="flex justify-between items-center mb-4"><h3 class="text-lg font-bold">历史订单</h3><button @click="showHistory=false" class="text-gray-500">关闭</button></div><div class="flex-1 overflow-y-auto"><div class="p-4 border-b border-gray-800 flex justify-between"><div><div class="text-sm font-bold">购买 USDT</div><div class="text-xs text-gray-500">10:00</div></div><div class="text-right"><div class="text-sm font-bold">100.00 USDT</div><div class="text-xs text-neon mt-1">待付款</div></div></div></div></div></transition></div></transition>
+<transition name="fade"><div v-if="showMoreMenu" class="absolute inset-0 z-[100] bg-black/80 backdrop-blur" @click.self="showMoreMenu=false"><transition name="up"><div class="absolute bottom-0 w-full bg-[#121212] rounded-t-3xl p-6" @click.stop><div class="flex justify-between items-center mb-4"><h3 class="text-lg font-bold">更多操作</h3><button @click="showMoreMenu=false" class="text-gray-500">关闭</button></div><div class="space-y-2"><div @click="showPostAd=true; showMoreMenu=false" class="p-4 bg-[#1c1c1e] rounded-xl text-center text-sm font-bold text-white active:bg-[#2c2c2e]">发布广告</div><div @click="alert('进入我的广告'); showMoreMenu=false" class="p-4 bg-[#1c1c1e] rounded-xl text-center text-sm font-bold text-white active:bg-[#2c2c2e]">我的广告</div></div></div></transition></div></transition>
+<transition name="fade"><div v-if="showFilter" class="absolute inset-0 z-[100] bg-black/80 backdrop-blur" @click.self="showFilter=false"><transition name="up"><div class="absolute bottom-0 w-full bg-[#121212] rounded-t-3xl p-6" @click.stop><div class="flex justify-between items-center mb-6"><h3 class="text-lg font-bold">选择支付方式</h3><button @click="showFilter=false" class="text-gray-500">关闭</button></div><div class="flex flex-wrap gap-3 mb-8"><div v-for="pay in payMethods" :key="pay" @click="togglePay(pay)" class="pay-tag" :class="{'active': selectedPays.includes(pay)}">{{pay}}</div></div><button @click="showFilter=false" class="w-full bg-neon text-black font-bold py-3.5 rounded-full">确认筛选</button></div></transition></div></transition>
+<transition name="fade"><div v-if="showKyc" class="absolute inset-0 z-[100] bg-black/80 backdrop-blur" @click.self="showKyc=false"><transition name="up"><div class="absolute bottom-0 w-full bg-[#121212] rounded-t-3xl p-6" @click.stop><div class="flex justify-between items-center mb-6"><h3 class="text-lg font-bold">实名认证 (KYC)</h3><button @click="showKyc=false" class="text-gray-500">关闭</button></div><div class="space-y-4"><input type="text" placeholder="真实姓名" class="input-box"><input type="text" placeholder="身份证号" class="input-box"></div><button @click="showKyc=false; alert('提交成功')" class="w-full bg-neon text-black font-bold py-3.5 rounded-xl mt-6">提交认证</button></div></transition></div></transition>
+<transition name="fade"><div v-if="showPostAd" class="absolute inset-0 z-[100] bg-black/80 backdrop-blur" @click.self="showPostAd=false"><transition name="up"><div class="absolute bottom-0 w-full bg-[#121212] rounded-t-3xl p-6" @click.stop><div class="flex justify-between items-center mb-6"><h3 class="text-lg font-bold">发布广告</h3><button @click="showPostAd=false" class="text-gray-500">关闭</button></div><div class="flex gap-2 mb-4"><input type="number" placeholder="单价 (CNY)" class="input-box flex-1 mb-0"><input type="number" placeholder="总数量" class="input-box flex-1 mb-0"></div><button @click="showPostAd=false; alert('发布成功')" class="w-full bg-neon text-black font-bold py-3.5 rounded-xl mt-2">发布广告</button></div></transition></div></transition>
+<transition name="fade"><div v-if="showOrderModal" class="absolute inset-0 z-[100] bg-black/80 backdrop-blur" @click.self="showOrderModal=false"><transition name="up"><div class="absolute bottom-0 w-full bg-[#121212] rounded-t-3xl p-6" @click.stop><div class="flex justify-between items-center mb-6"><h3 class="text-lg font-bold">{{tradeType==='buy'?'购买':'出售'}} USDT</h3><button @click="showOrderModal=false" class="text-gray-500">关闭</button></div><div class="bg-[#1c1c1e] p-4 rounded-xl mb-4"><div class="text-xs text-gray-500 mb-1">交易金额 (CNY)</div><div class="flex items-center border-b border-gray-700 pb-2"><input v-model="orderCNY" type="number" class="bg-transparent text-2xl outline-none flex-1 text-white font-bold placeholder-gray-600" placeholder="0.00"><span class="text-gray-400 font-bold">CNY</span></div></div><div class="bg-[#1c1c1e] p-4 rounded-xl mb-4"><div class="text-xs text-gray-500 mb-1">预计获得 (USDT)</div><div class="flex items-center pb-2"><input :value="orderUSDT" readonly class="bg-transparent text-2xl outline-none flex-1 text-neon font-bold"><span class="text-neon font-bold">USDT</span></div></div><button @click="submitOrder" class="w-full bg-neon text-black font-bold py-3.5 rounded-xl">确认下单</button></div></transition></div></transition>
+
+<!-- 订单详情页 -->
 <transition name="slide">
-  <div v-if="activeChat" class="absolute inset-0 z-50 bg-[#0a0a0a] flex flex-col">
-    <header class="px-4 py-3 flex justify-between items-center bg-black/90 border-b border-[#1a1a1a]">
-      <div class="flex items-center gap-3">
-        <button @click="closeChat" class="text-gray-300 active:opacity-50">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
-        </button>
-        <span class="font-bold text-[16px] text-white flex items-center gap-1">{{ activeChat.name }} <span v-if="activeChat.verified" class="text-blue-400 text-sm">✔</span></span>
+  <div v-if="showOrderDetail" class="absolute inset-0 z-[100] bg-[#0a0a0a] flex flex-col">
+    <header class="px-4 py-3 flex items-center bg-black/90 border-b border-[#1a1a1a]"><button @click="showOrderDetail=false; clearInterval(timer)" class="text-gray-300 active:opacity-50 mr-3"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg></button><span class="font-bold text-lg mx-auto pr-8">订单详情</span></header>
+    <main class="flex-1 overflow-y-auto p-5 space-y-5">
+      <div class="bg-[#1c1c1e] rounded-2xl p-6 text-center"><div class="text-sm text-gray-400 mb-2">请尽快向卖家付款</div><div class="text-3xl font-bold text-neon mb-2">{{ formatTime(orderCountdown) }}</div><div class="text-xs text-gray-500">超时订单将自动取消</div></div>
+      <div class="bg-[#121212] rounded-2xl p-5"><div class="flex justify-between items-center mb-3"><span class="text-sm text-gray-400">付款金额</span><span class="text-2xl font-bold text-white">{{ currentOrder.totalCNY }} <span class="text-sm font-normal">CNY</span></span></div><div class="flex justify-between items-center"><span class="text-sm text-gray-400">获得数量</span><span class="text-neon font-bold">{{ currentOrder.totalUSDT }} USDT</span></div></div>
+      <div class="bg-[#121212] rounded-2xl p-5">
+        <div class="flex justify-between items-center mb-3">
+          <div class="text-sm font-bold text-gray-200">卖家收款信息 ({{ currentOrder.payMethod }})</div>
+          <button @click.stop="contactSeller" class="flex items-center gap-1 text-[11px] text-neon bg-neon/10 px-2 py-1 rounded"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg> 联系卖家</button>
+        </div>
+        <div class="text-sm text-gray-400 mb-4">收款人: 王**</div>
+        <div class="bg-white p-3 rounded-xl flex items-center justify-center mb-2"><div class="w-40 h-40 bg-gray-300 flex items-center justify-center text-gray-600 text-sm">收款码占位图</div></div>
+        <div class="text-xs text-center text-gray-500">请使用 {{ currentOrder.payMethod }} 扫码付款</div>
       </div>
-      <button @click="showChatSettings=true" class="text-gray-300 active:opacity-50">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
-      </button>
-    </header>
-
-    <div class="flex-1 overflow-y-auto p-4 space-y-6" id="chatScrollArea">
-      <div class="text-center text-xs text-gray-500">昨天 12:22</div>
-      <div class="text-center text-xs text-gray-500">你们已互相关注对方</div>
-      
-      <div v-for="(msg, index) in currentMessages" :key="index" class="flex gap-3" :class="msg.isMe ? 'flex-row-reverse' : ''">
-        <div @click="openUserProfile(activeChat)" class="w-10 h-10 bg-gradient-to-tr from-gray-700 to-gray-600 rounded-[10px] flex items-center justify-center text-xl flex-shrink-0 active:opacity-70 transition-opacity" :class="msg.isMe ? 'from-green-700 to-green-500' : 'from-orange-700 to-yellow-600'">
-          {{ msg.isMe ? 'X' : activeChat.avatarText }}
-        </div>
-        <div :class="msg.isMe ? 'chat-bubble-right' : 'chat-bubble-left'" class="px-3 py-2 max-w-[80%] flex flex-wrap items-baseline gap-x-2 gap-y-1">
-          <span class="text-[15px] leading-snug break-all">{{ msg.text }}</span>
-          <span class="text-[10px] flex items-center gap-1 ml-auto mt-1" :class="msg.isMe ? 'text-black/60' : 'text-gray-500'">
-            {{ msg.time }} 
-            <svg v-if="msg.isMe" class="w-3.5 h-3.5 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13l4 4L23 7"></path></svg>
-          </span>
-        </div>
-      </div>
-    </div>
-
-    <div class="bg-[#121212] border-t border-[#1a1a1a] flex flex-col relative z-20">
-      <div class="px-3 py-2 flex items-center gap-3">
-        <button @click="isRecording = !isRecording; showChatPanel = false" class="text-gray-400 active:text-white transition-colors">
-          <svg v-if="!isRecording" class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg>
-          <svg v-else class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
-        </button>
-
-        <div v-if="isRecording" class="flex-1 bg-[#1c1c1e] rounded-lg text-center py-2 text-[15px] text-gray-300 font-bold active:bg-[#2c2c2e] transition-colors cursor-pointer"
-             @mousedown="startRecord" @mouseup="stopRecord" @mouseleave="stopRecord"
-             @touchstart.prevent="startRecord" @touchend.prevent="stopRecord">
-          {{ isHolding ? '松开 结束' : '按住 说话' }}
-        </div>
-
-        <input v-else v-model="newMsg" @focus="showChatPanel = false" @keyup.enter="sendMessage" type="text" class="flex-1 bg-[#1c1c1e] rounded-lg px-3 py-2 outline-none text-[15px] text-white" placeholder="">
-        
-        <button @click="sendMessage" v-if="newMsg.trim() && !isRecording" class="bg-[#2b8c57] text-white px-4 py-1.5 rounded-lg text-sm font-bold whitespace-nowrap active:scale-95 transition">发送</button>
-        
-        <template v-else-if="!isRecording">
-          <button class="text-gray-400"><svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></button>
-          <button @click="showChatPanel = !showChatPanel" class="text-gray-400"><svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg></button>
-        </template>
-      </div>
-
-      <transition name="up">
-        <div v-if="showChatPanel" class="grid grid-cols-4 gap-y-6 p-6 pb-8 border-t border-[#2a2a2a]">
-          <div class="flex flex-col items-center gap-2 text-xs text-gray-400"><div class="w-14 h-14 bg-[#2c2c2e] rounded-2xl flex items-center justify-center text-2xl">🖼️</div>照片</div>
-          <div class="flex flex-col items-center gap-2 text-xs text-gray-400"><div class="w-14 h-14 bg-[#2c2c2e] rounded-2xl flex items-center justify-center text-2xl">📷</div>拍摄</div>
-          <div class="flex flex-col items-center gap-2 text-xs text-gray-400"><div class="w-14 h-14 bg-[#2c2c2e] rounded-2xl flex items-center justify-center text-2xl">📞</div>语音通话</div>
-          <div class="flex flex-col items-center gap-2 text-xs text-gray-400"><div class="w-14 h-14 bg-[#2c2c2e] rounded-2xl flex items-center justify-center text-2xl">🔗</div>分享</div>
-          <div class="flex flex-col items-center gap-2 text-xs text-gray-400"><div class="w-14 h-14 bg-[#2c2c2e] rounded-2xl flex items-center justify-center text-2xl">📁</div>文件</div>
-          <div class="flex flex-col items-center gap-2 text-xs text-gray-400"><div class="w-14 h-14 bg-[#2c2c2e] rounded-2xl flex items-center justify-center text-2xl">⭐</div>收藏</div>
-          <div class="flex flex-col items-center gap-2 text-xs text-gray-400"><div class="w-14 h-14 bg-[#2c2c2e] rounded-2xl flex items-center justify-center text-2xl">🧧</div>红包</div>
-          <div class="flex flex-col items-center gap-2 text-xs text-gray-400"><div class="w-14 h-14 bg-[#2c2c2e] rounded-2xl flex items-center justify-center text-2xl">🤝</div>P2P</div>
-        </div>
-      </transition>
-    </div>
+    </main>
+    <div class="p-4 bg-[#121212] border-t border-[#1a1a1a]"><button @click.stop="confirmPayment" class="w-full bg-neon text-black font-bold py-4 rounded-xl text-lg active:scale-95 transition">我已付款</button></div>
   </div>
 </transition>
 
-<transition name="fade">
-  <div v-if="isHolding" class="fixed inset-0 z-[100] flex items-center justify-center pointer-events-none">
-    <div class="bg-black/80 backdrop-blur-md rounded-2xl px-8 py-6 flex flex-col items-center gap-4 border border-gray-700">
-      <div class="flex items-end gap-1 h-8">
-        <div class="w-1 h-4 bg-neon rounded-full animate-[bounce_1s_infinite]"></div>
-        <div class="w-1 h-6 bg-neon rounded-full animate-[bounce_1.2s_infinite]"></div>
-        <div class="w-1 h-8 bg-neon rounded-full animate-[bounce_0.8s_infinite]"></div>
-        <div class="w-1 h-6 bg-neon rounded-full animate-[bounce_1.1s_infinite]"></div>
-      </div>
-      <div class="text-white font-bold text-sm">正在录音...</div>
-    </div>
-  </div>
-</transition>
-
-<!-- ================= 个人名片页 ================= -->
 <transition name="slide">
-  <div v-if="showProfilePage && activeChat" class="absolute inset-0 z-[70] bg-[#050505] flex flex-col">
-    <header class="px-4 py-3 flex items-center justify-between bg-black/90">
-      <button @click="showProfilePage=false" class="text-gray-300">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
-      </button>
-      <div class="text-gray-300">···</div>
-    </header>
-    
-    <main class="flex-1 overflow-y-auto">
-      <div class="flex gap-4 p-6 bg-[#0a0a0a]">
-        <div class="w-16 h-16 bg-gradient-to-tr from-orange-700 to-yellow-600 rounded-xl flex items-center justify-center text-3xl">{{ activeChat.avatarText }}</div>
-        <div class="flex-1">
-          <div class="text-xl font-bold flex items-center gap-2">
-            {{ activeChat.name }}
-            <span v-if="activeChat.verified" class="text-[10px] bg-blue-500/20 text-blue-400 px-1.5 rounded border border-blue-500/30">已认证</span>
-            <span v-else class="text-[10px] bg-gray-800 text-gray-400 px-1.5 rounded border border-gray-700">未认证</span>
-          </div>
-          <div class="text-xs text-gray-400 mt-2">成交 452 笔 &nbsp; | &nbsp; 成交率 99.5%</div>
-        </div>
-      </div>
-
-      <div class="px-4 mt-2">
-        <div class="menu-group">
-          <div @click="alert('进入TA的动态')" class="menu-item">
-            <div class="font-bold">动态</div>
-            <div class="text-gray-500">›</div>
-          </div>
-          <div class="p-4 text-xs text-gray-500 border-b border-[#1c1c1e]">TA还没有发布过动态。</div>
-        </div>
-
-        <div class="menu-group mt-4">
-          <div @click="showProfilePage=false" class="menu-item justify-center text-blue-400 font-bold gap-2">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
-            发消息
-          </div>
-          <div @click="alert('正在呼叫...')" class="menu-item justify-center text-gray-300 font-bold gap-2 border-t border-[#1c1c1e]">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
-            音视频通话
-          </div>
-        </div>
-      </div>
+  <div v-if="showChatSettings" class="absolute inset-0 z-[100] bg-[#0a0a0a] flex flex-col">
+    <header class="px-4 py-3 flex items-center bg-black/90 border-b border-[#1a1a1a]"><button @click="showChatSettings=false" class="text-gray-300 active:opacity-50 mr-3"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg></button><span class="font-bold text-lg mx-auto pr-8">聊天设置</span></header>
+    <main class="flex-1 overflow-y-auto p-4 space-y-4">
+      <div class="card"><div class="p-4 flex justify-between items-center"><div><div class="text-gray-200">接收陌生人消息</div></div><label class="relative flex items-center cursor-pointer"><input type="checkbox" checked class="tgl absolute w-6 h-6 rounded-full bg-white appearance-none cursor-pointer"><span class="tgl-lbl block h-6 rounded-full w-11"></span></label></div></div>
     </main>
   </div>
 </transition>
+<transition name="slide"><div v-if="showSet" class="absolute inset-0 z-[100] bg-black flex flex-col"><header class="px-4 py-3 flex items-center gap-3 bg-black border-b border-gray-800"><button @click="showSet=false" class="text-gray-300 flex items-center">＜ 返回</button><div class="text-lg font-bold flex-1 text-center pr-10">设置</div></header><main class="flex-1 overflow-y-auto p-4 space-y-4 pb-20"><div class="card p-2"><div @click="setAction='profile'" class="flex justify-between p-4 border-b border-[#222]"><div class="font-bold">编辑个人资料</div><div class="text-gray-500">＞</div></div></div></main></div></transition>
+<transition name="fade"><div v-if="setAction" class="absolute inset-0 z-[100] bg-black/80 backdrop-blur" @click.self="setAction=null"><transition name="up"><div class="absolute bottom-0 w-full bg-[#121212] rounded-t-3xl p-6" @click.stop><div class="flex justify-between items-center mb-6"><h3 class="text-lg font-bold">编辑资料</h3><button @click="setAction=null" class="text-gray-500">关闭</button></div><button @click="setAction=null" class="w-full bg-gold text-black font-bold py-3.5 rounded-xl">保存</button></div></transition></div></transition>
+<transition name="fade"><div v-if="showGroupManage" class="absolute inset-0 z-[100] bg-black/80 backdrop-blur" @click.self="showGroupManage=false"><transition name="up"><div class="absolute bottom-0 w-full bg-[#121212] rounded-t-3xl p-6" @click.stop><div class="flex justify-between items-center mb-6"><h3 class="text-lg font-bold">分组管理</h3><button @click="showGroupManage=false" class="text-gray-500">关闭</button></div><input type="text" v-model="newGroupName" class="input-box" placeholder="输入新分组名称"><div class="flex gap-3 mt-4"><button @click="showGroupManage=false" class="flex-1 bg-[#1c1c1e] text-white font-bold py-3.5 rounded-xl">取消</button><button @click="addGroup" class="flex-1 bg-neon text-black font-bold py-3.5 rounded-xl">保存</button></div></div></transition></div></transition>
+<transition name="fade"><div v-if="showContextMenu" class="absolute inset-0 z-[100] bg-black/50 backdrop-blur-sm" @click.self="showContextMenu=false" @contextmenu.prevent><div class="context-menu" @click.stop><div class="context-item" @click="handleMenu('消息免打扰')"><span class="text-lg">🔕</span> 消息免打扰</div><div class="context-item" @click="handleMenu('置顶')"><span class="text-lg">📌</span> 置顶</div><div class="context-item" @click="handleMenu('标记为已读')"><span class="text-lg">✉️</span> 标记为已读</div><div class="context-item" @click="showAddToGroup=true"><span class="text-lg">📁</span> 添加到分组</div><div class="context-item" @click="handleMenu('不显示该聊天')"><span class="text-lg">🚫</span> 不显示该聊天</div><div class="context-item danger" @click="handleMenu('删除该聊天')"><span class="text-lg">🗑️</span> 删除该聊天</div></div></div></transition>
+<transition name="fade"><div v-if="showAddToGroup" class="absolute inset-0 z-[100] bg-black/60 backdrop-blur" @click.self="showAddToGroup=false"><transition name="up"><div class="absolute bottom-0 w-full bg-[#1c1c1e] rounded-t-3xl p-6" @click.stop><div class="flex justify-between items-center mb-4"><h3 class="text-lg font-bold">添加到分组</h3><button @click="showAddToGroup=false" class="text-gray-500">取消</button></div><div class="space-y-2 max-h-60 overflow-y-auto"><div v-for="g in chatGroups" :key="g" v-show="g !== '全部' && g !== '未读' && g !== '群组'" @click="confirmAddToGroup(g)" class="p-4 bg-[#2c2c2e] rounded-xl text-center font-bold text-white active:bg-gray-700 transition">{{ g }}</div></div></div></transition></div></transition>
 
-<!-- ================= 全屏发布动态 ================= -->
+<!-- 聊天窗口和动态发布的全屏层 -->
 <transition name="slide">
-  <div v-if="showPost" class="absolute inset-0 z-[60] bg-[#0a0a0a] flex flex-col">
-    <header class="px-4 py-3 flex justify-between items-center bg-[#0a0a0a]">
-      <button @click="showPost=false" class="text-gray-300 text-[15px] active:opacity-50">取消</button>
-      <button @click="submitPost" :class="postContent.trim() ? 'bg-[#C5FF32] text-black' : 'bg-[#2c2c2e] text-gray-500'" class="px-4 py-1.5 rounded-full text-sm font-bold transition-colors">发布</button>
+  <div v-if="activeChat" class="absolute inset-0 z-[90] bg-[#0a0a0a] flex flex-col">
+    <header class="px-4 py-3 flex justify-between items-center bg-black/90 border-b border-[#1a1a1a]">
+      <div class="flex items-center gap-3"><button @click="closeChat" class="text-gray-300 active:opacity-50"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg></button><span class="font-bold text-[16px] text-white flex items-center gap-1">{{ activeChat.name }} <span v-if="activeChat.verified" class="text-blue-400 text-sm">✔</span></span></div>
+      <button @click="showChatSettings=true" class="text-gray-300 active:opacity-50"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg></button>
     </header>
-    <div class="flex-1 px-4 py-2 flex flex-col relative">
-      <textarea v-model="postContent" maxlength="1000" class="w-full h-40 bg-transparent text-[16px] text-white outline-none resize-none placeholder-gray-600" placeholder="分享你的交易心得，或者发布求购信息..."></textarea>
-      <div class="text-right text-xs text-gray-500 mt-2">{{ postContent.length }}/1000</div>
+    <div class="flex-1 overflow-y-auto p-4 space-y-6" id="chatScrollArea">
+      <div class="text-center text-xs text-gray-500">昨天 12:22</div><div class="text-center text-xs text-gray-500">你们已互相关注对方</div>
+      <div v-for="(msg, index) in currentMessages" :key="index" class="flex gap-3" :class="msg.isMe ? 'flex-row-reverse' : ''">
+        <div @click="openUserProfile(activeChat)" class="w-10 h-10 bg-gradient-to-tr from-gray-700 to-gray-600 rounded-[10px] flex items-center justify-center text-xl flex-shrink-0 active:opacity-70 transition-opacity" :class="msg.isMe ? 'from-green-700 to-green-500' : 'from-orange-700 to-yellow-600'">{{ msg.isMe ? 'X' : activeChat.avatarText }}</div>
+        <div :class="msg.isMe ? 'chat-bubble-right' : 'chat-bubble-left'" class="px-3 py-2 max-w-[80%] flex flex-wrap items-baseline gap-x-2 gap-y-1"><span class="text-[15px] leading-snug break-all">{{ msg.text }}</span><span class="text-[10px] flex items-center gap-1 ml-auto mt-1" :class="msg.isMe ? 'text-black/60' : 'text-gray-500'">{{ msg.time }} <svg v-if="msg.isMe" class="w-3.5 h-3.5 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13l4 4L23 7"></path></svg></span></div>
+      </div>
     </div>
-    <div class="bg-[#121212] border-t border-[#1a1a1a] p-4 flex items-center gap-6 text-gray-400">
-      <button class="flex items-center gap-1 active:text-white"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg> <span class="text-sm">照片</span></button>
-      <button class="flex items-center gap-1 active:text-white"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg> <span class="text-sm">视频</span></button>
-      <button class="flex items-center gap-1 active:text-white"><span class="text-xl font-bold">@</span> <span class="text-sm">好友</span></button>
-      <button class="flex items-center gap-1 active:text-white"><span class="text-xl font-bold">#</span> <span class="text-sm">话题</span></button>
-    </div>
-  </div>
+    <div class="bg-[#121212] border-t border-[#1a1a1a] flex flex-col relative z-20">
+      <div class="px-3 py-2 flex items-center gap-3">
+        <button @click="isRecording = !isRecording; showChatPanel = false" class="text-gray-400 active:text-white transition-colors"><svg v-if="!isRecording" class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg><svg v-else class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg></button>
+        <div v-if="isRecording" class="flex-1 bg-[#1c1c1e] rounded-lg text-center py-2 text-[15px] text-gray-300 font-bold active:bg-[#2c2c2e] transition-colors cursor-pointer" @mousedown="startRecord" @mouseup="stopRecord" @mouseleave="stopRecord" @touchstart.prevent="startRecord" @touchend.prevent="stopRecord">{{ isHolding ? '松开 结束' : '按住 说话' }}</div>
+        <input v-else v-model="newMsg" @focus="showChatPanel = false" @keyup.enter="sendMessage" type="text" class="flex-1 bg-[#1c1c1e] rounded-lg px-3 py-2 outline-none text-[15px] text-white" placeholder="">
+        <button @click="sendMessage" v-if="newMsg.trim() && !isRecording" class="bg-[#2b8c57] text-white px-4 py-1.5 rounded-lg text-sm font-bold whitespace-nowrap active:scale-95 transition">发送</button>
+        <template v-else-if="!isRecording"><button class="text-gray-400"><svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></button><button @click="showChatPanel = !showChatPanel" class="text-gray-400"><svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg></button></template>
+      </div>
+      <transition name="up"><div v-if="showChatPanel" class="grid grid-cols-4 gap-y-6 p-6 pb-8 border-t border-[#2a2a2a]"><div class="flex flex-col items-center gap-2 text-xs text-gray-400"><div class="w-14 h-14 bg-[#2c2c2e] rounded-2xl flex items-center justify-center text-2xl">🖼️</div>照片</div><div class="flex flex-col items-center gap-2 text-xs text-gray-400"><div class="w-14 h-14 bg-[#2c2c2e] rounded-2xl flex items-center justify-center text-2xl">📷</div>拍摄</div><div class="flex flex-col items-center gap-2 text-xs text-gray-400"><div class="w-14 h-14 bg-[#2c2c2e] rounded-2xl flex items-center justify-center text-2xl">📞</div>语音通话</div><div class="flex flex-col items-center gap-2 text-xs text-gray-400"><div class="w-14 h-14 bg-[#2c2c2e] rounded-2xl flex items-center justify-center text-2xl">🔗</div>分享</div><div class="flex flex-col items-center gap-2 text-xs text-gray-400"><div class="w-14 h-14 bg-[#2c2c2e] rounded-2xl flex items-center justify-center text-2xl">📁</div>文件</div><div class="flex flex-col items-center gap-2 text-xs text-gray-400"><div class="w-14 h-14 bg-[#2c2c2e] rounded-2xl flex items-center justify-center text-2xl">⭐</div>收藏</div><div class="flex flex-col items-center gap-2 text-xs text-gray-400"><div class="w-14 h-14 bg-[#2c2c2e] rounded-2xl flex items-center justify-center text-2xl">🧧</div>红包</div><div class="flex flex-col items-center gap-2 text-xs text-gray-400"><div class="w-14 h-14 bg-[#2c2c2e] rounded-2xl flex items-center justify-center text-2xl-linejoin="round" stroke-width="">2🤝</div>P2"P</div></div></transition>
+    d="M4 16l4. </div>
+ 586 </div>
 </transition>
-
-<!-- 弹窗区 (不变) -->
-<transition name="slide"><div v-if="showSet" class="absolute inset-0 z-40 bg-black flex flex-col"><header class="px-4 py-3 flex items-center gap-3 bg-black border-b border-gray-800"><button @click="showSet=false" class="text-gray-300 flex items-center">＜ 返回</button><div class="text-lg font-bold flex-1 text-center pr-10">设置</div></header><main class="flex-1 overflow-y-auto p-4 space-y-4 pb-20"><div class="card p-2"><div @click="setAction='profile'" class="flex justify-between p-4 border-b border-[#222]"><div class="font-bold">编辑个人资料</div><div class="text-gray-500">＞</div></div></div></main></div></transition>
-<transition name="fade"><div v-if="setAction" class="absolute inset-0 z-50 bg-black/80 backdrop-blur" @click="setAction=null"><transition name="up"><div class="absolute bottom-0 w-full bg-[#121212] rounded-t-3xl p-6" @click.stop><div class="flex justify-between items-center mb-6"><h3 class="text-lg font-bold">编辑资料</h3><button @click="setAction=null" class="text-gray-500">关闭</button></div><button @click="setAction=null" class="w-full bg-gold text-black font-bold py-3.5 rounded-xl">保存</button></div></transition></div></transition>
-<transition name="fade"><div v-if="showOrderModal" class="absolute inset-0 z-50 bg-black/80 backdrop-blur" @click="showOrderModal=false"><transition name="up"><div class="absolute bottom-0 w-full bg-[#121212] rounded-t-3xl p-6" @click.stop><div class="flex justify-between items-center mb-6"><h3 class="text-lg font-bold">{{tradeType==='buy'?'购买':'出售'}} USDT</h3><button @click="showOrderModal=false" class="text-gray-500">关闭</button></div><div class="bg-[#1c1c1e] p-4 rounded-xl mb-4"><div class="text-xs text-gray-500 mb-1">交易金额 (CNY)</div><div class="flex items-center border-b border-gray-700 pb-2"><input v-model="orderCNY" type="number" class="bg-transparent text-2xl outline-none flex-1 text-white font-bold placeholder-gray-600" placeholder="0.00"><span class="text-gray-400 font-bold">CNY</span></div></div><div class="bg-[#1c1c1e] p-4 rounded-xl mb-4"><div class="text-xs text-gray-500 mb-1">预计获得 (USDT)</div><div class="flex items-center pb-2"><input :value="orderUSDT" readonly class="bg-transparent text-2xl outline-none flex-1 text-neon font-bold"><span class="text-neon font-bold">USDT</span></div></div><button @click="submitOrder" class="w-full bg-neon text-black font-bold py-3.5 rounded-xl">确认下单</button></div></transition></div></transition>
-<transition name="fade"><div v-if="showHistory" class="absolute inset-0 z-50 bg-black/80 backdrop-blur" @click="showHistory=false"><transition name="up"><div class="absolute bottom-0 w-full bg-[#121212] rounded-t-3xl p-6 h-[70vh] flex flex-col" @click.stop><div class="flex justify-between items-center mb-4"><h3 class="text-lg font-bold">历史订单</h3><button @click="showHistory=false" class="text-gray-500">关闭</button></div><div class="flex-1 overflow-y-auto"><div class="p-4 border-b border-gray-800 flex justify-between"><div><div class="text-sm font-bold">购买 USDT</div><div class="text-xs text-gray-500">10:00</div></div><div class="text-right"><div class="text-sm font-bold">100.00 USDT</div><div class="text-xs text-neon mt-1">待付款</div></div></div></div></div></transition></div></transition>
-<transition name="fade"><div v-if="showMoreMenu" class="absolute inset-0 z-50 bg-black/80 backdrop-blur" @click="showMoreMenu=false"><transition name="up"><div class="absolute bottom-0 w-full bg-[#121212] rounded-t-3xl p-6" @click.stop><div class="flex justify-between items-center mb-4"><h3 class="text-lg font-bold">更多操作</h3><button @click="showMoreMenu=false" class="text-gray-500">关闭</button></div><div class="space-y-2"><div @click="showPostAd=true; showMoreMenu=false" class="p-4 bg-[#1c1c1e] rounded-xl text-center text-sm font-bold text-white">发布广告</div><div class="p-4 bg-[#1c1c1e] rounded-xl text-center text-sm font-bold text-white">我的广告</div></div></div></transition></div></transition>
-<transition name="fade"><div v-if="showFilter" class="absolute inset-0 z-50 bg-black/80 backdrop-blur" @click="showFilter=false"><transition name="up"><div class="absolute bottom-0 w-full bg-[#121212] rounded-t-3xl p-6" @click.stop><div class="flex justify-between items-center mb-6"><h3 class="text-lg font-bold">选择支付方式</h3><button @click="showFilter=false" class="text-gray-500">关闭</button></div><div class="flex flex-wrap gap-3 mb-8"><div v-for="pay in payMethods" :key="pay" @click="togglePay(pay)" class="pay-tag" :class="{'active': selectedPays.includes(pay)}">{{pay}}</div></div><button @click="showFilter=false" class="w-full bg-neon text-black font-bold py-3.5 rounded-full">确认筛选</button></div></transition></div></transition>
-<transition name="fade"><div v-if="showKyc" class="absolute inset-0 z-50 bg-black/80 backdrop-blur" @click="showKyc=false"><transition name="up"><div class="absolute bottom-0 w-full bg-[#121212] rounded-t-3xl p-6" @click.stop><div class="flex justify-between items-center mb-6"><h3 class="text-lg font-bold">实名认证 (KYC)</h3><button @click="showKyc=false" class="text-gray-500">关闭</button></div><div class="space-y-4"><input type="text" placeholder="真实姓名" class="input-box"><input type="text" placeholder="身份证号" class="input-box"></div><button @click="showKyc=false; alert('提交成功')" class="w-full bg-neon text-black font-bold py-3.5 rounded-xl mt-6">提交认证</button></div></transition></div></transition>
-<transition name="fade"><div v-if="showPostAd" class="absolute inset-0 z-50 bg-black/80 backdrop-blur" @click="showPostAd=false"><transition name="up"><div class="absolute bottom-0 w-full bg-[#121212] rounded-t-3xl p-6" @click.stop><div class="flex justify-between items-center mb-6"><h3 class="text-lg font-bold">发布广告</h3><button @click="showPostAd=false" class="text-gray-500">关闭</button></div><div class="flex gap-2 mb-4"><input type="number" placeholder="单价 (CNY)" class="input-box flex-1 mb-0"><input type="number" placeholder="总数量" class="input-box flex-1 mb-0"></div><button @click="showPostAd=false; alert('发布成功')" class="w-full bg-neon text-black font-bold py-3.5 rounded-xl mt-2">发布广告</button></div></transition></div></transition>
-<transition name="fade"><div v-if="showGroupManage" class="absolute inset-0 z-50 bg-black/80 backdrop-blur" @click="showGroupManage=false"><transition name="up"><div class="absolute bottom-0 w-full bg-[#121212] rounded-t-3xl p-6" @click.stop><div class="flex justify-between items-center mb-6"><h3 class="text-lg font-bold">分组管理</h3><button @click="showGroupManage=false" class="text-gray-500">关闭</button></div><input type="text" v-model="newGroupName" class="input-box" placeholder="输入新分组名称"><div class="flex gap-3 mt-4"><button @click="showGroupManage=false" class="flex-1 bg-[#1c1c1e] text-white font-bold py-3.5 rounded-xl">取消</button><button @click="addGroup" class="flex-1 bg-neon text-black font-bold py-3.5 rounded-xl">保存</button></div></div></transition></div></transition>
-<transition name="fade"><div v-if="showContextMenu" class="absolute inset-0 z-50 bg-black/50 backdrop-blur-sm" @click="showContextMenu=false" @contextmenu.prevent><div class="context-menu" @click.stop><div class="context-item" @click="handleMenu('消息免打扰')"><span class="text-lg">🔕</span> 消息免打扰</div><div class="context-item" @click="handleMenu('置顶')"><span class="text-lg">📌</span> 置顶</div><div class="context-item" @click="handleMenu('标记为已读')"><span class="text-lg">✉️</span> 标记为已读</div><div class="context-item" @click="showAddToGroup=true"><span class="text-lg">📁</span> 添加到分组</div><div class="context-item" @click="handleMenu('不显示该聊天')"><span class="text-lg">🚫</span> 不显示该聊天</div><div class="context-item danger" @click="handleMenu('删除该聊天')"><span class="text-lg">🗑️</span> 删除该聊天</div></div></div></transition>
-<transition name="fade"><div v-if="showAddToGroup" class="absolute inset-0 z-[60] bg-black/60 backdrop-blur" @click="showAddToGroup=false"><transition name="up"><div class="absolute bottom-0 w-full bg-[#1c1c1e] rounded-t-3xl p-6" @click.stop><div class="flex justify-between items-center mb-4"><h3 class="text-lg font-bold">添加到分组</h3><button @click="showAddToGroup=false" class="text-gray-500">取消</button></div><div class="space-y-2 max-h-60 overflow-y-auto"><div v-for="g in chatGroups" :key="g" v-show="g !== '全部' && g !== '未读' && g !== '群组'" @click="confirmAddToGroup(g)" class="p-4 bg-[#2c2c2e] rounded-xl text-center font-bold text-white active:bg-gray-700 transition">{{ g }}</div></div></div></transition></div></transition>
+<transition name="fade"><div v--if="isHolding4" class.="fixed inset-586a2 2 0 0 z-[012100] flex items-center justify-center pointer-events-none"><div class="bg-black/80 backdrop-blur-md rounded-2xl px-8 py-6 flex flex-col items-center gap-4 border border-gray-700"><div class="flex items-end gap-1 h-8"><div class="w-1 h-4 bg-neon rounded-full animate-[bounce_1s_infinite.]"></div><div class="w-1 h-6 bg-neon rounded-full animate-[bounce_1.2s_infinite]"></div><div class="w-1 h-8 bg-neon rounded-full animate-[bounce_0.8s_infinite]"></div><div class="w-1 h-6 bg-neon rounded-full animate-[bounce_1.1s_infinite]"></div></div><div class="text-white font-bold text-sm">正在录音...</div></div></div></transition>
+<transition name="slide"><div v-if="showProfilePage && activeChat" class="absolute inset-0 z-[100] bg-[#050505] flex flex-col"><header class="px-4 py-3 flex items-center justify-between bg-black/90"><button @click="showProfilePage=false" class="text-gray-300"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg></button><div class="text-gray-300">···</div></header><main class="flex-1 overflow-y-auto"><div class="flex gap-4 p-6 bg-[#0a0a0a]"><div class="w-16 h-16 bg-gradient-to-tr from-orange-700 to-yellow-600 rounded-xl flex items-center justify-center text-3xl">{{ activeChat.avatarText }}</div><div class="flex-1"><div class="text-xl font-bold flex items-center gap-2">{{ activeChat.name }}<span v-if="activeChat.verified" class="text-[10px] bg-blue-500/20 text-blue-400 px-1.5 rounded border border-blue-500/30">已认证</span><span v-else class="text-[10px] bg-gray-800 text-gray-400 px-1.5 rounded border border-gray-700">未认证</span></div><div class="text-xs text-gray-400 mt-2">成交 452 笔 &nbsp; | &nbsp; 成交率 99.5%</div></div></div><div class="px-4 mt-2"><div class="menu-group"><div @click="alert('进入TA的动态')" class="menu-item"><div class="font-bold">动态</div><div class="text-gray-500">›</div></div><div class="p-4 text-xs text-gray-500 border-b border-[#1c1c1e]">TA还没有发布过动态。</div></div><div class="menu-group mt-4"><div @click="showProfilePage=false" class="menu-item justify-center text-blue-400 font-bold gap-2"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>发消息</div><div @click="alert('正在呼叫...')" class="menu-item justify-center text-gray-300 font-bold gap-2 border-t border-[#1c1c1e]"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>音视频通话</div></div></div></main></div></transition>
+<transition name="slide"><div v-if="showPost" class="absolute inset-0 z-[100] bg-[#0a0a0a] flex flex-col"><header class="px-4 py-3 flex justify-between items-center bg-[#0a0a0a]"><button @click="showPost=false" class="text-gray-300 text-[15px] active:opacity-50">取消</button><button @click="submitPost" :class="postContent.trim() ? 'bg-[#C5FF32] text-black' : 'bg-[#2c2c2e] text-gray-500'" class="px-4 py-1.5 rounded-full text-sm font-bold transition-colors">发布</button></header><div class="flex-1 px-4 py-2 flex flex-col relative"><textarea v-model="postContent" maxlength="1000" class="w-full h-40 bg-transparent text-[16px] text-white outline-none resize-none placeholder-gray-600" placeholder="分享你的交易心得，或者发布求购信息..."></textarea><div class="text-right text-xs text-gray-500 mt-2">{{ postContent.length }}/1000</div></div><div class="bg-[#121212] border-t border-[#1a1a1a] p-4 flex items-center gap-6 text-gray-400"><button class="flex items-center gap-1 active:text-white"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg> <span class="text-sm">照片</span></button><button class="flex items-center gap-1 active:text-white"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg> <span class="text-sm">视频</span></button><button class="flex items-center gap-1 active:text-white"><span class="text-xl font-bold">@</span> <span class="text-sm">好友</span></button><button class="flex items-center gap-1 active:text-white"><span class="text-xl font-bold">#</span> <span class="text-sm">话题</span></button></div></div></transition>
 
 </div>
 <script>
@@ -466,9 +375,7 @@ createApp({
     payMethods:['全部', '微信', '支付宝', '银行卡', '信用卡', '礼品卡'],
     selectedPays:['全部'],
     
-    // 子钱包页
     showSubWallet: false,
-
     showOrderModal: false,
     showOrderDetail: false,
     orderCNY: '',
