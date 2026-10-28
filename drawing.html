@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dimensional Drawing - Wallet UI</title>
+<style>
+  body { background-color: #111; color: #eee; font-family: monospace; margin: 0; padding: 20px; }
+  .drawing-container { position: relative; width: 375px; height: 812px; background: #000; border: 1px solid #444; margin: 0 auto; }
+  .layer { position: absolute; border: 1px dashed #555; display: flex; align-items: center; justify-content: center; }
+  .solid-line { border: 1px solid #aaa; }
+  .label { position: absolute; font-size: 10px; color: #ffeb3b; white-space: nowrap; }
+  .dim-line { position: absolute; border-top: 1px solid #00bcd4; }
+  .dim-line::before, .dim-line::after { content: ''; position: absolute; width: 1px; height: 4px; background: #00bcd4; top: -2px; }
+  .dim-line::before { left: 0; } .dim-line::after { right: 0; }
+</style>
+</head>
+<body>
+<div class="drawing-container">
+  <!-- 视口标注 VW -->
+  <div class="dim-line" style="top: 10px; left: 0; right: 0;"><span class="label" style="left: 50%; top: -15px; color: #00bcd4;">VW = 375px</span></div>
+
+  <!-- 1. Header 区域 -->
+  <div class="layer" style="top: 32px; left: 20px; right: 20px; height: 24px; justify-content: space-between;">
+    <!-- Avatar -->
+    <div class="layer solid-line" style="position: relative; width: 24px; height: 24px; border-radius: 50%; padding:0;">
+      <span class="label" style="bottom: -15px; left: -5px;">R=50%</span>
+    </div>
+    <div style="display:flex; gap:8px; align-items:center;">
+        <div class="layer solid-line" style="position: relative; height: 24px; width: 80px;"><span class="label" style="bottom: -15px;">Text:16px</span></div>
+    </div>
+    <!-- Settings Icon -->
+    <div class="layer solid-line" style="position: relative; width: 24px; height: 24px; border-radius: 4px;"></div>
+  </div>
+
+  <!-- 2. 余额区域 -->
+  <div style="position: absolute; top: 90px; left: 20px; right: 20px;">
+    <div class="layer solid-line" style="position: relative; height: 60px; width: 200px; justify-content: flex-start; border:none;">
+      <span style="font-size: 48px; font-weight: bold; color: #fff; font-family: sans-serif;">$0.00</span>
+      <span class="label" style="top: -15px; left: 0; color:#00bcd4;">Font: 56px Bold</span>
+    </div>
+    <div class="layer" style="position: relative; height: 20px; width: 260px; justify-content: flex-start; border:none; margin-top: 8px;">
+      <span class="label" style="top: 0; left: 0;">Sub Data: 14px Regular (Margin-Top: S1=8px)</span>
+    </div>
+    <!-- 像素条 -->
+    <div class="layer solid-line" style="position: absolute; top: 10px; right: 0; width: 96px; height: 8px;"></div>
+  </div>
+
+  <!-- 3. 四大水泡按钮 -->
+  <div style="position: absolute; top: 200px; left: 20px; right: 20px; display: flex; justify-content: space-between;">
+    <!-- Button 1 -->
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+      <div class="layer solid-line" style="position: relative; width: 64px; height: 64px; border-radius: 50%;">
+        <span class="label" style="top: -20px; left: -10px;">D=64px</span>
+        <span class="label" style="bottom: -15px; left: -30px;">Glass: Blur(10px)</span>
+      </div>
+      <div class="label" style="position: relative;">Text 12px</div>
+    </div>
+    <!-- Button 2 -->
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+      <div class="layer solid-line" style="position: relative; width: 64px; height: 64px; border-radius: 50%;"></div>
+      <div class="label" style="position: relative;">Text 12px</div>
+    </div>
+    <!-- Button 3 -->
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+      <div class="layer solid-line" style="position: relative; width: 64px; height: 64px; border-radius: 50%;"></div>
+      <div class="label" style="position: relative;">Text 12px</div>
+    </div>
+    <!-- Button 4 -->
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+      <div class="layer solid-line" style="position: relative; width: 64px; height: 64px; border-radius: 50%;"></div>
+      <div class="label" style="position: relative;">Text 12px</div>
+    </div>
+  </div>
+  <!-- 尺寸连线：按钮间距 -->
+  <div class="dim-line" style="top: 260px; left: 84px; width: 42px;"><span class="label" style="top: -15px; left: 5px;">Gap (Auto)</span></div>
+
+  <!-- 4. P2P 入口模块 -->
+  <div class="layer solid-line" style="position: absolute; top: 320px; left: 20px; right: 20px; height: 160px; border-radius: 24px; padding: 24px; display: flex; flex-direction: column; align-items: flex-start;">
+    <span class="label" style="top: -15px; left: 0; color:#00bcd4;">Padding: S2 = 24px, R1 = 24px</span>
+    <div class="label" style="position: relative; color: #fff; margin-bottom: 8px;">Kicker (Start)</div>
+    <div class="label" style="position: relative; font-size: 20px; font-weight: bold; color: #fff; margin-bottom: 8px;">Title (P2P Trade)</div>
+    <div class="label" style="position: relative; color: #aaa; margin-bottom: 24px;">Subtitle (Buy/Sell USDT)</div>
+    
+    <!-- P2P 内部按钮 -->
+    <div style="display: flex; width: 100%; gap: 12px; position: relative;">
+      <div class="layer solid-line" style="position: relative; flex: 1; height: 40px; border-radius: 20px; background: rgba(255,255,255,0.1);"><span class="label">Buy Btn</span></div>
+      <div class="layer solid-line" style="position: relative; flex: 1; height: 40px; border-radius: 20px; background: rgba(255,255,255,0.1);"><span class="label">Sell Btn</span></div>
+    </div>
+  </div>
+
+  <!-- 5. 交易记录空状态 -->
+  <div style="position: absolute; top: 520px; left: 20px; right: 20px;">
+    <div class="label" style="position: relative; font-weight: bold; margin-bottom: 20px;">Section Title: 交易记录</div>
+    <div class="layer" style="position: relative; height: 100px; width: 100%; border: none; flex-direction: column; justify-content: center;">
+      <div class="label" style="position: relative; font-size: 14px; color: #666;">📭 Empty State Illustration</div>
+      <div class="label" style="position: relative; margin-top: 8px; color: #666;">Text: "还没有记录，开始交易吧"</div>
+    </div>
+  </div>
+
+  <!-- 底部导航 -->
+  <div class="layer solid-line" style="position: absolute; bottom: 0; left: 0; right: 0; height: 80px; border-bottom: none; border-left: none; border-right: none; justify-content: space-around;">
+     <div class="label" style="position: relative;">Tab Item</div>
+     <div class="label" style="position: relative;">Tab Item</div>
+     <div class="label" style="position: relative;">Tab Item</div>
+     <div class="label" style="position: relative;">Tab Item (Active)</div>
+  </div>
+</div>
+</body>
+</html>
