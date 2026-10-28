@@ -7,7 +7,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
 <style>
-body{background:#000;color:#fff;font-family:-apple-system,sans-serif;-webkit-tap-highlight-color:transparent; user-select: none;}
+body{background:#000;color:#fff;font-family:-apple-system,sans-serif;-webkit-tap-highlight-color:transparent; user-select: none; margin:0;}
 ::-webkit-scrollbar{display:none}
 .text-gold{color:#E6C875}.bg-gold{background:#E6C875}
 .text-neon{color:#C5FF32}.bg-neon{background:#C5FF32}
@@ -24,52 +24,185 @@ body{background:#000;color:#fff;font-family:-apple-system,sans-serif;-webkit-tap
 svg { max-width: 100%; max-height: 100%; }
 .list-item { border-bottom: 1px solid #1a1a1a; padding: 16px; }
 .list-item:last-child { border-bottom: none; }
+.pay-tag { background: #1c1c1e; border: 1px solid transparent; padding: 6px 14px; border-radius: 8px; font-size: 13px; color: #aaa; transition: all 0.2s; }
+.pay-tag.active { border-color: #C5FF32; color: #C5FF32; background: rgba(197,255,50,0.1); }
+.context-menu { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(1); background: rgba(30, 30, 30, 0.95); backdrop-filter: blur(20px); border-radius: 14px; width: 220px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.1); z-index: 100; animation: pop .2s ease-out; }
+@keyframes pop { 0% { transform: translate(-50%, -50%) scale(0.9); opacity: 0; } 100% { transform: translate(-50%, -50%) scale(1); opacity: 1; } }
+.context-item { display: flex; align-items: center; gap: 12px; padding: 14px 16px; font-size: 15px; color: #eee; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; transition: background 0.1s; }
+.context-item:active { background: rgba(255,255,255,0.1); }
+.context-item:last-child { border-bottom: none; }
+.context-item.danger { color: #ff4d4f; }
+
 .chat-bubble-left { background: #2c2c2e; color: #fff; border-radius: 8px; border-top-left-radius: 0; position: relative; }
 .chat-bubble-left::before { content: ''; position: absolute; top: 0; left: -6px; border-top: 0px solid transparent; border-right: 6px solid #2c2c2e; border-bottom: 6px solid transparent; }
 .chat-bubble-right { background: #2b8c57; color: #fff; border-radius: 8px; border-top-right-radius: 0; position: relative; }
 .chat-bubble-right::before { content: ''; position: absolute; top: 0; right: -6px; border-top: 0px solid transparent; border-left: 6px solid #2b8c57; border-bottom: 6px solid transparent; }
+
 .menu-group { background: #121212; border-radius: 12px; margin-bottom: 12px; overflow: hidden; }
 .menu-item { display: flex; align-items: center; justify-content: space-between; padding: 16px; border-bottom: 1px solid #1c1c1e; font-size: 16px; color: #eee; }
+.menu-item:last-child { border-bottom: none; }
+.menu-icon { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; margin-right: 12px; }
 </style>
 </head>
 <body>
 <div id="app" v-cloak class="max-w-md mx-auto h-[100dvh] flex flex-col relative overflow-hidden bg-black">
+
+<header v-if="tab!=='wallet' && tab!=='trade' && tab!=='chat' && !showSet && !showPost" class="px-4 py-3 flex justify-between sticky top-0 z-40 bg-black/90">
+<div class="text-lg font-bold">社区</div>
+</header>
+
 <main class="flex-1 overflow-y-auto pb-20 relative z-10">
+<!-- 1. 聊天列表 -->
 <div v-show="tab==='chat'">
+  <div class="flex justify-between items-center px-4 pt-4 pb-2 text-gray-300">
+    <button class="p-2 -m-2 pointer-events-auto"><svg class="w-6 h-6 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg></button>
+    <div class="flex gap-4">
+      <button class="p-2 -m-2 pointer-events-auto"><svg class="w-6 h-6 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg></button>
+      <button class="p-2 -m-2 pointer-events-auto"><svg class="w-6 h-6 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg></button>
+    </div>
+  </div>
+  
+  <div class="flex gap-2 px-4 pb-2 overflow-x-auto">
+    <div v-for="g in chatGroups" :key="g" @click="chatTab=g" 
+         :class="chatTab===g ? 'bg-[#2a3a2e] text-neon border border-neon/20' : 'bg-[#121212] text-gray-400'" 
+         class="px-4 py-1.5 rounded-full text-sm font-bold whitespace-nowrap transition-colors cursor-pointer">{{g}}</div>
+  </div>
+
   <div class="px-2">
-    <div v-for="chat in chats" :key="chat.id" class="flex items-center px-3 py-1.5 active:bg-[#121212] transition-colors cursor-pointer" @click="openChatDetail(chat)">
-      <div class="w-[52px] h-[52px] bg-gradient-to-tr from-gray-700 to-gray-600 rounded-[14px] flex items-center justify-center text-xl mr-3 flex-shrink-0">{{ chat.avatar_text }}</div>
-      <div class="flex-1 min-w-0 h-[52px] flex flex-col justify-center border-b border-[#1a1a1a]"><div class="flex justify-between items-center mb-1"><span class="font-bold text-[15px] text-gray-100 truncate">{{ chat.name }}</span><span class="text-[11px] text-gray-500">{{ chat.time }}</span></div><div class="text-[13px] text-gray-400 truncate">{{ chat.last_msg }}</div></div>
+    <div v-for="chat in chats" :key="chat.id" 
+         class="flex items-center px-3 py-1.5 active:bg-[#121212] transition-colors cursor-pointer"
+         @click="openChatDetail(chat)">
+      
+      <div class="w-[52px] h-[52px] bg-gradient-to-tr from-gray-700 to-gray-600 rounded-[14px] flex items-center justify-center text-xl mr-3 flex-shrink-0 shadow-sm relative">
+        <span>{{ chat.avatar_text }}</span>
+      </div>
+      
+      <div class="flex-1 min-w-0 h-[52px] flex flex-col justify-center border-b border-[#1a1a1a]">
+        <div class="flex justify-between items-center mb-1">
+          <span class="font-bold text-[15px] text-gray-100 truncate pr-2">{{ chat.name }}</span>
+          <span class="text-[11px] text-gray-500 flex-shrink-0">{{ chat.time }}</span>
+        </div>
+        <div class="text-[13px] text-gray-400 truncate">{{ chat.last_msg }}</div>
+      </div>
     </div>
   </div>
 </div>
-<div v-show="tab==='community'" class="p-4 space-y-4"><div class="card p-4" v-for="post in posts" :key="post.id"><p class="text-sm text-gray-200">{{ post.content }}</p></div><button @click="showPost=true" class="fixed bottom-24 right-4 w-14 h-14 bg-neon text-black rounded-full flex items-center justify-center">+</button></div>
-<div v-show="tab==='trade'" class="p-4"><div class="bg-[#121212] rounded-2xl overflow-hidden"><div class="list-item" v-for="item in filteredListings" :key="item.id"><div class="flex justify-between"><span class="font-bold">{{item.name}}</span><span class="text-xs">{{item.price}} CNY</span></div></div></div></div>
-<div v-show="tab==='wallet'" class="p-6"><div class="text-xl font-bold">{{ user.username }}</div><div class="text-xs text-gray-400 mt-2">{{ myName }} - ID: {{ myId }}</div><div class="mt-2 text-neon text-xs">每个设备ID已自动区分，无限账号</div></div>
-</main>
-<nav class="absolute bottom-0 w-full bg-black flex justify-around py-2 pb-6 z-30">
-<button @click="tab='chat'" :class="tab==='chat'?'text-white':'text-gray-600'" class="flex flex-col items-center"><span class="text-[10px]">聊天</span></button>
-<button @click="tab='community'" :class="tab==='community'?'text-white':'text-gray-600'" class="flex flex-col items-center"><span class="text-[10px]">社区</span></button>
-<button @click="tab='trade'" :class="tab==='trade'?'text-white':'text-gray-600'" class="flex flex-col items-center"><span class="text-[10px]">交易</span></button>
-<button @click="tab='wallet'" :class="tab==='wallet'?'text-white':'text-gray-600'" class="flex flex-col items-center"><span class="text-[10px]">我的</span></button>
-</nav>
 
-<transition name="slide"><div v-if="activeChat" class="absolute inset-0 z-[90] bg-[#0a0a0a] flex flex-col">
-  <header class="px-4 py-3 flex justify-between items-center bg-black/90 border-b border-[#1a1a1a]"><div class="flex items-center gap-3"><button @click="closeChat" class="text-gray-300">‹ 返回</button><span class="font-bold">{{ activeChat.name }}</span></div><span class="text-xs text-neon">{{ myName }}</span></header>
-  <div class="flex-1 overflow-y-auto p-4 space-y-6" id="chatScrollArea">
-    <div v-for="(msg, index) in currentMessages" :key="index" class="flex gap-3" :class="msg.is_me ? 'flex-row-reverse' : ''">
-      <div class="w-10 h-10 rounded-[10px] flex items-center justify-center text-xs flex-shrink-0" :class="msg.is_me ? 'bg-green-600' : 'bg-gray-700'">{{ msg.is_me ? '我' : (msg.sender || '他') }}</div>
-      <div :class="msg.is_me ? 'chat-bubble-right' : 'chat-bubble-left'" class="px-3 py-2 max-w-[80%]"><span class="text-[15px] break-all">{{ msg.text }}</span><span class="text-[10px] ml-2 opacity-60">{{ msg.time }}</span></div>
+<!-- 2. 社区动态 -->
+<div v-show="tab==='community'" class="relative h-full">
+  <div class="flex justify-around items-center px-4 py-2 border-b border-[#1a1a1a] sticky top-0 bg-black z-10">
+    <div class="pb-2 text-sm font-bold text-gold border-b-2 border-gold">动态</div>
+    <div class="pb-2 text-sm font-bold text-gray-500">行情</div>
+    <div class="pb-2 text-sm font-bold text-gray-500">机会</div>
+  </div>
+  <div class="p-4 space-y-4">
+    <div class="card p-4" v-for="post in posts" :key="post.id">
+      <div class="flex items-center gap-2 mb-3">
+        <img :src="user.avatar_url" class="w-8 h-8 rounded-full object-cover bg-[#333]">
+        <div><div class="text-sm font-bold">{{ user.username }}</div><div class="text-[10px] text-gray-500">{{ new Date(post.created_at).toLocaleString() }}</div></div>
+      </div>
+      <p class="text-sm text-gray-200 mb-3">{{ post.content }}</p>
+    </div>
+    <div v-if="posts.length === 0" class="text-center text-gray-500 py-10 text-sm">暂无动态</div>
+  </div>
+  <button @click="showPost=true" class="fixed bottom-24 right-4 w-14 h-14 bg-neon text-black rounded-full shadow-[0_0_15px_rgba(197,255,50,0.4)] flex items-center justify-center z-20 active:scale-95 transition">+</button>
+</div>
+
+<!-- 3. 交易 -->
+<div v-show="tab==='trade'" class="pb-4">
+  <div class="px-4 py-4 flex justify-between items-center bg-black/90 sticky top-0 z-30">
+    <div class="flex items-center gap-2"><div class="w-1.5 h-5 bg-neon rounded-full"></div><span class="text-xl font-extrabold text-white tracking-wide">P2P交易</span></div>
+  </div>
+  <div class="px-4 mb-4"><span class="text-xs text-blue-400 bg-blue-900/20 px-3 py-1.5 rounded-full border border-blue-900/30">购买 USDT 零手续费</span></div>
+  <div class="bg-[#121212] mx-4 rounded-2xl overflow-hidden">
+    <div class="list-item" v-for="item in listings" :key="item.id">
+      <div class="flex justify-between items-center mb-2">
+        <div class="flex items-center gap-2">
+          <div class="w-7 h-7 rounded-full flex items-center justify-center text-[10px] text-white border bg-gradient-to-tr from-green-900 to-black border-green-500/50">认</div>
+          <span class="font-bold text-[15px] text-gray-100">{{item.name}}</span>
+        </div>
+      </div>
+      <div class="flex justify-between items-end mt-3">
+        <div>
+          <div class="text-xl font-bold text-gray-200 mb-1">{{item.price}} <span class="text-xs font-normal text-gray-500">CNY</span></div>
+          <div class="text-[13px] text-gray-500">限额: {{item.min}} - {{item.max}} CNY</div>
+        </div>
+        <button class="bg-neon text-black px-6 py-2 rounded-lg text-[14px] font-bold">购买</button>
+      </div>
+    </div>
+    <div v-if="listings.length === 0" class="p-8 text-center text-gray-500 text-sm">暂无挂单</div>
+  </div>
+</div>
+
+<!-- 4. 我的 -->
+<div v-show="tab==='wallet'" class="pb-6 bg-[#050505]">
+  <div class="bg-[#121212] p-6 pt-10 rounded-b-3xl mb-4">
+    <div class="flex items-center gap-4">
+      <div class="relative">
+        <img :src="user.avatar_url || 'https://api.dicebear.com/7.x/bottts/svg?seed=XILI'" class="w-16 h-16 rounded-xl shadow-lg bg-gray-800 object-cover">
+        <div class="absolute -bottom-1 -right-1 bg-[#121212] px-1 rounded-full"><div class="w-3.5 h-3.5 bg-neon rounded-full border-2 border-[#121212]"></div></div>
+      </div>
+      <div>
+        <div class="text-xl font-bold text-white flex items-center gap-2">
+          {{ user.username || 'XILI' }}
+          <span class="text-[10px] bg-neon/20 text-neon px-1.5 py-0.5 rounded border border-neon/30">已认证</span>
+        </div>
+        <div class="text-xs text-gray-400 mt-1 flex items-center gap-1"><div class="w-1.5 h-1.5 bg-neon rounded-full"></div> 在线</div>
+      </div>
+    </div>
+    <div class="mt-4 pt-4 border-t border-[#1c1c1e]">
+      <div class="text-xs text-gray-400 mb-1">设备 ID (独立账户)</div>
+      <div class="text-[13px] font-mono text-gray-300">{{ myId }}</div>
     </div>
   </div>
-  <div class="bg-[#121212] border-t border-[#1a1a1a] px-3 py-2">
+</div>
+</main>
+
+<nav class="absolute bottom-0 w-full bg-black flex justify-around py-2 pb-6 z-30 border-t border-[#1a1a1a]">
+<button @click="tab='chat'" :class="tab==='chat'?'text-white':'text-gray-600'" class="flex flex-col items-center gap-1 p-2"><span class="text-[10px]">聊天</span></button>
+<button @click="tab='community'" :class="tab==='community'?'text-white':'text-gray-600'" class="flex flex-col items-center gap-1 p-2"><span class="text-[10px]">社区</span></button>
+<button @click="tab='trade'" :class="tab==='trade'?'text-white':'text-gray-600'" class="flex flex-col items-center gap-1 p-2"><span class="text-[10px]">交易</span></button>
+<button @click="tab='wallet'" :class="tab==='wallet'?'text-white':'text-gray-600'" class="flex flex-col items-center gap-1 p-2"><span class="text-[10px]">我的</span></button>
+</nav>
+
+<!-- 聊天窗口 (真实WebSocket) -->
+<transition name="slide"><div v-if="activeChat" class="absolute inset-0 z-[90] bg-[#0a0a0a] flex flex-col">
+  <header class="px-4 py-3 flex justify-between items-center bg-black/90 border-b border-[#1a1a1a]">
+    <div class="flex items-center gap-3"><button @click="closeChat" class="text-gray-300 text-xl">‹</button><span class="font-bold text-[16px]">{{ activeChat.name }}</span></div>
+    <span class="text-xs text-neon">{{ myName }}</span>
+  </header>
+  
+  <div class="flex-1 overflow-y-auto p-4 space-y-6" id="chatScrollArea">
+    <div v-for="(msg, index) in currentMessages" :key="index" class="flex gap-3" :class="msg.user_id === myId ? 'flex-row-reverse' : ''">
+      <div class="w-10 h-10 rounded-[10px] flex items-center justify-center text-xs flex-shrink-0" :class="msg.user_id === myId ? 'bg-green-600' : 'bg-gray-700'">
+        {{ msg.user_id === myId ? '我' : (msg.user_name ? msg.user_name.slice(0,1) : '他') }}
+      </div>
+      <div :class="msg.user_id === myId ? 'chat-bubble-right' : 'chat-bubble-left'" class="px-3 py-2 max-w-[80%]">
+        <div class="text-[10px] text-gray-400 mb-1" v-if="msg.user_id !== myId">{{ msg.user_name }}</div>
+        <span class="text-[15px] break-all">{{ msg.text }}</span>
+        <span class="text-[10px] ml-2 opacity-60">{{ msg.time }}</span>
+      </div>
+    </div>
+  </div>
+  
+  <div class="bg-[#121212] border-t border-[#1a1a1a] px-3 py-2 pb-6">
     <div class="flex items-center gap-3">
       <input v-model="newMsg" @keyup.enter="sendMessage" type="text" class="flex-1 bg-[#1c1c1e] rounded-lg px-3 py-2 outline-none text-[15px] text-white" placeholder="发消息...">
       <button @click="sendMessage" class="bg-[#2b8c57] text-white px-4 py-2 rounded-lg text-sm font-bold">发送</button>
     </div>
-    <div class="text-[10px] text-gray-600 mt-1">ID: {{ myId.slice(0,20) }} | {{ socket && socket.readyState===1 ? '已连接' : '未连接' }}</div>
+    <div class="text-[10px] text-gray-600 mt-1">ID: {{ myId.slice(0,15) }}... | {{ socket && socket.readyState===1 ? '已连接' : '未连接' }}</div>
   </div>
 </div></transition>
+
+<!-- 发布动态弹窗 -->
+<transition name="fade"><div v-if="showPost" class="fixed inset-0 z-[100] bg-black/80 backdrop-blur flex items-center justify-center p-4">
+  <div class="w-full bg-[#121212] rounded-3xl p-6">
+    <div class="flex justify-between items-center mb-6"><h3 class="text-lg font-bold">发布动态</h3><button @click="showPost=false" class="text-gray-500">关闭</button></div>
+    <textarea v-model="postContent" rows="4" class="w-full bg-[#1c1c1e] rounded-xl p-3 text-sm text-white outline-none resize-none placeholder-gray-600 mb-4" placeholder="分享你的交易心得..."></textarea>
+    <button @click="submitPost" class="w-full bg-neon text-black font-bold py-3 rounded-xl">发布</button>
+  </div>
+</div></transition>
+
 </div>
 
 <script>
@@ -77,15 +210,14 @@ const WS_URL = 'wss://xili003-hardened-2.onrender.com/ws/chat';
 const {createApp}=Vue;
 createApp({
   data:()=>({
-    tab:'chat', comTab:'动态', chatTab:'全部', chatGroups:['全部'], tradeType:'buy', searchAmount:'', selectedPays:['全部'],
-    posts:[], listings:[], chats:[], orders:[],
+    tab:'chat',
+    chatGroups: ['全部', '未读', '群组'],
+    chatTab: '全部',
+    posts:[], listings:[], chats:[],
     user:{username:'XILI',avatar_url:'',is_kyc:false},
-    showPost:false, postContent:'', showHistory:false, showOrderModal:false, orderCNY:'', currentListing:{price:7},
+    showPost:false, postContent:'',
     activeChat:null, currentMessages:[], newMsg:'', socket:null, myId:'', myName:''
   }),
-  computed:{
-    filteredListings(){ return this.listings; }
-  },
   mounted(){
     if(!localStorage.getItem('my_chat_id')){
       localStorage.setItem('my_chat_id','u_'+Date.now()+'_'+Math.floor(Math.random()*1000000));
@@ -93,6 +225,7 @@ createApp({
     }
     this.myId=localStorage.getItem('my_chat_id');
     this.myName=localStorage.getItem('my_chat_name');
+    
     this.fetchUser(); this.fetchPosts(); this.fetchListings(); this.fetchChats();
   },
   methods:{
@@ -100,34 +233,65 @@ createApp({
     async fetchPosts(){ try{ const r=await fetch('/api/posts'); this.posts=await r.json(); }catch{} },
     async fetchListings(){ try{ const r=await fetch('/api/listings'); this.listings=await r.json(); }catch{} },
     async fetchChats(){ try{ const r=await fetch('/api/chats'); this.chats=await r.json(); }catch{} },
+    
     openChatDetail(chat){
       this.activeChat=chat; this.currentMessages=[];
       if(this.socket) this.socket.close();
+      
       this.socket=new WebSocket(WS_URL);
-      this.socket.onopen=()=>{ this.socket.send(JSON.stringify({type:'open_chat',chatId:chat.id})); };
+      this.socket.onopen=()=>{ 
+        this.socket.send(JSON.stringify({type:'open_chat',chatId:chat.id})); 
+      };
+      
       this.socket.onmessage=(e)=>{
         try{
           const d=JSON.parse(e.data);
           if(d.type==='chat_history' && d.chatId===chat.id){
             this.currentMessages=d.messages;
-            this.$nextTick(()=>{ const c=document.getElementById('chatScrollArea'); if(c) c.scrollTop=c.scrollHeight; });
+            this.scrollToBottom();
           }
           if(d.type==='new_message' && d.chatId===chat.id){
             this.currentMessages.push(d.message);
-            this.$nextTick(()=>{ const c=document.getElementById('chatScrollArea'); if(c) c.scrollTop=c.scrollHeight; });
-            this.fetchChats();
+            this.scrollToBottom();
+            this.fetchChats(); 
           }
         }catch{}
       };
     },
-    closeChat(){ this.activeChat=null; if(this.socket){ this.socket.close(); this.socket=null; } this.fetchChats(); },
+    closeChat(){ 
+      this.activeChat=null; 
+      if(this.socket){ this.socket.close(); this.socket=null; } 
+      this.fetchChats(); 
+    },
     sendMessage(){
       if(!this.newMsg.trim() || !this.socket || this.socket.readyState!==1) return;
+      const now = new Date();
+      const time = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+      
       const text=this.newMsg; this.newMsg='';
-      this.socket.send(JSON.stringify({type:'send',chatId:this.activeChat.id,text:text,userId:this.myId,userName:this.myName}));
+      
+      this.socket.send(JSON.stringify({
+        type:'send',
+        chatId:this.activeChat.id,
+        text:text,
+        userId:this.myId,
+        userName:this.myName,
+        time: time
+      }));
     },
-    openOrder(item){},
-    submitOrder(){}
+    scrollToBottom() {
+      this.$nextTick(() => {
+        const container = document.getElementById('chatScrollArea');
+        if(container) container.scrollTop = container.scrollHeight;
+      });
+    },
+    async submitPost() {
+      if(!this.postContent.trim()) return;
+      try {
+        const res = await fetch('/api/posts', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ content: this.postContent }) });
+        if (res.ok) { this.showPost = false; this.postContent = ''; this.fetchPosts(); }
+      } catch (err) {}
+    }
   }
 }).mount('#app');
 </script>
