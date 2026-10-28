@@ -7,432 +7,278 @@
 <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
 <style>
-body{background:#000;color:#fff;font-family:-apple-system,sans-serif;-webkit-tap-highlight-color:transparent; user-select: none; margin:0;}
+body{background:#000;color:#fff;font-family:-apple-system,sans-serif;user-select:none;margin:0;}
 ::-webkit-scrollbar{display:none}
-.text-gold{color:#E6C875}.bg-gold{background:#E6C875}
-.text-neon{color:#C5FF32}.bg-neon{background:#C5FF32}
+.text-gold{color:#E6C875}.text-neon{color:#C5FF32}.bg-neon{background:#C5FF32}
 .card{background:#121212;border-radius:16px;overflow:hidden}
-.glass-bubble{background:rgba(30,30,30,.4);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.12);box-shadow:inset 0 1px 1px rgba(255,255,255,.05),0 4px 15px rgba(0,0,0,.5);border-radius:50%;display:flex;align-items:center;justify-content:center;transition:.2s}
-.glass-bubble:active{transform:scale(.92);background:rgba(50,50,50,.5)}
+.glass-bubble{background:rgba(30,30,30,.4);border:1px solid rgba(255,255,255,.12);box-shadow:inset 0 1px 1px rgba(255,255,255,.05);border-radius:50%;display:flex;align-items:center;justify-content:center;}
 .pixel-bar{background:repeating-linear-gradient(90deg,transparent,transparent 2px,#C5FF32 2px,#C5FF32 6px);filter:drop-shadow(0 0 6px rgba(197,255,50,.6))}
-.fade-enter-active,.fade-leave-active{transition:opacity .2s}.fade-enter-from,.fade-leave-to{opacity:0}
-.up-enter-active,.up-leave-active{transition:transform .3s}.up-enter-from,.up-leave-to{transform:translateY(100%)}
-.slide-enter-active,.slide-leave-active{transition:transform .3s}.slide-enter-from,.slide-leave-to{transform:translateX(100%)}
-.input-box{background:#1c1c1e;border-radius:12px;padding:12px;width:100%;outline:none;color:#fff;font-size:14px;margin-bottom:12px;border:1px solid transparent; box-sizing: border-box;}
+.input-box{background:#1c1c1e;border-radius:12px;padding:12px;width:100%;outline:none;color:#fff;border:1px solid transparent;box-sizing:border-box;}
 .input-box:focus{border-color:rgba(197,255,50,.5)}
-[v-cloak] { display: none; }
-svg { max-width: 100%; max-height: 100%; }
-.list-item { border-bottom: 1px solid #1a1a1a; padding: 16px; }
-.list-item:last-child { border-bottom: none; }
-.pay-tag { background: #1c1c1e; border: 1px solid transparent; padding: 6px 14px; border-radius: 8px; font-size: 13px; color: #aaa; transition: all 0.2s; cursor: pointer;}
-.pay-tag.active { border-color: #C5FF32; color: #C5FF32; background: rgba(197,255,50,0.1); }
-.chat-bubble-left { background: #2c2c2e; color: #fff; border-radius: 8px; border-top-left-radius: 0; position: relative; }
-.chat-bubble-left::before { content: ''; position: absolute; top: 0; left: -6px; border-top: 0px solid transparent; border-right: 6px solid #2c2c2e; border-bottom: 6px solid transparent; }
-.chat-bubble-right { background: #2b8c57; color: #fff; border-radius: 8px; border-top-right-radius: 0; position: relative; }
-.chat-bubble-right::before { content: ''; position: absolute; top: 0; right: -6px; border-top: 0px solid transparent; border-left: 6px solid #2b8c57; border-bottom: 6px solid transparent; }
-.menu-group { background: #121212; border-radius: 12px; margin-bottom: 12px; overflow: hidden; }
-.menu-item { display: flex; align-items: center; justify-content: space-between; padding: 16px; border-bottom: 1px solid #1c1c1e; font-size: 16px; color: #eee; cursor: pointer; }
-.menu-item:last-child { border-bottom: none; }
-.menu-icon { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; margin-right: 12px; }
-.context-menu { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(30, 30, 30, 0.95); backdrop-filter: blur(20px); border-radius: 14px; width: 220px; overflow: hidden; z-index: 9999; }
-.context-item { display: flex; align-items: center; gap: 12px; padding: 14px 16px; font-size: 15px; color: #eee; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; }
+[v-cloak]{display:none} svg{max-width:100%;max-height:100%}
+.list-item{border-bottom:1px solid #1a1a1a;padding:16px}.list-item:last-child{border-bottom:none}
+.chat-bubble-left{background:#2c2c2e;color:#fff;border-radius:8px;border-top-left-radius:0}
+.chat-bubble-right{background:#2b8c57;color:#fff;border-radius:8px;border-top-right-radius:0}
+.menu-group{background:#121212;border-radius:12px;margin-bottom:12px;overflow:hidden}
+.menu-item{display:flex;align-items:center;justify-content:space-between;padding:16px;border-bottom:1px solid #1c1c1e;color:#eee}
+.menu-item:last-child{border-bottom:none}
 </style>
 </head>
 <body>
 <div id="app" v-cloak class="max-w-md mx-auto h-[100dvh] flex flex-col relative overflow-hidden bg-black">
 
-<input type="file" ref="fileInput" accept="image/*" style="display:none" @change="handleAvatarUpload">
-
-<header v-if="tab!=='wallet' && tab!=='trade' && tab!=='chat' && !showSet && !showPost" class="px-4 py-3 flex justify-between sticky top-0 z-40 bg-black/90">
-<div class="text-lg font-bold">社区</div>
-</header>
-
-<main class="flex-1 overflow-y-auto pb-20 relative z-10">
-<!-- 1. 聊天列表 -->
-<div v-show="tab==='chat'">
-  <div class="flex justify-between items-center px-4 pt-4 pb-2 text-gray-300">
-    <button class="p-2 -m-2"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg></button>
-    <div class="flex gap-4">
-      <button class="p-2 -m-2"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg></button>
-      <button class="p-2 -m-2"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg></button>
-    </div>
-  </div>
-  
-  <div class="flex gap-2 px-4 pb-2 overflow-x-auto">
-    <div v-for="g in ['全部', '未读', '群组']" :key="g" 
-         :class="g==='全部' ? 'bg-[#2a3a2e] text-neon border border-neon/20' : 'bg-[#121212] text-gray-400'" 
-         class="px-4 py-1.5 rounded-full text-sm font-bold whitespace-nowrap">{{g}}</div>
-  </div>
-
-  <div class="px-2">
-    <div v-for="chat in chats" :key="chat.id" 
-         class="flex items-center px-3 py-1.5 active:bg-[#121212] transition-colors cursor-pointer border-[0.5px] border-neon/30 rounded-xl mb-1"
-         @click="openChatDetail(chat)">
-      <div class="w-[52px] h-[52px] bg-gradient-to-tr from-gray-700 to-gray-600 rounded-[14px] flex items-center justify-center text-xl mr-3 flex-shrink-0 shadow-sm relative">
-        <span>{{ chat.avatar_text || '群' }}</span>
-      </div>
-      <div class="flex-1 min-w-0 h-[52px] flex flex-col justify-center border-b border-[#1a1a1a]">
-        <div class="flex justify-between items-center mb-1">
-          <span class="font-bold text-[15px] text-gray-100 truncate pr-2">{{ chat.name }}</span>
-          <span class="text-[11px] text-gray-500 flex-shrink-0">{{ chat.time }}</span>
-        </div>
-        <div class="text-[13px] text-gray-400 truncate">{{ chat.last_msg }}</div>
-      </div>
-    </div>
-  </div>
+<!-- 登录/注册 -->
+<div v-if="!user" class="flex flex-col items-center justify-center h-full p-8">
+  <div class="text-3xl font-bold text-neon mb-8">Web3 P2P</div>
+  <input v-model="authForm.username" type="text" placeholder="用户名 (如 A, B)" class="input-box mb-4">
+  <input v-model="authForm.password" type="password" placeholder="密码 (如 123)" class="input-box mb-8">
+  <button @click="doAuth" class="w-full bg-neon text-black font-bold py-4 rounded-xl mb-4">{{ isReg ? '注 册' : '登 录' }}</button>
+  <div @click="isReg = !isReg" class="text-gray-400 text-sm cursor-pointer">{{ isReg ? '已有账号？去登录' : '没有账号？去注册' }}</div>
 </div>
 
-<!-- 2. 社区动态 -->
-<div v-show="tab==='community'" class="relative h-full">
-  <div class="flex justify-around items-center px-4 py-2 border-b border-[#1a1a1a] sticky top-0 bg-black z-10">
-    <div class="pb-2 text-sm font-bold text-gold border-b-2 border-gold">动态</div>
-    <div class="pb-2 text-sm font-bold text-gray-500">行情</div>
-    <div class="pb-2 text-sm font-bold text-gray-500">机会</div>
-  </div>
-  <div class="p-4 space-y-4">
-    <div class="card p-4" v-for="post in posts" :key="post.id">
-      <div class="flex items-center gap-2 mb-3">
-        <img :src="user.avatar_url || 'https://api.dicebear.com/7.x/bottts/svg?seed=XILI'" class="w-8 h-8 rounded-full object-cover bg-[#333]">
-        <div><div class="text-sm font-bold">{{ user.username }}</div><div class="text-[10px] text-gray-500">{{ new Date(post.created_at).toLocaleString() }}</div></div>
-      </div>
-      <p class="text-sm text-gray-200 mb-3">{{ post.content }}</p>
-    </div>
-    <div v-if="posts.length === 0" class="text-center text-gray-500 py-10 text-sm">暂无动态，快去发布一条吧</div>
-  </div>
-  <button @click="showPost=true" class="fixed bottom-24 right-4 w-14 h-14 bg-neon text-black rounded-full shadow-[0_0_15px_rgba(197,255,50,0.4)] flex items-center justify-center z-20 text-2xl font-bold">+</button>
-</div>
-
-<!-- 3. 交易 -->
-<div v-show="tab==='trade'" class="pb-4">
-  <div class="px-4 py-4 flex justify-between items-center bg-black/90 sticky top-0 z-50">
-    <div class="flex items-center gap-2"><div class="w-1.5 h-5 bg-neon rounded-full"></div><span class="text-xl font-extrabold text-white tracking-wide">P2P交易</span></div>
-    <div class="flex items-center gap-2 text-gray-300 relative z-50">
-      <button @click.stop="showHistory=true" class="p-2 -m-2 active:text-neon">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-      </button>
-      <button @click.stop="showMoreMenu=true" class="p-2 -m-2 active:text-neon">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z"></path></svg>
-      </button>
-    </div>
-  </div>
-
-  <div class="px-4 py-2 flex justify-between items-end mb-3">
-    <div class="flex items-baseline gap-4">
-      <span @click="tradeType='buy'" :class="tradeType==='buy'?'text-3xl font-bold text-white':'text-2xl font-medium text-gray-600'">购买</span>
-      <span @click="tradeType='sell'" :class="tradeType==='sell'?'text-3xl font-bold text-white':'text-2xl font-medium text-gray-600'">出售</span>
-    </div>
-    <div class="flex items-center gap-1 bg-[#1c1c1e] px-3 py-1.5 rounded-full text-sm font-bold text-white">CNY</div>
-  </div>
-
-  <div class="px-4 flex gap-3 items-center mb-3">
-    <div class="flex-1 bg-[#1c1c1e] rounded-full flex items-center p-1.5 pr-2">
-      <div class="flex items-center gap-1 border-r border-gray-700 pr-2 pl-2">
-        <div class="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center text-[10px] text-white font-bold">T</div>
-        <span class="text-sm font-bold text-white">USDT</span>
-      </div>
-      <input v-model="searchAmount" type="number" placeholder="输入金额" class="bg-transparent ml-2 flex-1 outline-none text-sm text-white placeholder-gray-500 w-full">
-      <button @click.stop="doSearch" class="p-1 -m-1"><svg class="w-5 h-5 text-gray-400 active:text-neon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg></button>
-    </div>
-    <button @click.stop="showFilter=true" class="flex flex-col items-center justify-center text-gray-300 active:text-neon p-1 -m-1">
-      <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
-      <span class="text-[10px]">筛选</span>
-    </button>
-  </div>
-
-  <div class="px-4 mb-4"><span class="text-xs text-blue-400 bg-blue-900/20 px-3 py-1.5 rounded-full border border-blue-900/30">{{tradeType==='buy'?'购买':'出售'}} USDT 零手续费</span></div>
-
-  <div class="bg-[#121212] mx-4 rounded-2xl overflow-hidden">
-    <div class="list-item" v-for="item in filteredListings" :key="item.id">
-      <div class="flex justify-between items-center mb-2">
-        <div class="flex items-center gap-2">
-          <div :class="item.verified ? 'bg-gradient-to-tr from-green-900 to-black border-green-500/50' : 'bg-gray-800 text-gray-400'" class="w-7 h-7 rounded-full flex items-center justify-center text-[10px] text-white border">{{item.verified?'认':'未'}}</div>
-          <span class="font-bold text-[15px] text-gray-100">{{item.name}}</span>
-        </div>
-        <div class="text-xs text-gray-500 flex items-center gap-1"><span class="text-gray-400">📄</span> {{item.trades}} &nbsp;|&nbsp; <span class="text-gray-400">🤝</span> {{item.rate}}%</div>
-      </div>
-      <div class="flex justify-between items-end mt-3">
-        <div>
-          <div class="text-xl font-bold text-gray-200 mb-1">{{item.price}} <span class="text-xs font-normal text-gray-500">CNY</span></div>
-          <div class="text-[13px] text-gray-500">限额: {{item.min}} - {{item.max}} CNY</div>
-        </div>
-        <button v-if="item.verified" @click.stop="openOrder(item)" class="bg-neon text-black px-6 py-2 rounded-lg text-[14px] font-bold active:scale-95 transition">{{tradeType==='buy'?'购买':'出售'}}</button>
-        <button v-else @click.stop="showKyc=true" class="bg-[#1c1c1e] text-gray-400 border border-gray-700 px-5 py-2 rounded-lg text-[13px] font-bold">交易前需 KYC</button>
-      </div>
-      <div class="mt-4 flex items-center gap-3 text-[12px] text-gray-400">
-        <div v-for="pay in (item.pays || [])" :key="pay" class="flex items-center gap-1"><div class="w-0.5 h-3 bg-gold"></div> {{pay}}</div>
-      </div>
-    </div>
-    <div v-if="filteredListings.length === 0" class="p-8 text-center text-gray-500 text-sm">暂无挂单</div>
-  </div>
-</div>
-
-<!-- 4. 钱包 -->
-<div v-show="tab==='wallet'" class="pb-6 bg-[#050505]">
-  <div class="bg-[#121212] p-6 pt-10 rounded-b-3xl mb-4">
-    <div class="flex justify-between items-start mb-6">
-      <div class="flex items-center gap-4">
-        <div class="relative">
-          <img :src="user.avatar_url || 'https://api.dicebear.com/7.x/bottts/svg?seed=XILI'" class="w-16 h-16 rounded-xl shadow-lg bg-gray-800 object-cover cursor-pointer" @click="$refs.fileInput.click()">
-          <div class="absolute -bottom-1 -right-1 bg-[#121212] px-1 rounded-full">
-            <div class="w-3.5 h-3.5 bg-neon rounded-full border-2 border-[#121212]"></div>
-          </div>
-        </div>
-        <div>
-          <div class="text-xl font-bold text-white flex items-center gap-2">
-            {{ user.username }}
-            <span v-if="user.is_kyc" class="text-[10px] bg-neon/20 text-neon px-1.5 py-0.5 rounded border border-neon/30">已认证</span>
-            <span v-else class="text-[10px] bg-gray-800 text-gray-400 px-1.5 py-0.5 rounded border border-gray-700 cursor-pointer" @click="doKyc">未认证</span>
-          </div>
-          <div class="text-xs text-gray-400 mt-1 flex items-center gap-1">
-            <div class="w-1.5 h-1.5 bg-neon rounded-full"></div> 在线 (ID: {{ myId.slice(0,5) }})
-          </div>
-        </div>
-      </div>
-      <button @click.stop="alert('打开个人二维码')" class="p-1 -m-1 text-gray-400 cursor-pointer active:scale-90 transition">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm14 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
-      </button>
-    </div>
-
-    <div class="mb-8 relative mt-2">
-      <div class="text-[56px] font-bold leading-none tracking-tight">$0.00</div>
-      <div class="text-sm text-gray-400 mt-2">成交 1,024 笔 &nbsp; | &nbsp; 成交率 99.8%</div>
-      <div class="absolute right-0 top-4 w-24 h-2 pixel-bar opacity-80"></div>
-    </div>
+<!-- 主界面 -->
+<div v-else class="flex flex-col h-full">
+  <main class="flex-1 overflow-y-auto pb-20">
     
-    <div class="flex justify-between px-2 mb-8">
-      <div @click="actSheet='发送'" class="flex flex-col items-center gap-2 cursor-pointer"><div class="w-16 h-16 glass-bubble"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2.5" d="M8 7l4-4m0 0l4 4m-4-4v18"/></svg></div><span class="text-xs text-gray-300">发送</span></div>
-      <div @click="actSheet='接收'" class="flex flex-col items-center gap-2 cursor-pointer"><div class="w-16 h-16 glass-bubble"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2.5" d="M16 17l-4 4m0 0l-4-4m4 4V3"/></svg></div><span class="text-xs text-gray-300">接收</span></div>
-      <div @click="actSheet='明细'" class="flex flex-col items-center gap-2 cursor-pointer"><div class="w-16 h-16 glass-bubble"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg></div><span class="text-xs text-gray-300">明细</span></div>
-      <div @click="actSheet='更多'" class="flex flex-col items-center gap-2 cursor-pointer"><div class="w-16 h-16 glass-bubble"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2.5" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg></div><span class="text-xs text-gray-300">更多</span></div>
-    </div>
-
-    <div class="bg-[#1c1c1e] rounded-[24px] p-6 relative overflow-hidden mb-6">
-      <div class="relative z-10">
-        <div class="text-sm font-bold text-neon mb-1">开始使用</div>
-        <div class="text-2xl font-bold mb-2">开始 P2P 交易</div>
-        <div class="text-sm text-gray-400 mb-6">买卖 USDT，安全快捷。</div>
-        <div class="flex gap-3"><button @click="tab='trade'" class="flex-1 bg-neon text-black font-bold py-3.5 rounded-full">买入</button><button @click="tab='trade'" class="flex-1 bg-[#2c2c2e] font-bold py-3.5 rounded-full">卖出</button></div>
+    <!-- 聊天 -->
+    <div v-show="tab==='chat'">
+      <div class="px-4 pt-4 pb-2"><div class="text-xl font-bold">消息 (我: {{ user.username }})</div></div>
+      <div class="px-2">
+        <div v-for="u in otherUsers" :key="u.id" @click="openChat(u)" class="flex items-center px-3 py-3 active:bg-[#121212] cursor-pointer border-b border-[#1a1a1a]">
+          <img :src="u.avatar_url" class="w-[48px] h-[48px] rounded-[12px] bg-gray-800 mr-3 object-cover">
+          <div class="flex-1"><div class="font-bold text-[15px]">{{ u.username }}</div><div class="text-xs text-gray-500">点击发消息测试秒达</div></div>
+        </div>
       </div>
     </div>
-    
-    <div class="mt-4"><div class="text-sm font-bold text-gray-400 mb-4 px-1">交易记录</div><div class="flex flex-col items-center justify-center py-8 opacity-60"><div class="text-4xl mb-3">📭</div><div class="text-sm text-gray-500">还没有记录，开始交易吧</div></div></div>
-  </div>
 
-  <div class="px-4">
-    <div class="menu-group">
-      <div class="menu-item" @click="showSubWallet = true"><div class="flex items-center"><span class="menu-icon text-green-500">💳</span>钱包</div><div class="text-gray-500">›</div></div>
-      <div class="menu-item" @click="alert('进入收藏')"><div class="flex items-center"><span class="menu-icon text-blue-500">⭐</span>收藏</div><div class="text-gray-500">›</div></div>
-      <div class="menu-item" @click="tab='community'"><div class="flex items-center"><span class="menu-icon text-orange-500">🖼️</span>动态</div><div class="text-gray-500">›</div></div>
-      <div class="menu-item" @click="showSet=true"><div class="flex items-center"><span class="menu-icon text-gray-400">⚙️</span>设置</div><div class="text-gray-500">›</div></div>
+    <!-- 社区 -->
+    <div v-show="tab==='community'" class="relative h-full">
+      <div class="flex justify-around items-center px-4 py-3 border-b border-[#1a1a1a] bg-black">
+        <div class="text-sm font-bold text-gold border-b-2 border-gold pb-1">动态</div><div class="text-sm font-bold text-gray-500">行情</div><div class="text-sm font-bold text-gray-500">机会</div>
+      </div>
+      <div class="p-4 space-y-4">
+        <div class="card p-4" v-for="p in posts" :key="p.id">
+          <div class="flex items-center gap-2 mb-3">
+            <img :src="p.avatar_url" class="w-8 h-8 rounded-full bg-[#333] object-cover">
+            <div><div class="text-sm font-bold">{{ p.username }} <span v-if="p.id===1" class="text-[10px] bg-gold text-black px-1 rounded">置顶</span></div><div class="text-[10px] text-gray-500">{{ new Date(p.created_at).toLocaleTimeString() }}</div></div>
+          </div>
+          <p class="text-sm text-gray-200">{{ p.content }}</p>
+        </div>
+      </div>
+      <button @click="showPost=true" class="fixed bottom-24 right-4 w-14 h-14 bg-neon text-black rounded-full shadow-lg flex items-center justify-center z-20 text-2xl">+</button>
     </div>
-    <div class="menu-group mt-4">
-      <div class="menu-item" @click="alert('已生成分享链接')"><div class="flex items-center"><span class="menu-icon text-green-400">🔗</span>分享给好友</div><div class="text-gray-500">›</div></div>
-      <div class="menu-item" @click="alert('关于我们')"><div class="flex items-center"><span class="menu-icon text-blue-400">ℹ️</span>关于我们</div><div class="text-gray-500">›</div></div>
-      <div class="menu-item" @click="alert('联系官方客服')"><div class="flex items-center"><span class="menu-icon text-gray-300">🎧</span>联系官方</div><div class="text-gray-500">›</div></div>
+
+    <!-- 交易 -->
+    <div v-show="tab==='trade'" class="pb-4">
+      <div class="px-4 py-4 flex justify-between items-center bg-black/90 sticky top-0 z-50">
+        <div class="flex items-center gap-2"><div class="w-1.5 h-5 bg-neon rounded-full"></div><span class="text-xl font-extrabold">P2P交易</span></div>
+        <button @click.stop="showPostAd=true" class="p-2 -m-2 active:text-neon">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z"></path></svg>
+        </button>
+      </div>
+      <div class="px-4 py-2 flex justify-between items-end mb-3">
+        <div class="flex items-baseline gap-4"><span class="text-3xl font-bold text-white">购买</span><span class="text-2xl font-medium text-gray-600">出售</span></div>
+        <div class="bg-[#1c1c1e] px-3 py-1.5 rounded-full text-sm font-bold">CNY</div>
+      </div>
+      <div class="px-4 mb-4"><span class="text-xs text-blue-400 bg-blue-900/20 px-3 py-1.5 rounded-full">购买 USDT 零手续费</span></div>
+      <div class="bg-[#121212] mx-4 rounded-2xl overflow-hidden">
+        <div class="list-item" v-for="item in listings" :key="item.id">
+          <div class="flex justify-between items-center mb-2">
+            <div class="flex items-center gap-2"><div :class="item.verified?'border-green-500/50':'border-gray-600'" class="w-7 h-7 rounded-full flex items-center justify-center text-[10px] border">{{item.verified?'认':'未'}}</div><span class="font-bold text-[15px]">{{item.name}}</span></div>
+            <div class="text-xs text-gray-500">📄 {{item.trades}} | 🤝 {{item.rate}}%</div>
+          </div>
+          <div class="flex justify-between items-end mt-3">
+            <div><div class="text-xl font-bold">{{item.price}} <span class="text-xs text-gray-500">CNY</span></div><div class="text-[13px] text-gray-500">限额: {{item.min_limit}} - {{item.max_limit}} CNY</div></div>
+            <button @click="contactSeller(item)" class="bg-neon text-black px-6 py-2 rounded-lg text-[14px] font-bold">购买</button>
+          </div>
+          <div class="mt-4 flex gap-2 text-[12px] text-gray-400">
+            <div v-for="pay in item.pays" :key="pay" class="border-l-2 border-gold pl-1">{{ pay }}</div>
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
+
+    <!-- 我的 -->
+    <div v-show="tab==='wallet'" class="pb-6 bg-[#050505]">
+      <div class="bg-[#121212] p-6 pt-10 rounded-b-3xl mb-4">
+        <div class="flex justify-between items-start mb-6">
+          <div class="flex items-center gap-4">
+            <div class="relative">
+              <img :src="user.avatar_url" class="w-16 h-16 rounded-xl bg-gray-800 object-cover cursor-pointer" @click="$refs.fileInput.click()">
+              <div class="absolute -bottom-1 -right-1 bg-[#121212] px-1 rounded-full"><div class="w-3.5 h-3.5 bg-neon rounded-full border-2 border-[#121212]"></div></div>
+            </div>
+            <div>
+              <div class="text-xl font-bold flex items-center gap-2">{{ user.username }}<span v-if="user.is_kyc" class="text-[10px] text-neon bg-neon/20 px-1.5 py-0.5 rounded border border-neon/30">已认证</span><span v-else @click="doKyc" class="text-[10px] text-gray-400 bg-gray-800 px-1.5 py-0.5 rounded border border-gray-700 cursor-pointer">未认证</span></div>
+              <div class="text-xs text-gray-400 mt-1">在线</div>
+            </div>
+          </div>
+        </div>
+        <div class="mb-8 relative">
+          <div class="text-[56px] font-bold leading-none">$0.00</div>
+          <div class="text-sm text-gray-400 mt-2">成交 1,024 笔 | 成交率 99.8%</div>
+          <div class="absolute right-0 top-4 w-24 h-2 pixel-bar"></div>
+        </div>
+        <div class="flex justify-between px-2 mb-8">
+          <div class="flex flex-col items-center gap-2"><div class="w-16 h-16 glass-bubble"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2.5" d="M8 7l4-4m0 0l4 4m-4-4v18"/></svg></div><span class="text-xs text-gray-300">发送</span></div>
+          <div class="flex flex-col items-center gap-2"><div class="w-16 h-16 glass-bubble"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2.5" d="M16 17l-4 4m0 0l-4-4m4 4V3"/></svg></div><span class="text-xs text-gray-300">接收</span></div>
+          <div class="flex flex-col items-center gap-2"><div class="w-16 h-16 glass-bubble"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg></div><span class="text-xs text-gray-300">明细</span></div>
+          <div class="flex flex-col items-center gap-2"><div class="w-16 h-16 glass-bubble"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2.5" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg></div><span class="text-xs text-gray-300">更多</span></div>
+        </div>
+      </div>
+      <div class="px-4">
+        <div class="bg-[#1c1c1e] rounded-[24px] p-6 mb-6">
+          <div class="text-sm font-bold text-neon mb-1">开始使用</div>
+          <div class="text-2xl font-bold mb-2">开始 P2P 交易</div>
+          <div class="text-sm text-gray-400 mb-6">买卖 USDT，安全快捷。</div>
+          <div class="flex gap-3"><button @click="tab='trade'" class="flex-1 bg-neon text-black font-bold py-3.5 rounded-full">买入</button><button @click="tab='trade'" class="flex-1 bg-[#2c2c2e] font-bold py-3.5 rounded-full">卖出</button></div>
+        </div>
+        <div class="menu-group">
+          <div class="menu-item"><div class="flex items-center"><span class="mr-3 text-green-500">💳</span>钱包</div><div class="text-gray-500">›</div></div>
+          <div class="menu-item"><div class="flex items-center"><span class="mr-3 text-blue-500">⭐</span>收藏</div><div class="text-gray-500">›</div></div>
+          <div class="menu-item"><div class="flex items-center"><span class="mr-3 text-orange-500">🖼️</span>动态</div><div class="text-gray-500">›</div></div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <nav class="absolute bottom-0 w-full bg-black flex justify-around py-2 pb-6 z-30 border-t border-[#1a1a1a]">
+    <button @click="tab='chat'" :class="tab==='chat'?'text-white':'text-gray-600'" class="flex flex-col items-center gap-1 p-2"><span class="text-[10px]">聊天</span></button>
+    <button @click="tab='community'" :class="tab==='community'?'text-white':'text-gray-600'" class="flex flex-col items-center gap-1 p-2"><span class="text-[10px]">社区</span></button>
+    <button @click="tab='trade'" :class="tab==='trade'?'text-white':'text-gray-600'" class="flex flex-col items-center gap-1 p-2"><span class="text-[10px]">交易</span></button>
+    <button @click="tab='wallet'" :class="tab==='wallet'?'text-white':'text-gray-600'" class="flex flex-col items-center gap-1 p-2"><span class="text-[10px]">钱包</span></button>
+  </nav>
 </div>
-</main>
 
-<!-- 底部导航 -->
-<nav class="absolute bottom-0 w-full bg-black flex justify-around py-2 pb-6 z-30 shadow-[0_-1px_0_rgba(255,255,255,0.05)] border-t border-[#1a1a1a]">
-<button @click="tab='chat'" :class="tab==='chat'?'text-white':'text-gray-600'" class="flex flex-col items-center gap-1 p-2 transition-colors"><svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg><span class="text-[10px]">聊天</span></button>
-<button @click="tab='community'" :class="tab==='community'?'text-white':'text-gray-600'" class="flex flex-col items-center gap-1 p-2 transition-colors"><svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path></svg><span class="text-[10px]">社区</span></button>
-<button @click="tab='trade'" :class="tab==='trade'?'text-white':'text-gray-600'" class="flex flex-col items-center gap-1 p-2 transition-colors"><svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg><span class="text-[10px]">交易</span></button>
-<button @click="tab='wallet'" :class="tab==='wallet'?'text-white':'text-gray-600'" class="flex flex-col items-center gap-1 p-2 transition-colors"><svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg><span class="text-[10px]">我的</span></button>
-</nav>
-
-<!-- ================= 弹窗区 ================= -->
-<!-- 历史订单 -->
-<transition name="fade"><div v-if="showHistory" class="absolute inset-0 z-[100] bg-black/80 backdrop-blur" @click.self="showHistory=false"><transition name="up"><div class="absolute bottom-0 w-full bg-[#121212] rounded-t-3xl p-6 h-[70vh] flex flex-col" @click.stop><div class="flex justify-between items-center mb-4"><h3 class="text-lg font-bold">历史订单</h3><button @click="showHistory=false" class="text-gray-500">关闭</button></div><div class="flex-1 overflow-y-auto"><div class="p-4 border-b border-gray-800 flex justify-between"><div><div class="text-sm font-bold">购买 USDT</div><div class="text-xs text-gray-500">10:00</div></div><div class="text-right"><div class="text-sm font-bold">100.00 USDT</div><div class="text-xs text-neon mt-1">待付款</div></div></div></div></div></transition></div></transition>
-
-<!-- 筛选 -->
-<transition name="fade"><div v-if="showFilter" class="absolute inset-0 z-[100] bg-black/80 backdrop-blur" @click.self="showFilter=false"><transition name="up"><div class="absolute bottom-0 w-full bg-[#121212] rounded-t-3xl p-6" @click.stop><div class="flex justify-between items-center mb-6"><h3 class="text-lg font-bold">选择支付方式</h3><button @click="showFilter=false" class="text-gray-500">关闭</button></div><div class="flex flex-wrap gap-3 mb-8"><div v-for="pay in ['全部', '微信', '支付宝', '银行卡', '信用卡', '礼品卡']" :key="pay" @click="togglePay(pay)" class="pay-tag" :class="{'active': selectedPays.includes(pay)}">{{pay}}</div></div><button @click="showFilter=false" class="w-full bg-neon text-black font-bold py-3.5 rounded-full">确认筛选</button></div></transition></div></transition>
-
-<!-- 发布广告 -->
-<transition name="fade"><div v-if="showMoreMenu" class="fixed inset-0 z-[100] bg-black/80 backdrop-blur flex items-end" @click.self="showMoreMenu=false">
-  <transition name="up"><div class="absolute bottom-0 w-full bg-[#121212] rounded-t-3xl p-6" @click.stop>
-    <div class="flex justify-between items-center mb-4"><h3 class="text-lg font-bold">更多操作</h3><button @click="showMoreMenu=false" class="text-gray-500">关闭</button></div>
-    <div class="space-y-2"><div @click="showPostAd=true; showMoreMenu=false" class="p-4 bg-[#1c1c1e] rounded-xl text-center text-sm font-bold text-white active:bg-[#2c2c2e]">发布广告</div></div>
-  </div></transition>
-</div></transition>
-
-<transition name="fade"><div v-if="showPostAd" class="absolute inset-0 z-[100] bg-black/80 backdrop-blur" @click.self="showPostAd=false">
-  <transition name="up"><div class="absolute bottom-0 w-full bg-[#121212] rounded-t-3xl p-6" @click.stop>
-    <div class="flex justify-between items-center mb-6"><h3 class="text-lg font-bold">发布广告</h3><button @click="showPostAd=false" class="text-gray-500">关闭</button></div>
-    <div class="flex gap-2 mb-4">
-      <input type="number" v-model="adForm.price" placeholder="单价 (CNY)" class="input-box flex-1 mb-0">
-      <input type="number" v-model="adForm.amount" placeholder="总数量" class="input-box flex-1 mb-0">
+<!-- 发动态弹窗 -->
+<transition name="fade">
+  <div v-if="showPost" class="fixed inset-0 z-[100] bg-black/80 flex items-center justify-center p-4">
+    <div class="bg-[#121212] rounded-3xl p-6 w-full">
+      <h3 class="font-bold mb-4">发布动态</h3>
+      <textarea v-model="postContent" rows="3" class="input-box mb-4"></textarea>
+      <button @click="submitPost" class="w-full bg-neon text-black font-bold py-3 rounded-xl">发布</button>
     </div>
-    <button @click="submitAd" class="w-full bg-neon text-black font-bold py-3.5 rounded-xl mt-2">发布广告</button>
-  </div></transition>
-</div></transition>
-
-<!-- 下单/订单详情 -->
-<transition name="fade"><div v-if="showOrderModal" class="absolute inset-0 z-[100] bg-black/80 backdrop-blur" @click.self="showOrderModal=false"><transition name="up"><div class="absolute bottom-0 w-full bg-[#121212] rounded-t-3xl p-6" @click.stop><div class="flex justify-between items-center mb-6"><h3 class="text-lg font-bold">下单</h3><button @click="showOrderModal=false" class="text-gray-500">关闭</button></div><div class="bg-[#1c1c1e] p-4 rounded-xl mb-4"><div class="text-xs text-gray-500 mb-1">交易金额 (CNY)</div><div class="flex items-center border-b border-gray-700 pb-2"><input v-model="orderCNY" type="number" class="bg-transparent text-2xl outline-none flex-1 text-white font-bold placeholder-gray-600" placeholder="0.00"><span class="text-gray-400 font-bold">CNY</span></div></div><button @click="submitOrder" class="w-full bg-neon text-black font-bold py-3.5 rounded-xl">确认下单</button></div></transition></div></transition>
-<transition name="slide"><div v-if="showOrderDetail" class="fixed inset-0 z-[100] bg-[#0a0a0a] flex flex-col"><header class="px-4 py-3 flex items-center bg-black/90 border-b border-[#1a1a1a]"><button @click="showOrderDetail=false" class="text-gray-300 mr-3">‹</button><span class="font-bold text-lg mx-auto pr-8">订单详情</span></header><main class="flex-1 overflow-y-auto p-5 space-y-5"><div class="bg-[#1c1c1e] rounded-2xl p-6 text-center"><div class="text-sm text-gray-400 mb-2">请尽快向卖家付款</div><div class="text-3xl font-bold text-neon mb-2">15:00</div></div><div class="bg-[#121212] rounded-2xl p-5"><div class="flex justify-between items-center mb-3"><span class="text-sm text-gray-400">付款金额</span><span class="text-2xl font-bold text-white">{{orderCNY}} <span class="text-sm font-normal">CNY</span></span></div></div></main><div class="p-4 bg-[#121212] border-t border-[#1a1a1a]"><button @click="showOrderDetail=false" class="w-full bg-neon text-black font-bold py-4 rounded-xl text-lg">我已付款</button></div></div></transition>
-
-<!-- 发布动态 -->
-<transition name="fade"><div v-if="showPost" class="fixed inset-0 z-[100] bg-black/80 backdrop-blur flex items-center justify-center p-4">
-  <div class="w-full bg-[#121212] rounded-3xl p-6">
-    <div class="flex justify-between items-center mb-6"><h3 class="text-lg font-bold">发布动态</h3><button @click="showPost=false" class="text-gray-500">关闭</button></div>
-    <textarea v-model="postContent" rows="4" class="w-full bg-[#1c1c1e] rounded-xl p-3 text-sm text-white outline-none resize-none placeholder-gray-600 mb-4" placeholder="分享你的交易心得..."></textarea>
-    <button @click="submitPost" class="w-full bg-neon text-black font-bold py-3 rounded-xl">发布</button>
   </div>
-</div></transition>
+</transition>
 
-<!-- 钱包操作弹窗 -->
-<transition name="fade"><div v-if="actSheet" class="absolute inset-0 z-[100] bg-black/80 backdrop-blur" @click.self="actSheet=null"><transition name="up"><div class="absolute bottom-0 w-full bg-[#121212] rounded-t-3xl p-6" @click.stop><div class="flex justify-between items-center mb-6"><h3 class="text-lg font-bold">{{actSheet}}</h3><button @click="actSheet=null" class="text-gray-500">关闭</button></div><div class="text-center text-gray-400 py-6">功能开发中...</div><button @click="actSheet=null" class="w-full bg-neon text-black font-bold py-3.5 rounded-xl mt-2">关闭</button></div></transition></div></transition>
+<!-- 发广告弹窗 -->
+<transition name="fade">
+  <div v-if="showPostAd" class="fixed inset-0 z-[100] bg-black/80 flex items-end">
+    <div class="bg-[#121212] rounded-t-3xl p-6 w-full">
+      <h3 class="font-bold mb-4">发布广告</h3>
+      <input type="number" v-model="adForm.price" placeholder="单价" class="input-box mb-2">
+      <input type="number" v-model="adForm.amount" placeholder="数量" class="input-box mb-4">
+      <button @click="submitAd" class="w-full bg-neon text-black font-bold py-3 rounded-xl">发布</button>
+    </div>
+  </div>
+</transition>
 
-<!-- 设置页 -->
-<transition name="slide"><div v-if="showSet" class="fixed inset-0 z-[100] bg-black flex flex-col"><header class="px-4 py-3 flex items-center gap-3 bg-black border-b border-gray-800"><button @click="showSet=false" class="text-gray-300">＜ 返回</button><div class="text-lg font-bold flex-1 text-center pr-10">设置</div></header><main class="flex-1 overflow-y-auto p-4 space-y-4 pb-20"><div class="menu-group"><div class="menu-item" @click="alert('编辑资料')"><div>编辑个人资料</div><div class="text-gray-500">›</div></div><div class="menu-item" @click="alert('安全设置')"><div>安全设置</div><div class="text-gray-500">›</div></div></div></main></div></transition>
-
-<!-- 聊天窗口 (WebSocket 真实通讯) -->
-<transition name="slide"><div v-if="activeChat" class="absolute inset-0 z-[90] bg-[#0a0a0a] flex flex-col">
-  <header class="px-4 py-3 flex justify-between items-center bg-black/90 border-b border-[#1a1a1a]">
-    <div class="flex items-center gap-3"><button @click="closeChat" class="text-gray-300 text-xl">‹</button><span class="font-bold text-[16px]">{{ activeChat.name }}</span></div>
-    <span class="text-xs text-neon">{{ myName }}</span>
-  </header>
-  <div class="flex-1 overflow-y-auto p-4 space-y-6" id="chatScrollArea">
-    <div v-for="(msg, index) in currentMessages" :key="index" class="flex gap-3" :class="msg.user_id === myId ? 'flex-row-reverse' : ''">
-      <div class="w-10 h-10 rounded-[10px] flex items-center justify-center text-xs flex-shrink-0" :class="msg.user_id === myId ? 'bg-green-600' : 'bg-gray-700'">
-        {{ msg.user_id === myId ? '我' : (msg.user_name ? msg.user_name.slice(0,1) : '他') }}
-      </div>
-      <div :class="msg.user_id === myId ? 'chat-bubble-right' : 'chat-bubble-left'" class="px-3 py-2 max-w-[80%]">
-        <div class="text-[10px] text-gray-400 mb-1" v-if="msg.user_id !== myId">{{ msg.user_name }}</div>
-        <span class="text-[15px] break-all">{{ msg.text }}</span>
-        <span class="text-[10px] ml-2 opacity-60">{{ msg.time }}</span>
+<!-- 聊天窗口 -->
+<transition name="slide">
+  <div v-if="chatTarget" class="fixed inset-0 z-[90] bg-[#0a0a0a] flex flex-col">
+    <header class="px-4 py-3 flex justify-between items-center bg-black border-b border-[#1a1a1a]">
+      <div class="flex items-center gap-3"><button @click="closeChat" class="text-gray-300 text-xl">‹</button><span class="font-bold">{{ chatTarget.username }}</span></div>
+      <span class="text-xs text-neon">ID: {{ user.id }}</span>
+    </header>
+    <div class="flex-1 overflow-y-auto p-4 space-y-4" id="chatBox">
+      <div v-for="m in messages" :key="m.id" class="flex gap-3" :class="m.sender_id === user.id ? 'flex-row-reverse' : ''">
+        <div class="w-10 h-10 rounded bg-gray-700 flex items-center justify-center text-xs">{{ m.sender_id === user.id ? '我' : chatTarget.username.slice(0,1) }}</div>
+        <div :class="m.sender_id === user.id ? 'chat-bubble-right' : 'chat-bubble-left'" class="px-3 py-2 max-w-[80%]">{{ m.content }}</div>
       </div>
     </div>
-  </div>
-  <div class="bg-[#121212] border-t border-[#1a1a1a] px-3 py-2 pb-6">
-    <div class="flex items-center gap-3">
-      <input v-model="newMsg" @keyup.enter="sendMessage" type="text" class="flex-1 bg-[#1c1c1e] rounded-lg px-3 py-2 outline-none text-[15px] text-white" placeholder="发消息...">
-      <button @click="sendMessage" class="bg-[#2b8c57] text-white px-4 py-2 rounded-lg text-sm font-bold">发送</button>
+    <div class="p-3 bg-[#121212] border-t border-[#1a1a1a] flex gap-3">
+      <input v-model="newMsg" @keyup.enter="sendMsg" type="text" class="input-box mb-0" placeholder="发消息...">
+      <button @click="sendMsg" class="bg-[#2b8c57] text-white px-4 py-2 rounded-lg">发送</button>
     </div>
-    <div class="text-[10px] text-gray-600 mt-1">ID: {{ myId.slice(0,15) }}... | {{ socket && socket.readyState===1 ? '已连接' : '未连接' }}</div>
   </div>
-</div></transition>
+</transition>
 
+<input type="file" ref="fileInput" accept="image/*" style="display:none" @change="handleAvatar">
 </div>
 
 <script>
-const WS_URL = 'wss://xili003-hardened-2.onrender.com/ws/chat';
-const {createApp}=Vue;
+const { createApp } = Vue;
 createApp({
-  data:()=>({
-    tab:'chat',
-    posts:[], listings:[], chats:[],
-    user:{username:'XILI',avatar_url:'',is_kyc:false},
-    showPost:false, postContent:'',
-    showMoreMenu: false, showPostAd: false, adForm: { price: '', amount: '' },
-    showFilter: false, selectedPays: ['全部'],
-    showOrderModal: false, showOrderDetail: false, orderCNY: '', currentListing: null,
-    showHistory: false,
-    actSheet: null, showSet: false, showSubWallet: false,
-    activeChat:null, currentMessages:[], newMsg:'', socket:null, myId:'', myName:''
-  }),
-  computed: {
-    filteredListings() {
-      if (this.selectedPays.includes('全部') || this.selectedPays.length === 0) return this.listings;
-      return this.listings.filter(item => item.pays && item.pays.some(p => this.selectedPays.includes(p)));
+  data() {
+    return {
+      tab: 'chat',
+      user: JSON.parse(localStorage.getItem('user') || 'null'),
+      isReg: false,
+      authForm: { username: '', password: '' },
+      posts: [], listings: [], otherUsers: [],
+      showPost: false, postContent: '',
+      showPostAd: false, adForm: { price: '', amount: '' },
+      chatTarget: null, messages: [], newMsg: '', socket: null
     }
   },
-  mounted(){
-    if(!localStorage.getItem('my_chat_id')){
-      localStorage.setItem('my_chat_id','u_'+Date.now()+'_'+Math.floor(Math.random()*1000000));
-      localStorage.setItem('my_chat_name','用户'+Math.floor(Math.random()*1000000));
-    }
-    this.myId=localStorage.getItem('my_chat_id');
-    this.myName=localStorage.getItem('my_chat_name');
-    this.fetchUser(); this.fetchPosts(); this.fetchListings(); this.fetchChats();
+  mounted() {
+    if (this.user) this.initApp();
   },
-  methods:{
-    async fetchUser(){ try{ const r=await fetch('/api/user'); this.user=await r.json(); }catch{} },
-    async fetchPosts(){ try{ const r=await fetch('/api/posts'); this.posts=await r.json(); }catch{} },
-    async fetchListings(){ try{ const r=await fetch('/api/listings'); this.listings=await r.json(); }catch{} },
-    async fetchChats(){ try{ const r=await fetch('/api/chats'); this.chats=await r.json(); }catch{} },
-    
-    handleAvatarUpload(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      if (file.size > 2 * 1024 * 1024) { alert('图片太大了，请换小于2MB的图片'); return; }
-      const reader = new FileReader();
-      reader.onload = async (e) => {
-        try {
-          const res = await fetch('/api/user', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...this.user, avatar_url: e.target.result }) });
-          if(res.ok) { const data = await res.json(); this.user = data.user; }
-        } catch (err) {}
+  methods: {
+    async doAuth() {
+      const url = this.isReg ? '/api/register' : '/api/login';
+      const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(this.authForm) });
+      if (res.ok) {
+        const d = await res.json();
+        this.user = d.user; localStorage.setItem('user', JSON.stringify(d.user)); this.initApp();
+      } else { alert('账号密码错误或已存在'); }
+    },
+    initApp() {
+      this.fetchPosts(); this.fetchListings(); this.fetchUsers();
+      
+      this.socket = new WebSocket(`wss://${window.location.host}/ws`);
+      this.socket.onopen = () => this.socket.send(JSON.stringify({ type: 'auth', userId: this.user.id }));
+      this.socket.onmessage = (e) => {
+        const d = JSON.parse(e.data);
+        if ((d.type === 'receive' && d.message.sender_id === this.chatTarget?.id) || 
+            (d.type === 'sent' && d.message.receiver_id === this.chatTarget?.id)) {
+          this.messages.push(d.message);
+          this.scrollBottom();
+        }
       };
-      reader.readAsDataURL(file);
     },
-    async doKyc() {
-      if(confirm('进行实名认证？')) {
-        try {
-          const res = await fetch('/api/user', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...this.user, is_kyc: true }) });
-          if(res.ok) { const data = await res.json(); this.user = data.user; }
-        } catch (err) {}
-      }
-    },
+    async fetchUsers() { const r = await fetch(`/api/users/${this.user.id}`); this.otherUsers = await r.json(); },
+    async fetchPosts() { const r = await fetch('/api/posts'); this.posts = await r.json(); },
+    async fetchListings() { const r = await fetch('/api/listings'); this.listings = await r.json(); },
     async submitPost() {
-      if(!this.postContent.trim()) return;
-      try {
-        const res = await fetch('/api/posts', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ content: this.postContent }) });
-        if (res.ok) { this.showPost = false; this.postContent = ''; this.fetchPosts(); }
-      } catch (err) {}
+      if(!this.postContent) return;
+      await fetch('/api/posts', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ user_id: this.user.id, content: this.postContent }) });
+      this.showPost = false; this.postContent = ''; this.fetchPosts();
     },
     async submitAd() {
-      if(!this.adForm.price || !this.adForm.amount) { alert('请填写完整'); return; }
-      try {
-        const res = await fetch('/api/listings', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: this.user.username, price: Number(this.adForm.price), min: 100, max: 10000, pays: ['微信'] }) });
-        if (res.ok) { this.showPostAd = false; this.adForm = { price: '', amount: '' }; this.fetchListings(); }
-      } catch (err) {}
+      if(!this.adForm.price) return;
+      await fetch('/api/listings', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ user_id: this.user.id, name: this.user.username, price: this.adForm.price, min: 100, max: 50000, pays: ['微信'] }) });
+      this.showPostAd = false; this.adForm = { price: '', amount: '' }; this.fetchListings();
     },
-    openOrder(item){ this.currentListing = item; this.orderCNY = ''; this.showOrderModal = true; },
-    submitOrder(){ 
-      if(!this.orderCNY) { alert('请输入金额'); return; }
-      this.showOrderModal = false; this.showOrderDetail = true; 
+    async openChat(u) {
+      this.chatTarget = u;
+      const r = await fetch(`/api/messages/${this.user.id}/${u.id}`);
+      this.messages = await r.json(); this.scrollBottom();
     },
-    togglePay(pay) {
-      if (pay === '全部') { this.selectedPays = ['全部']; return; }
-      const index = this.selectedPays.indexOf(pay);
-      if (index > -1) this.selectedPays.splice(index, 1);
-      else { if (this.selectedPays.includes('全部')) this.selectedPays = []; this.selectedPays.push(pay); }
-      if (this.selectedPays.length === 0) this.selectedPays = ['全部'];
+    closeChat() { this.chatTarget = null; },
+    sendMsg() {
+      if(!this.newMsg.trim() || !this.socket) return;
+      this.socket.send(JSON.stringify({ type: 'send', sender_id: this.user.id, receiver_id: this.chatTarget.id, content: this.newMsg }));
+      this.newMsg = '';
     },
-    doSearch(){},
-    openChatDetail(chat){
-      this.activeChat=chat; this.currentMessages=[];
-      if(this.socket) this.socket.close();
-      this.socket=new WebSocket(WS_URL);
-      this.socket.onopen=()=>{ this.socket.send(JSON.stringify({type:'open_chat',chatId:chat.id})); };
-      this.socket.onmessage=(e)=>{
-        try{
-          const d=JSON.parse(e.data);
-          if(d.type==='chat_history' && d.chatId===chat.id){
-            this.currentMessages=d.messages; this.scrollToBottom();
-          }
-          if(d.type==='new_message' && d.chatId===chat.id){
-            this.currentMessages.push(d.message); this.scrollToBottom(); this.fetchChats(); 
-          }
-        }catch{}
+    scrollBottom() { this.$nextTick(() => { const box = document.getElementById('chatBox'); if(box) box.scrollTop = box.scrollHeight; }); },
+    contactSeller(item) {
+      const seller = this.otherUsers.find(u => u.id === item.user_id);
+      if(seller) this.openChat(seller);
+    },
+    async doKyc() {
+      if(confirm('实名认证？')) {
+        const r = await fetch(`/api/user/${this.user.id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...this.user, is_kyc: true }) });
+        if(r.ok) { this.user.is_kyc = true; localStorage.setItem('user', JSON.stringify(this.user)); }
+      }
+    },
+    handleAvatar(e) {
+      const file = e.target.files[0]; if(!file) return;
+      const reader = new FileReader();
+      reader.onload = async (ev) => {
+        const r = await fetch(`/api/user/${this.user.id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...this.user, avatar_url: ev.target.result }) });
+        if(r.ok) { const d = await r.json(); this.user.avatar_url = d.user.avatar_url; localStorage.setItem('user', JSON.stringify(this.user)); }
       };
-    },
-    closeChat(){ 
-      this.activeChat=null; 
-      if(this.socket){ this.socket.close(); this.socket=null; } 
-      this.fetchChats(); 
-    },
-    sendMessage(){
-      if(!this.newMsg.trim() || !this.socket || this.socket.readyState!==1) return;
-      const text=this.newMsg; this.newMsg='';
-      this.socket.send(JSON.stringify({ type:'send', chatId:this.activeChat.id, text:text, userId:this.myId, userName:this.myName }));
-    },
-    scrollToBottom() {
-      this.$nextTick(() => {
-        const container = document.getElementById('chatScrollArea');
-        if(container) container.scrollTop = container.scrollHeight;
-      });
+      reader.readAsDataURL(file);
     }
   }
 }).mount('#app');
