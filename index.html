@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>Web3 P2P</title>
-<!-- 换了国内极度稳定的镜像源，保证秒开 -->
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.staticfile.net/vue/3.3.4/vue.global.prod.js"></script>
 <style>
@@ -52,12 +51,7 @@ svg { max-width: 100%; max-height: 100%; }
       <button class="p-2 -m-2"><svg class="w-6 h-6 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg></button>
     </div>
   </div>
-  
-  <div class="flex gap-2 px-4 pb-2 overflow-x-auto">
-    <div v-for="g in ['全部','未读','群组']" :key="g" class="px-4 py-1.5 rounded-full text-sm font-bold bg-[#121212] text-gray-400">{{g}}</div>
-  </div>
-
-  <div class="px-2">
+  <div class="px-2 mt-2">
     <div class="flex items-center px-3 py-1.5 active:bg-[#121212] transition-colors cursor-pointer" @click="activeChat = {name: '官方 P2P 交流大群', avatarText: '群'}">
       <div class="w-[52px] h-[52px] bg-gradient-to-tr from-gray-700 to-gray-600 rounded-[14px] flex items-center justify-center text-xl mr-3 flex-shrink-0 shadow-sm relative">
         <span>群</span>
@@ -69,18 +63,6 @@ svg { max-width: 100%; max-height: 100%; }
           <span class="text-[11px] text-gray-500 flex-shrink-0">08:55</span>
         </div>
         <div class="text-[13px] text-gray-400 truncate">张三: 收一点USDT</div>
-      </div>
-    </div>
-    <div class="flex items-center px-3 py-1.5 active:bg-[#121212] transition-colors cursor-pointer" @click="activeChat = {name: '在线客服', avatarText: '客'}">
-      <div class="w-[52px] h-[52px] bg-gradient-to-tr from-gray-700 to-gray-600 rounded-[14px] flex items-center justify-center text-xl mr-3 flex-shrink-0 shadow-sm relative">
-        <span>客</span>
-      </div>
-      <div class="flex-1 min-w-0 h-[52px] flex flex-col justify-center border-b border-[#1a1a1a]">
-        <div class="flex justify-between items-center mb-1">
-          <span class="font-bold text-[15px] text-gray-100 truncate pr-2">在线客服</span>
-          <span class="text-[11px] text-gray-500 flex-shrink-0">昨天</span>
-        </div>
-        <div class="text-[13px] text-gray-400 truncate">您好，请问有什么可以帮您？</div>
       </div>
     </div>
   </div>
@@ -294,12 +276,13 @@ createApp({
         if (res.ok) {
           alert('发布成功');
           this.showPostAd = false;
-          this.fetchListings(); // 重新拉取
+          this.fetchListings(); 
         } else {
-          alert('后端报错，发布失败');
+          const errData = await res.json();
+          alert('数据库报错：' + (errData.error || '未知错误'));
         }
       } catch (err) {
-        alert('网络错误，发布失败');
+        alert('网络连接错误');
       }
     },
     submitOrder() { alert('下单成功'); this.showOrderModal = false; },
