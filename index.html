@@ -20,17 +20,21 @@ body{background:#000;color:#fff;font-family:-apple-system,sans-serif;-webkit-tap
 .up-enter-active,.up-leave-active{transition:transform .3s}.up-enter-from,.up-leave-to{transform:translateY(100%)}
 .slide-enter-active,.slide-leave-active{transition:transform .3s}.slide-enter-from,.slide-leave-to{transform:translateX(100%)}
 .tgl:checked{right:0;border-color:#E6C875}.tgl:checked+.tgl-lbl{background:#E6C875}.tgl{right:0;z-index:1;border-color:#4a4a4a;transition:.3s}.tgl-lbl{background:#333;transition:.3s}
+.input-box{background:#1c1c1e;border-radius:12px;padding:12px;width:100%;outline:none;color:#fff;font-size:14px;margin-bottom:12px}
 [v-cloak] { display: none; }
 svg { max-width: 100%; max-height: 100%; }
+/* 去掉列表的线框，纯靠排版 */
+.list-item { border-bottom: 1px solid #1a1a1a; padding: 16px; }
+.list-item:last-child { border-bottom: none; }
 </style>
 </head>
 <body>
 <div id="app" v-cloak class="max-w-md mx-auto h-screen flex flex-col relative overflow-hidden">
-<header v-if="tab!=='wallet'" class="px-4 py-3 flex justify-between sticky top-0 z-10 bg-black/90">
+<header v-if="tab!=='wallet' && !showSet" class="px-4 py-3 flex justify-between sticky top-0 z-10 bg-black/90">
 <div class="text-lg font-bold">{{tab==='chat'?'微信':(tab==='community'?'社区':'交易')}}</div>
 </header>
 <main class="flex-1 overflow-y-auto pb-20">
-<!-- 1. 聊天(微信排版) -->
+<!-- 1. 聊天 -->
 <div v-show="tab==='chat'" class="pt-2">
   <div class="card neon-line flex items-center p-3 mb-2 mx-2 rounded-xl">
     <div class="w-12 h-12 bg-[#1c1c1e] rounded-lg flex items-center justify-center text-xl mr-3">群</div>
@@ -40,7 +44,6 @@ svg { max-width: 100%; max-height: 100%; }
     </div>
   </div>
 </div>
-
 <!-- 2. 社区 -->
 <div v-show="tab==='community'" class="relative">
   <div class="flex justify-around items-center px-4 py-2 border-b border-[#1a1a1a] sticky top-0 bg-black z-10">
@@ -54,7 +57,6 @@ svg { max-width: 100%; max-height: 100%; }
       </div>
       <p class="text-sm text-gray-200 mb-3">今天收了一点USDT，有需要的老板联系我。支持担保交易！</p>
       <div class="w-full h-32 bg-[#1a1a1a] rounded-lg flex items-center justify-center text-gray-600 mb-3">图片/视频占位</div>
-      <div class="flex gap-4 text-gray-500 text-xs"><span>👍 12</span><span>💬 3</span><span>🔗 分享</span></div>
     </div>
   </div>
   <div v-show="comTab==='行情'" class="p-4"><div class="card p-4 text-center text-gray-500 text-sm">行情模块开发中...</div></div>
@@ -62,12 +64,15 @@ svg { max-width: 100%; max-height: 100%; }
   <button @click="showPost=true" class="fixed bottom-24 right-4 w-14 h-14 bg-neon text-black rounded-full shadow-[0_0_15px_rgba(197,255,50,0.4)] flex items-center justify-center z-20 active:scale-95 transition"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg></button>
 </div>
 
-<!-- 3. 交易(P2P) -->
+<!-- 3. 交易(重构极简版) -->
 <div v-show="tab==='trade'" class="p-4">
+  <!-- 顶部切换 -->
   <div class="flex bg-[#121212] rounded-full p-1 mb-6">
     <div @click="tradeType='buy'" class="flex-1 text-center py-2 rounded-full font-bold transition-colors" :class="tradeType==='buy'?'bg-gold text-black':'text-gray-400'">买入</div>
     <div @click="tradeType='sell'" class="flex-1 text-center py-2 rounded-full font-bold transition-colors" :class="tradeType==='sell'?'bg-gold text-black':'text-gray-400'">卖出</div>
   </div>
+  
+  <!-- 筛选标签 -->
   <div class="flex gap-2 overflow-x-auto mb-4 pb-1">
     <button class="px-4 py-1.5 bg-[#1c1c1e] rounded-full text-xs text-white whitespace-nowrap border border-gray-700">全部</button>
     <button class="px-4 py-1.5 bg-[#1c1c1e] rounded-full text-xs text-gray-400 whitespace-nowrap">微信</button>
@@ -75,60 +80,66 @@ svg { max-width: 100%; max-height: 100%; }
     <button class="px-4 py-1.5 bg-[#1c1c1e] rounded-full text-xs text-gray-400 whitespace-nowrap">银行卡</button>
     <button class="px-4 py-1.5 bg-[#1c1c1e] rounded-full text-xs text-gray-400 whitespace-nowrap">礼品卡</button>
   </div>
-  <div class="text-xs text-gray-500 mb-2">币种：USDT (TRC20)</div>
+  <div class="text-[11px] text-gray-500 mb-3 px-1">币种：USDT (TRC20)</div>
   
-  <div class="card p-4 mb-3" v-for="i in 3" :key="i">
-    <div class="flex justify-between items-center mb-3">
-      <div class="flex items-center gap-2"><div class="w-6 h-6 bg-gray-700 rounded-full"></div><span class="font-bold text-sm">商家_{{i}}</span></div>
-      <div class="text-xs text-gray-500">成交 1024 | 99%</div>
+  <!-- 模仿排版的商家列表 -->
+  <div class="bg-[#121212] rounded-2xl overflow-hidden">
+    <!-- 单个商家卡片 -->
+    <div class="list-item" v-for="i in 4" :key="i">
+      
+      <!-- 第一行：头像、名字、右侧数据 -->
+      <div class="flex justify-between items-center mb-2">
+        <div class="flex items-center gap-2">
+          <div class="w-7 h-7 bg-gradient-to-tr from-blue-900 to-black rounded-full flex items-center justify-center text-[10px] text-white">商</div>
+          <span class="font-bold text-[15px] text-gray-100">认证商家_{{i}}</span>
+        </div>
+        <div class="text-xs text-gray-500 flex items-center gap-1">
+          <span class="text-gray-400">📄</span> 1,024 &nbsp;|&nbsp; <span class="text-gray-400">🤝</span> 99.8%
+        </div>
+      </div>
+
+      <!-- 第二行：大额度、限额、右侧按钮 -->
+      <div class="flex justify-between items-end mt-3">
+        <div>
+          <div class="text-xl font-bold text-gray-200 mb-1">15,000.00 <span class="text-xs font-normal text-gray-500">USDT</span></div>
+          <div class="text-[13px] text-gray-500">限额: 100.00 - 5,000.00 CNY</div>
+        </div>
+        <button v-if="i===1" class="bg-[#1c1c1e] text-neon border border-neon/30 px-5 py-2 rounded-lg text-[13px] font-bold active:scale-95 transition">交易前需 KYC</button>
+        <button v-else class="bg-neon text-black px-6 py-2 rounded-lg text-[14px] font-bold active:scale-95 transition">{{tradeType==='buy'?'购买':'出售'}}</button>
+      </div>
+
+      <!-- 第三行：支付方式 -->
+      <div class="mt-4 flex items-center gap-2 text-[12px] text-gray-400">
+        <div class="w-0.5 h-3 bg-gold"></div>
+        <span v-if="i===1">微信支付</span>
+        <span v-else-if="i===2">支付宝</span>
+        <span v-else-if="i===3">银行卡转账</span>
+        <span v-else>礼品卡交易</span>
+      </div>
+
     </div>
-    <div class="flex justify-between items-end mb-4">
-      <div><div class="text-xs text-gray-500">单价</div><div class="text-lg font-bold text-neon">¥ 7.25</div></div>
-      <div class="text-right"><div class="text-xs text-gray-500">限额</div><div class="text-sm">¥100 - ¥50,000</div></div>
-    </div>
-    <div class="flex gap-1 mb-4"><span class="text-[10px] bg-[#222] text-gray-300 px-2 py-0.5 rounded">微信</span><span class="text-[10px] bg-[#222] text-gray-300 px-2 py-0.5 rounded">支付宝</span></div>
-    <button class="w-full py-2 rounded-xl font-bold text-sm" :class="tradeType==='buy'?'bg-gold text-black':'bg-neon text-black'">{{tradeType==='buy'?'购买 USDT':'出售 USDT'}}</button>
   </div>
 </div>
 
 <!-- 4. 钱包 -->
 <div v-show="tab==='wallet'" class="px-5 pt-8 pb-6">
 <div class="flex justify-between items-start mb-6">
-<div class="flex items-center gap-2">
-<div class="w-6 h-6 bg-green-400 rounded-md text-black flex items-center justify-center text-xs font-bold">X</div>
-<span class="text-lg font-bold text-neon">XILI ▾</span>
+  <div class="flex items-center gap-2"><div class="w-6 h-6 bg-green-400 rounded-md text-black flex items-center justify-center text-xs font-bold">X</div><span class="text-lg font-bold text-neon">XILI ▾</span></div>
+  <svg @click="showSet=true" class="w-6 h-6 text-gray-400 cursor-pointer" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><circle cx="12" cy="12" r="3" stroke-width="2"/></svg>
 </div>
-<!-- 这里加回设置齿轮 -->
-<svg @click="showSet=true" class="w-6 h-6 text-gray-400 active:rotate-90 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><circle cx="12" cy="12" r="3" stroke-width="2"/></svg>
-</div>
-<div class="mb-8 relative">
-<div class="text-[56px] font-bold leading-none tracking-tight">$0.00</div>
-<div class="text-sm text-gray-400 mt-2">成交 1,024 笔 &nbsp; | &nbsp; 成交率 99.8%</div>
-<div class="absolute right-0 top-4 w-24 h-2 pixel-bar opacity-80"></div>
-</div>
+<div class="mb-8 relative"><div class="text-[56px] font-bold leading-none tracking-tight">$0.00</div><div class="text-sm text-gray-400 mt-2">成交 1,024 笔 &nbsp; | &nbsp; 成交率 99.8%</div><div class="absolute right-0 top-4 w-24 h-2 pixel-bar opacity-80"></div></div>
 <div class="flex justify-between px-2 mb-8">
 <div @click="actSheet='发送'" class="flex flex-col items-center gap-2"><div class="w-16 h-16 glass-bubble"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2.5" d="M8 7l4-4m0 0l4 4m-4-4v18"/></svg></div><span class="text-xs text-gray-300">发送</span></div>
 <div @click="actSheet='接收'" class="flex flex-col items-center gap-2"><div class="w-16 h-16 glass-bubble"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2.5" d="M16 17l-4 4m0 0l-4-4m4 4V3"/></svg></div><span class="text-xs text-gray-300">接收</span></div>
 <div @click="actSheet='明细'" class="flex flex-col items-center gap-2"><div class="w-16 h-16 glass-bubble"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg></div><span class="text-xs text-gray-300">明细</span></div>
 <div @click="actSheet='更多'" class="flex flex-col items-center gap-2"><div class="w-16 h-16 glass-bubble"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2.5" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg></div><span class="text-xs text-gray-300">更多</span></div>
 </div>
-<div class="bg-[#1c1c1e] rounded-[24px] p-6 relative overflow-hidden mb-6">
-<div class="relative z-10">
-<div class="text-sm font-bold text-neon mb-1">开始使用</div>
-<div class="text-2xl font-bold mb-2">开始 P2P 交易</div>
-<div class="text-sm text-gray-400 mb-6">买卖 USDT，安全快捷。</div>
-<div class="flex gap-3"><button class="flex-1 bg-neon text-black font-bold py-3.5 rounded-full">买入</button><button class="flex-1 bg-[#2c2c2e] font-bold py-3.5 rounded-full">卖出</button></div>
-</div>
-</div>
-<div class="mt-4">
-    <div class="text-sm font-bold text-gray-400 mb-4 px-1">交易记录</div>
-    <div class="flex flex-col items-center justify-center py-8 opacity-60">
-        <div class="text-4xl mb-3">📭</div><div class="text-sm text-gray-500">还没有记录，开始交易吧</div>
-    </div>
-</div>
+<div class="bg-[#1c1c1e] rounded-[24px] p-6 relative overflow-hidden mb-6"><div class="relative z-10"><div class="text-sm font-bold text-neon mb-1">开始使用</div><div class="text-2xl font-bold mb-2">开始 P2P 交易</div><div class="text-sm text-gray-400 mb-6">买卖 USDT，安全快捷。</div><div class="flex gap-3"><button class="flex-1 bg-neon text-black font-bold py-3.5 rounded-full">买入</button><button class="flex-1 bg-[#2c2c2e] font-bold py-3.5 rounded-full">卖出</button></div></div></div>
+<div class="mt-4"><div class="text-sm font-bold text-gray-400 mb-4 px-1">交易记录</div><div class="flex flex-col items-center justify-center py-8 opacity-60"><div class="text-4xl mb-3">📭</div><div class="text-sm text-gray-500">还没有记录，开始交易吧</div></div></div>
 </div>
 </main>
 
+<!-- 底部导航 -->
 <nav class="absolute bottom-0 w-full bg-black flex justify-around py-3 pb-6 z-20">
 <button @click="tab='chat'" :class="tab==='chat'?'text-gold':'text-gray-600'" class="flex flex-col items-center gap-1"><span class="text-xl">💬</span><span class="text-[10px]">聊天</span></button>
 <button @click="tab='community'" :class="tab==='community'?'text-gold':'text-gray-600'" class="flex flex-col items-center gap-1"><span class="text-xl">🌍</span><span class="text-[10px]">社区</span></button>
@@ -136,62 +147,26 @@ svg { max-width: 100%; max-height: 100%; }
 <button @click="tab='wallet'" :class="tab==='wallet'?'text-gold':'text-gray-600'" class="flex flex-col items-center gap-1"><span class="text-xl">👛</span><span class="text-[10px]">钱包</span></button>
 </nav>
 
-<!-- 设置页面 (全屏滑入) -->
+<!-- 设置全屏页 (省略细节，保留之前功能) -->
 <transition name="slide">
-<div v-if="showSet" class="absolute inset-0 z-50 bg-black flex flex-col">
-  <header class="px-4 py-3 flex items-center gap-3 bg-black border-b border-gray-800">
-    <button @click="showSet=false" class="text-gray-300 active:opacity-50 flex items-center">＜ 返回</button>
-    <div class="text-lg font-bold flex-1 text-center pr-10">设置</div>
-  </header>
+<div v-if="showSet" class="absolute inset-0 z-40 bg-black flex flex-col">
+  <header class="px-4 py-3 flex items-center gap-3 bg-black border-b border-gray-800"><button @click="showSet=false" class="text-gray-300 flex items-center">＜ 返回</button><div class="text-lg font-bold flex-1 text-center pr-10">设置</div></header>
   <main class="flex-1 overflow-y-auto p-4 space-y-4 pb-20">
-    <div class="card p-2">
-      <div class="flex justify-between p-4 border-b border-[#222]"><div class="font-bold">编辑个人资料</div><div class="text-gray-500">头像/密码 ＞</div></div>
-      <div class="flex justify-between p-4"><div class="font-bold">个人介绍</div><div class="text-gray-500">签名 ＞</div></div>
-    </div>
-    <div class="text-xs text-gray-500 px-2 pt-2">隐私与安全</div>
-    <div class="card p-2">
-      <div class="flex justify-between p-4 border-b border-[#222]"><div>拉黑用户</div><div class="text-gray-500">＞</div></div>
-      <div class="flex justify-between p-4 border-b border-[#222]"><div>谁可以私信我</div><div class="text-gray-500">所有人 ＞</div></div>
-      <div class="flex justify-between p-4 border-b border-[#222]"><div>谁可以邀请我进群</div><div class="text-gray-500">所有人 ＞</div></div>
-      <div class="flex justify-between p-4"><div>公开我的资产</div><label class="relative flex items-center cursor-pointer"><input type="checkbox" class="tgl absolute w-6 h-6 rounded-full bg-white appearance-none cursor-pointer"><span class="tgl-lbl block h-6 rounded-full w-11"></span></label></div>
-    </div>
-    <div class="text-xs text-gray-500 px-2 pt-2">基础设置</div>
-    <div class="card p-2">
-      <div class="flex justify-between p-4 border-b border-[#222]"><div>语言设置</div><div class="text-gray-500">跟随系统 ＞</div></div>
-      <div class="flex justify-between p-4 border-b border-[#222]"><div>主题设置</div><div class="text-gray-500">纯黑 ＞</div></div>
-      <div class="flex justify-between p-4"><div>消息提醒</div><label class="relative flex items-center cursor-pointer"><input type="checkbox" checked class="tgl absolute w-6 h-6 rounded-full bg-white appearance-none cursor-pointer"><span class="tgl-lbl block h-6 rounded-full w-11"></span></label></div>
-    </div>
-    <div class="card p-2">
-      <div class="flex justify-between p-4 border-b border-[#222]"><div>关于我们</div><div class="text-gray-500">＞</div></div>
-      <div class="flex justify-between p-4"><div>检测更新</div><div class="text-gray-500">v1.0.0</div></div>
-    </div>
+    <div class="card p-2"><div @click="setAction='profile'" class="flex justify-between p-4 border-b border-[#222]"><div class="font-bold">编辑个人资料</div><div class="text-gray-500">＞</div></div></div>
   </main>
 </div>
 </transition>
 
 <!-- 发布动态弹窗 -->
-<transition name="fade"><div v-if="showPost" class="absolute inset-0 z-50 bg-black/80 backdrop-blur" @click="showPost=false">
-<transition name="up"><div class="absolute bottom-0 w-full bg-[#121212] rounded-t-2xl p-5" @click.stop>
-<div class="flex justify-between mb-4"><h3 class="font-bold">发布动态</h3><button @click="showPost=false" class="text-gray-500">取消</button></div>
-<textarea class="w-full bg-[#1c1c1e] rounded-xl p-3 text-sm outline-none" rows="4" placeholder="分享你的交易心得...（普通用户每日限发1条，VIP无限制）"></textarea>
-<div class="flex gap-4 mt-4 text-gray-400"><span>📷 图片</span><span>🎥 视频</span><span>🔗 链接</span></div>
-<button class="w-full mt-6 bg-gold text-black font-bold py-3 rounded-full">立即发布</button>
-</div></transition>
-</div></transition>
+<transition name="fade"><div v-if="showPost" class="absolute inset-0 z-50 bg-black/80 backdrop-blur" @click="showPost=false"><transition name="up"><div class="absolute bottom-0 w-full bg-[#121212] rounded-t-2xl p-5" @click.stop><div class="flex justify-between mb-4"><h3 class="font-bold">发布动态</h3><button @click="showPost=false" class="text-gray-500">取消</button></div><textarea class="w-full bg-[#1c1c1e] rounded-xl p-3 text-sm outline-none" rows="4" placeholder="分享你的交易心得..."></textarea><button class="w-full mt-6 bg-gold text-black font-bold py-3 rounded-full">立即发布</button></div></transition></div></transition>
 
-<!-- 钱包延伸功能弹窗 -->
-<transition name="fade"><div v-if="actSheet" class="absolute inset-0 z-50 bg-black/80 backdrop-blur" @click="actSheet=null">
-<transition name="up"><div class="absolute bottom-0 w-full bg-[#121212] rounded-t-2xl p-5" @click.stop>
-<div class="flex justify-between mb-4"><h3 class="font-bold">{{actSheet}}功能</h3><button @click="actSheet=null" class="text-gray-500">关闭</button></div>
-<div class="text-sm text-gray-400 py-10 text-center">这里是【{{actSheet}}】的延伸功能区域，后续可接入实际表单。</div>
-<button @click="actSheet=null" class="w-full bg-neon text-black font-bold py-3 rounded-full mt-2">我知道了</button>
-</div></transition>
-</div></transition>
+<!-- 弹窗底 -->
+<transition name="fade"><div v-if="actSheet" class="absolute inset-0 z-50 bg-black/80 backdrop-blur" @click="actSheet=null"><transition name="up"><div class="absolute bottom-0 w-full bg-[#121212] rounded-t-2xl p-5" @click.stop><div class="flex justify-between mb-4"><h3 class="font-bold">{{actSheet}}</h3><button @click="actSheet=null" class="text-gray-500">关闭</button></div><div class="text-sm text-gray-400 py-10 text-center">这里是【{{actSheet}}】的界面。</div><button @click="actSheet=null" class="w-full bg-neon text-black font-bold py-3 rounded-full">我知道了</button></div></transition></div></transition>
 
 </div>
 <script>
 const {createApp}=Vue;
-createApp({data:()=>({tab:'wallet',comTab:'动态',tradeType:'buy',showPost:false,actSheet:null,showSet:false})}).mount('#app');
+createApp({data:()=>({tab:'trade',comTab:'动态',tradeType:'buy',showPost:false,actSheet:null,showSet:false,setAction:null})}).mount('#app');
 </script>
 </body>
 </html>
