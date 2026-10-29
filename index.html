@@ -214,13 +214,22 @@ createApp({
     if (this.user) this.initApp();
   },
   methods: {
-    async doAuth() {
+async doAuth() {
+      if(!this.authForm.username || !this.authForm.password) {
+        alert('请填写账号和密码'); return;
+      }
       const url = this.isReg ? '/api/register' : '/api/login';
-      const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(this.authForm) });
-      if (res.ok) {
+      try {
+        const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(this.authForm) });
         const d = await res.json();
-        this.user = d.user; localStorage.setItem('user', JSON.stringify(d.user)); this.initApp();
-      } else { alert('账号密码错误或已存在'); }
+        if (res.ok) {
+          this.user = d.user; localStorage.setItem('user', JSON.stringify(d.user)); this.initApp();
+        } else { 
+          alert('真实的报错信息：' + (d.error || '服务器内部错误')); 
+        }
+      } catch (err) {
+        alert('网络彻底断了，连不上服务器');
+      }
     },
     initApp() {
       this.fetchPosts(); this.fetchListings(); this.fetchUsers();
